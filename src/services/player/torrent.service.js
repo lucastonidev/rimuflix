@@ -1,103 +1,67 @@
-// src/services/torrent/torrent.service.js
-import { searchTorrents as searchBitsearch } from "../torrent/bitsearch.service.js";
+// src/services/player/torrent.service.js
+import { searchAPIBay } from "../torrent/apibay.service.js";
 import { searchEZTV } from "../torrent/eztv.service.js";
-import { tmdbGet } from "../tmdb/tmdb.client.js";
 
-const pad = (num) => String(num).padStart(2, "0");
+// Função fictícia pra você substituir pela sua importação real do TMDB
+import { getMediaData } from "../tmdb/details.service.js";
 
-/**
- * Busca os detalhes do TMDB incluindo os External IDs (IMDB ID)
- */
-async function getMediaWithExternalIds(type, id) {
-  const media = await tmdbGet(`/${type}/${id}`);
-  const externalIds = await tmdbGet(`/${type}/${id}/external_ids`).catch(
-    () => ({}),
-  );
+export async function getTorrentsForMedia(type, tmdbId, season, episode) {
+  // 1. Pega o nome do filme/série original lá do TMDB
+  const tmdbData = await getMediaData(type, tmdbId);
+  const mediaTitle =
+    tmdbData.original_title ||
+    tmdbData.original_name ||
+    tmdbData.title ||
+    tmdbData.name;
 
-  return {
-    ...media,
-    imdb_id: externalIds.imdb_id || media.imdb_id,
-  };
-}
-
-/**
- * Busca torrents com fallback dinâmico entre provedores
- */
-export async function getTorrentsForMedia(
-  type,
-  id,
-  season = null,
-  episode = null,
-) {
-  const media = await getMediaWithExternalIds(type, id);
-  if (!media) throw new Error("Mídia não encontrada no TMDB");
-
-  const title = media.title || media.name;
-  const imdbId = media.imdb_id;
-  const year = (media.release_date || media.first_air_date || "").split("-")[0];
-
-  const providers = [];
-
-  if (type === "tv" && imdbId) {
-    providers.push({
-      name: "EZTV",
-      fetch: () => searchEZTV(imdbId, season, episode),
-    });
+  let searchQuery = mediaTitle;
+  if (type === "tv" && season && episode) {
+    const s = String(season).padStart(2, "0");
+    const e = String(episode).padStart(2, "0");
+    searchQuery = `${mediaTitle} s${s}e${e}`;
   }
 
-  providers.push({
-    name: "Bitsearch",
-    fetch: async () => {
-      let query = title;
-      if (type === "tv" && season && episode) {
-        query = `${title} S${pad(season)}E${pad(episode)}`;
-      } else if (year) {
-        query = `${title} ${year}`;
+  console.log(`[Torrent] Buscando por: "${searchQuery}"...`);
+
+  // 2. Monta as buscas que vão rodar (EZTV só se for série)
+  const promises = [{ name: "APIBay", promise: searchAPIBay(searchQuery) }];
+
+  if (type === "tv") {
+    promises.push({ name: "EZTV", promise: searchEZTV(searchQuery) });
+  }
+ 
+
+  // 3. Roda tudo em paralelo sem deixar que uma derrube a outra
+  const results = await Promise.allSettled(promises.map((p) => p.promise));
+
+  let allTorrents = [];
+  let apisOnline = 0;
+  let errosCriticos = [];
+
+  results.forEach((res, index) => {
+    const providerName = promises[index].name;
+
+    if (res.status === "fulfilled") {
+      apisOnline++; // A API respondeu com sucesso (seja com torrents ou vazia)
+      if (res.value.length > 0) {
+        allTorrents.push(...res.value);
       }
-
-      const res = await searchBitsearch(query, 10, "seeders");
-      if (!res?.results?.length) return [];
-
-      return res.results.map((t) => ({
-        title: t.title,
-        size: t.size,
-        seeders: t.seeders || 0,
-        leechers: t.leechers || 0,
-        magnet: t.magnet || `magnet:?xt=urn:btih:${t.infohash}`,
-        id: t.id || t.infohash,
-        source: "Bitsearch",
-      }));
-    },
-  });
-
-  let accumulatedTorrents = [];
-
-  for (const provider of providers) {
-    console.log(`[Torrent Resilience] Testando provedor: ${provider.name}...`);
-    try {
-      const results = await provider.fetch();
-      if (results && results.length > 0) {
-        console.log(
-          `[Torrent Resilience] ✅ Sucesso no ${provider.name} (${results.length} resultados)`,
-        );
-        accumulatedTorrents.push(...results);
-        break;
-      }
+    } else {
+      // A API deu erro feio (fetch failed, timeout)
+      errosCriticos.push(`${providerName}: ${res.reason.message}`);
       console.warn(
-        `[Torrent Resilience] ⚠️ ${provider.name} respondeu, mas sem resultados.`,
-      );
-    } catch (err) {
-      console.error(
-        `[Torrent Resilience] ❌ ${provider.name} CAIU ou falhou: ${err.message}. Tentando próxima fonte...`,
+        `[Torrent Resilience] ❌ ${providerName} CAIU:`,
+        res.reason.message,
       );
     }
-  }
+  });
 
-  if (accumulatedTorrents.length === 0) {
+  // 4. Inteligência: Só consideramos falha catastrófica se TODAS as APIs caírem
+  if (apisOnline === 0) {
     throw new Error(
-      "Todas as fontes de torrent (EZTV, Bitsearch) falharam ou não encontraram o arquivo.",
+      `CRITICAL: Todas as fontes de torrent estão offline. Detalhes: ${errosCriticos.join(" | ")}`,
     );
   }
 
-  return accumulatedTorrents.sort((a, b) => b.seeders - a.seeders);
+  return allTorrents.sort((a, b) => b.seeders - a.seeders);
 }

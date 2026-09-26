@@ -1,3 +1,4 @@
+// src/controllers/player/torrent.controller.js
 import { getTorrentsForMedia } from "../../services/player/torrent.service.js";
 
 export const getTorrentForMedia = async (req, res) => {
@@ -11,55 +12,21 @@ export const getTorrentForMedia = async (req, res) => {
         .json({ success: false, error: "Tipo de mídia inválido." });
     }
 
+    // Chama o serviço inteligente
     const torrents = await getTorrentsForMedia(type, id, season, episode);
 
+    // Retorna 200 OK. O Front-end já está preparado para lidar com data vazio (length === 0)
     return res.status(200).json({
       success: true,
-      data: torrents, // Retorna o array de torrents
+      data: torrents,
     });
   } catch (error) {
-    console.error("[Torrent Controller] Erro:", error);
-    return res.status(500).json({
+    // Cai aqui APENAS se TODAS as APIs estiverem offline simultaneamente (Erro Crítico)
+    console.error("\n[Torrent Controller] Falha Geral:", error.message);
+    return res.status(502).json({
+      // 502 Bad Gateway indica que nossos serviços externos caíram
       success: false,
-      error: error.message || "Erro interno ao buscar torrent.",
+      error: "No momento, nossos provedores de torrent estão offline.",
     });
   }
-};
-
-export const testTorrentSources = async (req, res) => {
-  const status = {
-    eztv: { status: "unknown", latency: null },
-    bitsearch: { status: "unknown", latency: null },
-  };
-
-  // Teste do EZTV
-  try {
-    const start = Date.now();
-    const response = await fetch("https://eztv1.xyz/api/get-torrents?limit=1", {
-      signal: AbortSignal.timeout(4000),
-    });
-    status.eztv = {
-      status: response.ok ? "ONLINE" : "ERROR",
-      latency: `${Date.now() - start}ms`,
-    };
-  } catch (e) {
-    status.eztv = { status: "OFFLINE", error: e.message };
-  }
-
-  // Teste do Bitsearch
-  try {
-    const start = Date.now();
-    const response = await fetch(
-      "https://bitsearch.eu/api/v1/search?q=test&limit=1",
-      { signal: AbortSignal.timeout(4000) },
-    );
-    status.bitsearch = {
-      status: response.ok ? "ONLINE" : "ERROR",
-      latency: `${Date.now() - start}ms`,
-    };
-  } catch (e) {
-    status.bitsearch = { status: "OFFLINE", error: e.message };
-  }
-
-  return res.status(200).json({ success: true, sources: status });
 };

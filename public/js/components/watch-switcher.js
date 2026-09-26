@@ -28,6 +28,16 @@ export class WatchSwitcher {
     const playerSwitcher = document.getElementById("playerSwitcher");
     if (!playerSwitcher) return;
 
+    // 👇 LÓGICA NOVA: Injeta o botão de Torrent nativo caso ele não venha da API de provedores
+    const hasTorrent = this.players.some((p) => p.type === "Torrent");
+    if (!hasTorrent) {
+      this.players.push({
+        title: "Torrent (P2P)",
+        type: "Torrent",
+        icon: '<i class="fa-solid fa-magnet" style="color: #3b82f6;"></i>',
+      });
+    }
+
     playerSwitcher.classList.add("player-switcher");
     playerSwitcher.innerHTML = `
       <div class="player-switcher__header" id="playerSwitcherHeader">
@@ -49,8 +59,11 @@ export class WatchSwitcher {
       btn.className = `player-option ${index === 0 ? "active" : ""}`;
 
       if (player.type === "Torrent") {
+        // Renderiza o botão nativo do Torrent usando o ícone do FontAwesome
         btn.innerHTML = `
-          <div class="player-option__icon" data-type="${player.title.toLowerCase()}" title="${player.title}">${player.icon}</div>
+          <div class="player-option__icon" data-type="torrent" title="${player.title}">
+            ${player.icon}
+          </div>
           ${player.title}
         `;
         btn.dataset.url = "";
@@ -59,6 +72,7 @@ export class WatchSwitcher {
         return;
       }
 
+      // Renderiza os botões normais de Embed
       btn.innerHTML = `<img class="player-option__icon" src="${player.icon}" alt="${player.title}" /> ${player.title}`;
       btn.dataset.url = player.embed;
       btn.dataset.type = "iframe";
@@ -100,48 +114,120 @@ export class WatchSwitcher {
   }
 
   async playTorrent() {
+    // 1. Define onde o menu/player vai aparecer
+    const container =
+      document.querySelector(".watch-player") ||
+      document.getElementById("watchFrame")?.parentElement;
+
+    if (!container) return;
+
     try {
+      // 2. Mostra estado de carregamento inteligente na tela
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; background: #050505; color: var(--text-secondary); min-height: 400px;">
+          <i class="fa-solid fa-magnet fa-beat-fade fa-3x" style="color: #3b82f6; margin-bottom: 20px;"></i>
+          <h3 style="font-size: 1.2rem; color: #fff;">Buscando as melhores opções...</h3>
+          <p style="font-size: 0.9rem; margin-top: 8px;">Isso pode levar alguns segundos.</p>
+        </div>
+      `;
+
       let url = `/api/v1/torrent/${this.type}/${this.id}`;
-      if (this.type === "tv")
+      if (this.type === "tv") {
         url += `?season=${this.tv.currentSeason}&episode=${this.tv.currentEpisode}`;
+      }
 
       const response = await fetch(url);
       const data = await response.json();
 
+      // 3. Validação caso não encontre nada
       if (!data.success || !data.data || data.data.length === 0) {
-        alert("Nenhum torrent encontrado.");
+        container.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; background: #050505; color: #ef4444; min-height: 400px;">
+            <i class="fa-solid fa-triangle-exclamation fa-3x" style="margin-bottom: 20px;"></i>
+            <h3 style="color: #fff; margin-bottom: 10px;">Nenhum torrent encontrado.</h3>
+            <p style="color: var(--text-secondary);">Tente usar os provedores normais no menu abaixo.</p>
+          </div>
+        `;
         return;
       }
 
-      const torrentList = data.data;
-      let currentIndex = 0;
+      // 4. Inteligência: Ordena os torrents pelo número de Seeders (Semeadores) decrescente
+      const torrentList = data.data.sort(
+        (a, b) => (b.seeders || 0) - (a.seeders || 0),
+      );
 
-      const tryNextTorrent = async () => {
-        if (currentIndex >= torrentList.length) {
-          alert("Todos os torrents disponíveis falharam.");
-          return;
-        }
-
-        const torrent = torrentList[currentIndex];
-        const container =
-          document.querySelector(".watch-player") ||
-          document.getElementById("watchFrame")?.parentElement;
-
-        if (container) {
-          container.innerHTML =
-            '<div id="webtor-player" class="watchTorrent"></div>';
-          try {
-            await this.torrentPlayer.start(torrent.magnet, "webtor-player");
-          } catch (err) {
-            currentIndex++;
-            await tryNextTorrent();
-          }
-        }
-      };
-
-      await tryNextTorrent();
+      // 5. Renderiza o Menu de Escolha
+      this.renderTorrentMenu(torrentList, container);
     } catch (error) {
-      alert("Erro ao buscar as opções de torrent.");
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; background: #050505; color: #ef4444; min-height: 400px;">
+          <i class="fa-solid fa-wifi fa-3x" style="margin-bottom: 20px;"></i>
+          <h3 style="color: #fff;">Erro de Conexão</h3>
+          <p style="color: var(--text-secondary);">Falha ao buscar as opções de torrent.</p>
+        </div>
+      `;
     }
+  }
+
+  renderTorrentMenu(torrentList, container) {
+    if (!container) return;
+
+    let menuHtml = `
+      <div class="torrent-mini-menu">
+        <div class="torrent-mini-menu__header">
+          <i class="fa-solid fa-magnet"></i>
+          <h3>Escolha a Qualidade do Torrent</h3>
+          <p>Recomendamos opções com mais <strong>Semeadores <i class="fa-solid fa-arrow-up"></i></strong> para carregar sem travar.</p>
+        </div>
+        <div class="torrent-mini-menu__list custom-scroll">
+    `;
+
+    torrentList.forEach((t) => {
+      // Fallbacks para garantir que a interface não quebre se a API mudar
+      const quality = t.quality || t.resolution || "Auto";
+      const size = t.size || "-- GB";
+      const seeders = t.seeders || t.seeds || 0;
+
+      // Inteligência de cores: Verde (Rápido), Amarelo (Médio), Vermelho (Lento/Morto)
+      const healthColor =
+        seeders > 40 ? "#10b981" : seeders > 10 ? "#f59e0b" : "#ef4444";
+
+      menuHtml += `
+        <button class="torrent-file-btn" data-magnet="${t.magnet}">
+          <div class="torrent-file-btn__quality">${quality}</div>
+          <div class="torrent-file-btn__info">
+            <span title="Tamanho do Arquivo"><i class="fa-solid fa-hard-drive"></i> ${size}</span>
+            <span title="Semeadores Ativos" style="color: ${healthColor};"><i class="fa-solid fa-arrow-up"></i> ${seeders}</span>
+          </div>
+        </button>
+      `;
+    });
+
+    menuHtml += `
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = menuHtml;
+
+    // Escuta o clique nas qualidades para iniciar o Webtor
+    const buttons = container.querySelectorAll(".torrent-file-btn");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const magnet = btn.getAttribute("data-magnet");
+
+        container.innerHTML =
+          '<div id="webtor-player" class="watchTorrent"></div>';
+        try {
+          await this.torrentPlayer.start(magnet, "webtor-player");
+        } catch (err) {
+          alert(
+            "Ocorreu um erro ao tentar reproduzir o Torrent. Tente outra qualidade.",
+          );
+          // Se falhar, renderiza o menu de novo para o usuário não ficar preso numa tela preta
+          this.renderTorrentMenu(torrentList, container);
+        }
+      });
+    });
   }
 }
