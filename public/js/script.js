@@ -147,24 +147,43 @@ class App {
   async loadWatchingContinue() {
     let historyData = await continueWaching();
 
-    if (!historyData || historyData.length === 0) return;
-
     const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
     const now = Date.now();
     const rawProgress =
       JSON.parse(localStorage.getItem("rimuflix:watch-progress")) || [];
 
-    historyData = historyData.filter((media) => {
-      const progressItem = rawProgress.find(
-        (p) => String(p.tmdbId) === String(media.id),
-      );
-      if (progressItem && progressItem.timestamp) {
-        return now - progressItem.timestamp < SEVEN_DAYS;
-      }
-      return true;
-    });
+    // Filtra os dados se existirem
+    if (historyData && historyData.length > 0) {
+      historyData = historyData.filter((media) => {
+        const progressItem = rawProgress.find(
+          (p) => String(p.tmdbId) === String(media.id),
+        );
+        if (progressItem && progressItem.timestamp) {
+          return now - progressItem.timestamp < SEVEN_DAYS;
+        }
+        return true;
+      });
+    } else {
+      historyData = [];
+    }
 
-    if (historyData.length === 0) return;
+    const container = document.getElementById("continue-watching-container");
+
+    // Lógica do Empty State: Mostra uma mensagem caso não haja histórico
+    if (!historyData || historyData.length === 0) {
+      const emptyArticle = document.createElement("article");
+      emptyArticle.classList.add("movie-section", "container");
+      emptyArticle.innerHTML = `
+        <h2 class="section-title">Continue Assistindo</h2>
+        <div class="empty-list-msg" style="padding: 40px; text-align: center; color: var(--text-secondary); background: var(--secondary-bg); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 20px;">
+          <i class="fa-solid fa-clock-rotate-left" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+          <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 8px;">Você ainda não assistiu a nada</h3>
+          <p>Explore nosso catálogo e comece a maratonar! Seus filmes e séries em andamento aparecerão aqui.</p>
+        </div>
+      `;
+      container.appendChild(emptyArticle);
+      return;
+    }
 
     const article = document.createElement("article");
     article.classList.add("movie-section", "container");
@@ -177,12 +196,13 @@ class App {
 
     historyData.forEach((media) => {
       const displayType = media.name ? "Série" : "Filme";
+      const mediaType = media.name ? "tv" : "movie"; // Define o tipo para a API
 
       const cardWrapper = document.createElement("div");
       cardWrapper.className = "continue-card-wrapper";
 
       cardWrapper.innerHTML = `
-            <button class="remove-continue-btn" data-id="${media.id}" title="Remover da lista">
+            <button class="remove-continue-btn" data-id="${media.id}" data-type="${mediaType}" title="Remover da lista">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             ${createMediaCard(media, displayType)}
@@ -195,19 +215,23 @@ class App {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
         const idToRemove = btn.getAttribute("data-id");
+        const typeToRemove = btn.getAttribute("data-type"); // Captura o tipo exato
 
         import("./components/watch-progress.js").then((module) => {
-          module.removeWatchProgress(idToRemove);
+          // Passa o ID e o Tipo correto (movie ou tv)
+          module.removeWatchProgress(idToRemove, typeToRemove);
           btn.parentElement.remove();
 
+          // Se a lista ficar vazia após a remoção
           if (movieList.children.length === 0) {
-            article.remove();
+            container.innerHTML = ""; // Limpa o container
+            this.loadWatchingContinue(); // Recarrega a função para forçar o Empty State a aparecer
           }
         });
       });
     });
 
-    document.getElementById("continue-watching-container").appendChild(article);
+    container.appendChild(article);
 
     // Aplica o evento de arrastar na lista recém criada
     this.setupCarousel(movieList);
