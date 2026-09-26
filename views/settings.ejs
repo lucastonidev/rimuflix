@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include('partials/head') %>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/pages/settings.css" />
+    <title>Rimuflix - Configurações de Perfil</title>
+  </head>
+  <body>
+    <div class="header-mock">
+      <a href="/" title="Voltar"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>Configurações de Perfil</h1>
+    </div>
+
+    <div class="settings-container">
+      <form id="profile-form">
+        <!-- Seção do Avatar -->
+        <div class="avatar-section">
+          <div class="avatar-wrapper">
+            <div class="avatar-preview" id="avatar-preview">U</div>
+            <!-- Label atua como botão de click para o input file escondido -->
+            <label
+              for="avatar-upload"
+              class="avatar-edit-btn"
+              title="Alterar Foto"
+            >
+              <i class="fa-solid fa-camera"></i>
+            </label>
+            <input
+              type="file"
+              id="avatar-upload"
+              accept="image/png, image/jpeg, image/webp"
+              hidden
+            />
+          </div>
+          <p class="avatar-hint">Formatos suportados: JPEG, PNG, WEBP.</p>
+        </div>
+
+        <!-- Seção de Dados -->
+        <div class="form-group">
+          <label for="username" class="form-label">Nome de Usuário</label>
+          <input
+            type="text"
+            id="username"
+            class="form-control"
+            placeholder="Seu nome"
+            required
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label for="email" class="form-label">Email do Usuário</label>
+          <input
+            type="text"
+            id="email"
+            class="form-control"
+            placeholder="Seu email"
+            required
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nova Senha</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            placeholder="Deixe em branco para manter a atual"
+          />
+        </div>
+
+        <button type="submit" class="btn-save" id="btn-save">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Salvar Alterações
+        </button>
+
+        <div id="status-message" class="message"></div>
+      </form>
+    </div>
+
+    <script src="/js/pages/settings.js" type="module"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Elementos do DOM
+        const avatarPreview = document.getElementById("avatar-preview");
+        const avatarUpload = document.getElementById("avatar-upload");
+        const usernameInput = document.getElementById("username");
+        const profileForm = document.getElementById("profile-form");
+        const btnSave = document.getElementById("btn-save");
+        const statusMessage = document.getElementById("status-message");
+
+        let currentUser = JSON.parse(localStorage.getItem("rimuflix:user")) || {
+          name: "Usuário Padrão",
+          avatar_url: "",
+        };
+
+        let selectedAvatarBase64 = currentUser.avatar_url; // Armazena a nova imagem
+
+        // 2. RENDERIZAR INTERFACE INICIAL
+        function updateUI() {
+          usernameInput.value = currentUser.name || "";
+
+          if (selectedAvatarBase64) {
+            avatarPreview.innerHTML = `<img src="${selectedAvatarBase64}" alt="Avatar">`;
+            avatarPreview.style.borderColor = "var(--accent)";
+          } else {
+            const initial = (currentUser.name || "U").charAt(0).toUpperCase();
+            avatarPreview.innerHTML = initial;
+            avatarPreview.style.borderColor = "var(--border-color)";
+          }
+        }
+
+        updateUI();
+
+        // 3. PREVIEW DA NOVA FOTO (Quando o usuário escolhe um arquivo)
+        avatarUpload.addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          // Validação de tamanho (ex: max 2MB)
+          if (file.size > 2 * 1024 * 1024) {
+            alert("A imagem deve ter no máximo 2MB.");
+            avatarUpload.value = "";
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            selectedAvatarBase64 = event.target.result;
+            avatarPreview.innerHTML = `<img src="${selectedAvatarBase64}" alt="Novo Avatar">`;
+            avatarPreview.style.borderColor = "var(--accent)";
+          };
+          reader.readAsDataURL(file);
+        });
+
+        // 4. SALVAR ALTERAÇÕES
+        profileForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const newName = usernameInput.value.trim();
+          if (!newName) return;
+
+          // Efeito de loading no botão
+          const originalBtnHtml = btnSave.innerHTML;
+          btnSave.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+          btnSave.disabled = true;
+
+          // Simulação de requisição para uma API (1 segundo de delay)
+          setTimeout(() => {
+            // Atualiza o objeto do usuário
+            currentUser.name = newName;
+            currentUser.avatar_url = selectedAvatarBase64;
+
+            // Salva no LocalStorage (No mundo real, faríamos um fetch PATCH para a API)
+            localStorage.setItem("rimuflix:user", JSON.stringify(currentUser));
+
+            // Restaura botão e mostra mensagem de sucesso
+            btnSave.innerHTML = originalBtnHtml;
+            btnSave.disabled = false;
+
+            statusMessage.textContent = "Perfil atualizado com sucesso!";
+            statusMessage.className = "message success";
+
+            // Esconde a mensagem após 3 segundos
+            setTimeout(() => {
+              statusMessage.style.display = "none";
+            }, 3000);
+          }, 1000);
+        });
+      });
+    </script>
+  </body>
+</html>

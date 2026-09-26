@@ -1,0 +1,61 @@
+@import '../layout.css';
+@import '../../components/admin-components.css';
+@import '../../components/admin-modal.css';
+@import '../../responsive/admin-responsive.css';
+
+.saga-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+   gap: 20px;
+   margin-top: 20px;
+ }
+
+ .saga-card {
+   background: var(--tertiary-bg);
+   border: 1px solid var(--border-color);
+   border-radius: 12px;
+   overflow: hidden;
+   position: relative;
+ }
+
+ .saga-image {
+   width: 100%;
+   aspect-ratio: 16/9;
+   object-fit: cover;
+   background: #222;
+ }
+
+ .saga-info {
+   padding: 15px;
+ }
+
+ .saga-info h4 {
+   margin: 0 0 5px 0;
+   font-size: 1rem;
+ }
+
+ .saga-info p {
+   margin: 0;
+   color: var(--text-secondary);
+   font-size: 0.8rem;
+ }
+
+ .btn-delete-saga {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   background: rgba(0, 0, 0, 0.7);
+   border: none;
+   color: #ef4444;
+   width: 30px;
+   height: 30px;
+   border-radius: 50%;
+   cursor: pointer;
+   transition: 0.2s;
+ }
+
+ .btn-delete-saga:hover {
+   background: #ef4444;
+   color: white;
+   transform: scale(1.1);
+ }

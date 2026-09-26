@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('partials/head') %>
+    <link rel="stylesheet" href="/styles/style.css">
+    <title>Rimuflix - assista tudo que se quiser</title>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs") %>
+    <div id="intro-overlay" class="intro-overlay">
+      <video id="intro-video" autoplay muted playsinline>
+        <source src="/video/intro_rimuflix.mp4" type="video/mp4">
+      </video>
+      <button id="skip-intro-btn" class="skip-btn">Pular Intro</button>
+    </div>
+    <main id="page-container">
+      <div id="hero-container"></div>
+      <div id="continue-watching-container"></div>
+      <div id="sections-container"></div>
+    </main>
+    <script type="module" src="/js/script.js"></script>
+</body>
+
+</html>

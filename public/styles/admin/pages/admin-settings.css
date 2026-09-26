@@ -1,0 +1,70 @@
+@import '../layout.css';
+@import '../../components/admin-components.css';
+@import '../../components/admin-modal.css';
+@import '../../responsive/admin-responsive.css';
+
+.toggle-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        padding: 16px;
+        border-radius: 12px;
+        transition: background 0.2s;
+        border: 1px solid transparent;
+}
+
+.toggle-label:hover {
+        background-color: rgba(255, 255, 255, 0.02);
+        border-color: var(--border-color);
+}
+
+.toggle-text p {
+        font-size: 0.875rem;
+        font-weight: 500;
+}
+
+.toggle-text span {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        display: block;
+        margin-top: 4px;
+}
+
+.toggle-switch {
+        position: relative;
+        width: 48px;
+        height: 28px;
+        flex-shrink: 0;
+}
+
+.toggle-input {
+        display: none;
+}
+
+.toggle-bg {
+        position: absolute;
+        inset: 0;
+        background-color: #4b5563;
+        border-radius: 20px;
+        transition: background 0.3s;
+}
+
+.toggle-dot {
+        position: absolute;
+        left: 4px;
+        top: 4px;
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+}
+
+.toggle-input:checked+.toggle-bg {
+        background-color: var(--accent);
+}
+
+.toggle-input:checked+.toggle-bg .toggle-dot {
+        transform: translateX(20px);
+}

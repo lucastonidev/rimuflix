@@ -1,0 +1,31 @@
+@media (min-width: 1024px) {
+
+  .nav-filters {
+    gap: 20px;
+    flex-wrap: nowrap;
+  }
+
+  .main-nav {
+    width: auto;
+    padding-bottom: 0;
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .separator {
+    display: block;
+  }
+
+  .action-btn {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    font-size: 0.9rem;
+  }
+
+  .action-btn:hover {
+    background-color: transparent;
+    border-color: transparent;
+  }
+}

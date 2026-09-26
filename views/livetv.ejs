@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('partials/head') %>
+    <link rel="stylesheet" href="/styles/pages/livetv.css">
+    <title>Rimuflix - Assista sua TV ao vivo</title>
+</head>
+
+<body class="livetv-body">
+  <%- include('partials/header') %>
+
+    <main class="livetv-main">
+
+      <!-- Left Sidebar: Categories & Channels -->
+      <aside class="livetv-sidebar glass-panel">
+        <div class="category-header">
+          <button id="btn-prev-cat" class="cat-nav-btn"><i class="fa-solid fa-angle-left"></i></button>
+          <h2 id="currentCategoryTitle" class="category-title">Carregando...</h2>
+          <button id="btn-next-cat" class="cat-nav-btn"><i class="fa-solid fa-angle-right"></i></button>
+        </div>
+
+        <div id="channelList" class="channel-list custom-scroll">
+          <div style="text-align: center; padding: 40px;">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Content Area: Video & EPG -->
+      <section class="livetv-content">
+
+        <!-- Video Player Area -->
+        <div class="video-wrapper">
+          <div class="video-container" id="desktopVideoContainer">
+            <div class="video-inner">
+              <iframe id="livePlayer" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- Electronic Program Guide (EPG) Area -->
+        <div class="epg-panel glass-panel custom-scroll" id="desktopEpgContainer">
+          <h3 id="epgChannelName" class="epg-channel-name">
+            <!-- Injected by JS -->
+          </h3>
+
+          <div id="epgList" class="epg-list">
+            <div class="epg-timeline-line"></div>
+            <!-- EPG items injected here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Mobile View Overlay -->
+      <div id="mobilePlayerView" class="mobile-player-view hidden">
+        <div class="mobile-player-header">
+          <button id="closeMobilePlayer" class="close-mobile-btn">
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+        </div>
+
+        <div id="mobileVideoContainerSlot" class="mobile-video-slot"></div>
+        <div id="mobileEpgSlot" class="mobile-epg-slot custom-scroll"></div>
+      </div>
+
+    </main>
+
+    <script type="module" src="/js/pages/livetv.js"></script>
+</body>
+
+</html>

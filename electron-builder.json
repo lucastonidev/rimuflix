@@ -1,0 +1,33 @@
+{
+  "appId": "com.rimublinda.rimuflix",
+  "productName": "Rimuflix",
+  "copyright": "Copyright © 2026 Rimublinda",
+  "directories": {
+    "output": "dist",
+    "buildResources": "build"
+  },
+  "files": ["**/*", ".env"],
+  "asar": true,
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "public/img/favicon.ico",
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  },
+  "publish": {
+    "provider": "github",
+    "releaseType": "release"
+  }
+}

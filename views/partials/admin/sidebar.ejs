@@ -1,0 +1,46 @@
+<aside id="sidebar" class="sidebar">
+  <div class="sidebar-logo">
+    <div><i class="fa-solid fa-play" style="margin-right: 8px;"></i>Rimu<span>Admin</span></div>
+    <button id="close-sidebar-btn" class="btn-icon hide-desktop" style="display: none;"><i
+        class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <nav class="nav-menu">
+    <p class="nav-label">Menu Principal</p>
+    <a href="/admin" class="nav-item active" data-target="dashboard">
+      <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+    <a href="/admin/media" class="nav-item" data-target="media">
+      <i class="fa-solid fa-film"></i> Adicionar Mídia
+    </a>
+    <a href="/admin/providers" class="nav-item" data-target="providers">
+      <i class="fa-solid fa-server"></i> Provedores
+    </a>
+    <a href="/admin/users" class="nav-item" data-target="users">
+      <i class="fa-solid fa-users"></i> Perfis & Usuários
+    </a>
+    <a href="/admin/sagas" class="nav-item" data-target="sagas">
+      <i class="fa-solid fa-book"></i> Sagas
+    </a>
+
+    <p class="nav-label">Sistema</p>
+    <a href="/admin/settings" class="nav-item" data-target="settings">
+      <i class="fa-solid fa-gear"></i> Configurações
+    </a>
+  </nav>
+
+  <div class="user-profile">
+    <div class="user-card">
+      <img src="https://placehold.co/100x100/e50914/ffffff?text=AD" alt="Admin">
+      <div class="user-info">
+        <h4>Rimublinda</h4>
+        <p>Super Admin</p>
+      </div>
+    </div>
+    <a href="/admin/auth/logout" class="btn-logout">
+      <i class="fa-solid fa-sign-out-alt" style="margin-right: 8px;"></i> Sair do Painel
+    </a>
+  </div>
+</aside>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>

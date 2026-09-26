@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('partials/head') %>
+    <link rel="stylesheet" href="/styles/pages/detail.css">
+    <title>Rimuflix</title>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs") %>
+
+    <main id="page-container">
+      <div class="hero-container"></div>
+
+      <section class="details-section">
+        <div class="details-grid">
+          <div class="details-main">
+            <section class="episode-section">
+              <div class="episode-section__header">
+                <div>
+                  <h2 class="episode-section__title">Temporada 1</h2>
+                </div>
+
+                <div class="season-picker">
+                  <div class="season-picker__field"></div>
+                </div>
+              </div>
+
+              <div class="episode-list__container"></div>
+            </section>
+            <section class="recomendations">
+              <h2 class="section-title">Recomendações de filme</h2>
+              <section class="recomendation-grid"></section>
+            </section>
+          </div>
+
+          <aside class="details-sidebar"></aside>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import DetailPage from "/js/pages/details.js";
+
+      const page = new DetailPage();
+      page.init("<%= id %>", "<%= type %>");
+    </script>
+</body>
+
+</html>

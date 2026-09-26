@@ -1,0 +1,64 @@
+@import url('./components/header.css');
+@import url('./components/hero.css');
+@import url('./components/card.css');
+@import url('./components/intro.css');
+@import url('./components/continue-watching.css');
+
+.movie-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 2rem;
+  margin: 40px 0 20px;
+  font-weight: 600;
+  border-left: 4px solid var(--accent);
+  padding-left: 10px;
+}
+
+.movie-list {
+  width: 100%;
+  display: flex;
+  gap: 16px; /* Adiciona respiro entre os filmes */
+  overflow-x: auto;
+  padding-bottom: 15px;
+  -webkit-overflow-scrolling: touch; /* Rolagem nativa suave no iOS */
+  scroll-behavior: smooth;
+}
+
+.movie-list::-webkit-scrollbar {
+  height: 8px;
+}
+
+/* Garante que os cards não sejam esmagados horizontalmente */
+.movie-list > div,
+.movie-list > a,
+.movie-list > article {
+  flex: 0 0 auto;
+}
+
+/* Barra de rolagem customizada para Desktop */
+.movie-list::-webkit-scrollbar {
+  height: 8px;
+}
+
+.movie-list::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.movie-list::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Oculta a barra de rolagem no celular para um visual mais limpo */
+@media (max-width: 768px) {
+  .movie-list::-webkit-scrollbar {
+    display: none;
+  }
+  .movie-list {
+    scrollbar-width: none; /* Firefox */
+  }
+}

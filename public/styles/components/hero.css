@@ -1,0 +1,153 @@
+.hero {
+  height: 80vh;
+  background-color: #000;
+  position: relative;
+  margin-bottom: 40px;
+  margin-top: 70px;
+  padding-top: 40px;
+  background-image: var(--hero-bg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 0;
+}
+
+.hero-overlay {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(0deg, rgba(10, 10, 10, 1) 0%, rgba(0, 0, 0, 0.56) 60%, rgba(255, 255, 255, 0) 100%);
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  transition: background 0.3s ease;
+}
+
+.hero-content {
+  z-index: 2 !important;
+  text-shadow: 0 2px 4px var(--shadow);
+}
+
+.hero-content h1 {
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 3rem;
+}
+
+.hero-content h1,
+.hero-meta,
+.hero-overview,
+.genre-list,
+.hero-actions{
+  animation: bounce .8s ease;
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.hero-overview {
+  max-width: 500px;
+  max-height: 150px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  text-shadow: 0 2px 4px var(--shadow);
+  text-align: justify;
+  text-justify: inter-word;
+  text-overflow: ellipsis;
+  font-size: 1rem;
+  
+}
+
+.genre-list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  
+}
+
+.circle-separetor {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  margin-inline: 10px;
+}
+
+.hero-meta .card-badge {
+  background: rgba(49, 49, 49, 0.722);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px var(--shadow);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.hero-actions a{
+  text-decoration: none;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(-20%);
+  }
+  100%{
+  transform: translateY(0%);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    min-height: 80vh;
+    padding-top: 100px;
+    padding-bottom: 40px;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+    white-space: normal; /* Permite quebra de linha em títulos longos */
+  }
+
+  .hero-overview {
+    font-size: 0.95rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Limita a sinopse a 4 linhas */
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    overflow: hidden;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .hero-actions .btn-primary,
+  .hero-actions .btn-secondary {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    display: flex;
+  }
+
+  .genre-list {
+    flex-wrap: wrap; /* Impede que os gêneros empurrem a tela horizontalmente */
+  }
+}

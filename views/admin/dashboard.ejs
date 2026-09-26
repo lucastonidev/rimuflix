@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/styles/admin/pages/admin-dashboard.css">
+    <link rel="stylesheet" href="/styles/admin/global.css">
+    <title>Dashboard | Admin Rimuflix</title>
+</head>
+
+<body>
+  <%- include('../partials/admin/sidebar') %>
+    <main class="main-content">
+      <header class="header">
+        <div class="header-title">
+          <h1 class="page-title">Visão Geral</h1>
+        </div>
+      </header>
+    
+      <div class="content-area">
+    
+        <!-- Cards de Estatísticas -->
+        <div class="grid grid-cols-4 mb-6">
+          <div class="card stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-film"></i></div>
+            <div class="stat-info">
+              <p>Mídias no Banco</p>
+              <h3 id="stat-media">0</h3>
+            </div>
+          </div>
+    
+          <div class="card stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+              <p>Usuários Cadastrados</p>
+              <h3 id="stat-users">0</h3>
+            </div>
+          </div>
+    
+          <div class="card stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-list-check"></i></div>
+            <div class="stat-info">
+              <p>Listas Criadas</p>
+              <h3 id="stat-lists">0</h3>
+            </div>
+          </div>
+    
+          <div class="card stat-card">
+            <div class="stat-icon red"><i class="fa-solid fa-star"></i></div>
+            <div class="stat-info">
+              <p>Avaliações</p>
+              <h3 id="stat-reviews">0</h3>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Área de Atividades Recentes -->
+        <div class="grid grid-cols-2">
+          <!-- Últimas Mídias Adicionadas -->
+          <div class="card">
+            <h2 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Últimas Adições</h2>
+            <div class="timeline" id="recent-media-timeline">
+              <p style="color: var(--text-secondary); font-size: 0.85rem;">Carregando...</p>
+            </div>
+          </div>
+    
+          <!-- Espaço para uso futuro (Ex: Últimos usuários ou Configurações) -->
+          <div class="card">
+            <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Ações Rápidas</h2>
+            <div class="flex flex-col gap-4 mt-4">
+              <a href="/admin/media" class="btn btn-primary w-full"><i class="fa-solid fa-plus"></i> Adicionar Nova
+                Mídia</a>
+              <a href="/admin/users" class="btn btn-secondary w-full"><i class="fa-solid fa-users-viewfinder"></i> Gerenciar
+                Usuários</a>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </main>
+    
+    <script type="module" src="/js/admin/dashboard.js"></script>
+    </body>
+
+</html>

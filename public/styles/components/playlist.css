@@ -1,0 +1,123 @@
+/* Modal de Playlists no Detail */
+.playlist-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.playlist-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.playlist-modal {
+  background: var(--secondary-bg);
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.playlist-modal-overlay.active .playlist-modal {
+  transform: translateY(0);
+}
+
+.playlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.playlist-header h3 {
+  font-size: 1.2rem;
+}
+
+.playlist-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.playlist-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.playlist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--tertiary-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.playlist-item:hover {
+  background: #2a2a2a;
+}
+
+.playlist-item.in-list {
+  border-color: var(--accent);
+}
+
+.playlist-item i {
+  color: var(--text-secondary);
+}
+
+.playlist-item.in-list i {
+  color: var(--accent);
+}
+
+/* Criar Nova Lista */
+.playlist-create {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 15px;
+}
+
+.playlist-create input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--tertiary-bg);
+  color: white;
+  outline: none;
+}
+
+.playlist-create input:focus {
+  border-color: var(--accent);
+}
+
+.playlist-create button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0 15px;
+  font-weight: bold;
+  cursor: pointer;
+}

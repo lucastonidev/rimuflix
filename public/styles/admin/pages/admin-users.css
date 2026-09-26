@@ -1,0 +1,116 @@
+@import '../layout.css';
+@import '../../components/admin-components.css';
+@import '../../components/admin-modal.css';
+@import '../../responsive/admin-responsive.css';
+
+.table-wrapper {
+  background-color: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  padding: 16px;
+  background-color: rgba(20, 20, 20, 0.8);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.user-role {
+  margin-left: 8px;
+  padding: 2px 6px;
+  font-size: 0.55rem;
+  background: rgba(229, 9, 20, 0.2);
+  color: var(--accent);
+  border: 1px solid rgba(229, 9, 20, 0.2);
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.profiles-stack {
+  display: flex;
+  margin-left: 8px;
+}
+
+.profiles-stack div {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--tertiary-bg);
+  margin-left: -8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+  color: var(--success);
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--success);
+  margin-right: 8px;
+}
+
+.table-footer {
+  padding: 16px;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  background-color: rgba(20, 20, 20, 0.3);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}

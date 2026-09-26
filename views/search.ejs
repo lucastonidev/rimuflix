@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('partials/head') %>
+    <link rel="stylesheet" href="/styles/pages/search.css">
+    <title>Rimuflix - busca qualquer serie/filme/novela</title>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs") %>
+    <div class="container">
+      <header class="search-header">
+        <div class="header-top">
+          <h1 class="page-title">Busque agora</h1>
+
+          <div class="nav-filters">
+            <nav class="main-nav" id="type-nav">
+              <a href="#" data-type="all" class="active">
+                <i class="fa-solid fa-border-all"></i>
+                Todos
+              </a>
+              <a href="#" data-type="movie">
+                <i class="fa-solid fa-film"></i>
+                Filmes
+              </a>
+              <a href="#" data-type="tv">
+                <i class="fa-solid fa-tv"></i>
+                Séries
+              </a>
+              <a href="#" data-type="doramas">
+                🌸 Doramas
+              </a>
+              <a href="#" data-type="Brasileiras">
+                🇧🇷 Novelas BR
+              </a>
+              <a href="#" data-type="Mexicanas">
+                🇲🇽 Novelas MX
+              </a>
+            </nav>
+            <button class="action-btn" id="btn-open-filters">
+              <i class="fa-solid fa-sliders"></i>
+              Filtros Avançados
+            </button>
+          </div>
+        </div>
+
+        <div class="genre-container">
+          <div class="genre-list" id="genre-list">
+            <button class="genre-btn active" data-id=""><span class="active-indicator">|</span> Todos</button>
+          </div>
+          <div class="scroll-indicator">
+            <i class="fa-solid fa-chevron-right" style="opacity: 0.5; font-size: 0.8rem;"></i>
+          </div>
+        </div>
+
+        <div class="search-section modern-search">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="searchInput" placeholder="Buscar filmes, séries ou gêneros..." autocomplete="off">
+          <button id="searchButton" class="btn-search">Buscar</button>
+        </div>
+      </header>
+
+      <main class="movie-grid" id="search-results">
+        <!-- Os cards dos resultados serão renderizados aqui pelo JS -->
+      </main>
+      <div class="pagination-container" id="pagination-container" style="display: none;">
+        <button class="btn-pagination" id="btn-prev-page" disabled>
+          <i class="fa-solid fa-chevron-left"></i> Anterior
+        </button>
+        <span class="pagination-info" id="pagination-info">Página 1 de 1</span>
+        <button class="btn-pagination" id="btn-next-page">
+          Próximo <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal de Filtros Avançados -->
+    <div class="filter-overlay" id="filter-modal">
+      <div class="filter-modal">
+        <div class="filter-header">
+          <h2>Filtros Avançados</h2>
+          <button class="filter-close" id="btn-close-filters">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="filter-body">
+          <div class="filter-group">
+            <h3>Ordenar por</h3>
+            <div class="filter-chips" id="sort-chips">
+              <div class="filter-chip active" data-value="popularity.desc">Mais Populares</div>
+              <div class="filter-chip" data-value="vote_average.desc">Mais Bem Avaliados</div>
+              <div class="filter-chip" data-value="primary_release_date.desc">Mais Recentes</div>
+              <div class="filter-chip" data-value="primary_release_date.asc">Mais Antigos</div>
+            </div>
+          </div>
+
+          <!-- NOVA SEÇÃO: Produtora / Streaming -->
+          <div class="filter-group">
+            <h3>Produtora / Streaming</h3>
+            <div class="filter-chips" id="provider-chips">
+              <div class="filter-chip" data-value="8">Netflix</div>
+              <div class="filter-chip" data-value="337">Disney+</div>
+              <div class="filter-chip" data-value="119">Prime Video</div>
+              <div class="filter-chip" data-value="1899">Max</div>
+              <div class="filter-chip" data-value="350">Apple TV+</div>
+              <div class="filter-chip" data-value="531">Paramount+</div>
+              <div class="filter-chip" data-value="307">Globoplay</div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <h3>Filtro de Sagas (Coleções e Listas)</h3>
+            <!-- A div abaixo vai receber os botões gerados pelo JavaScript -->
+            <div class="filter-chips" id="saga-chips">
+              <span style="color: var(--text-secondary); font-size: 0.85rem;">Carregando sagas...</span>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <h3>Ano de Lançamento</h3>
+            <input type="number" id="year-filter" placeholder="Ex: 2023"
+              style="padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: var(--tertiary-bg); color: white; width: 100%; outline: none; font-family: inherit;">
+          </div>
+        </div>
+
+        <div class="filter-footer">
+          <button class="btn-clear" id="btn-clear-filters">Limpar Tudo</button>
+          <button class="btn-apply" id="btn-apply-filters">Aplicar Filtros</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import SearchPage from '/js/pages/search.js';
+      const page = new SearchPage();
+      page.init();
+    </script>
+</body>
+
+</html>

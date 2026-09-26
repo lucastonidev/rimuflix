@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('partials/head') %>
+    <link rel="stylesheet" href="/styles/pages/watch.css">
+    <title>Rimuflix</title>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs") %>
+
+    <main class="watch-page">
+      <section class="watch-hero container">
+        <div class="watch-hero__content">
+          <h1 id="movieTitle" class="movie-title">Carregando...</h1>
+
+          <div class="movie-meta">
+            <span class="match">
+              0.0
+              <i class="fa-solid fa-star"></i>
+            </span>
+            <span class="badge">----</span>
+            <span class="badge">00H 00M</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="watch-layout container">
+        <div class="watch-main">
+          <div class="player-switcher" id="playerSwitcher"></div>
+
+          <div class="watch-player watch-torrent">
+            <iframe id="watchFrame" src="" allowfullscreen loading="eager" referrerpolicy="origin"></iframe>
+          </div>
+
+          <% if (type==='tv' ) { %>
+            <div class="menu-container episode-navigation" id="episodeNavigation">
+              <button class="ctrl-btn btn-back" id="btnPrevEpisode" title="Episódio anterior">
+                <i class="fa-solid fa-chevron-left"></i> Anterior
+              </button>
+
+              <a href="/tv/<%= id %>" class="ctrl-btn btn-info" id="btnDetails">
+                <i class="fa-solid fa-circle-info"></i> Detalhes
+              </a>
+
+              <span class="episode-badge" id="currentEpisodeBadge">
+                <i class="fa-solid fa-tv"></i> Carregando...
+              </span>
+
+              <button class="ctrl-btn btn-next" id="btnNextEpisode" title="Próximo episódio">
+                Próximo <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+            <% } %>
+        </div>
+
+
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
+    <script type="module">
+      import WatchPage from "/js/pages/watch.js";
+
+      const page = new WatchPage();
+      page.init("<%= id %>", "<%= type %>");
+    </script>
+</body>
+
+</html>

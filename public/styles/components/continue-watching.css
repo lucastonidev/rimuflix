@@ -1,0 +1,41 @@
+/* Wrapper para manter o botão posicionado em relação ao card */
+.continue-card-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Estilo do botão de remover */
+.remove-continue-btn {
+  position: absolute;
+  top: 2px;
+  right: -8px;
+  z-index: 10;
+  width: 28px;
+  height: 28px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: var(--text-secondary);
+  border: 2px solid var(--text-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.remove-continue-btn i {
+  font-size: 14px;
+}
+
+/* Efeito de hover para dar feedback ao usuário */
+.remove-continue-btn:hover {
+  background-color: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+
+.remove-continue-btn:active {
+  transform: scale(0.95);
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <%- include('partials/head') %>
+    <link rel="stylesheet" href="/styles/pages/mylist.css">
+    <title>Rimuflix - Sua lista de favoritos</title>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs") %>
+    <main class="mylist-container container">
+      <h1 class="page-title">Minhas Listas</h1>
+
+      <div class="mylist-layout">
+        <!-- Barra lateral com os nomes das listas -->
+        <aside class="mylist-sidebar">
+          <div class="sidebar-header">
+            <h3>Suas Playlists</h3>
+          </div>
+          <ul id="playlist-tabs" class="playlist-tabs">
+            <!-- O JS vai injetar as abas aqui -->
+          </ul>
+        </aside>
+
+        <!-- Área dos cards -->
+        <section class="mylist-content">
+          <div class="content-header">
+            <h2 id="current-list-title">Carregando...</h2>
+            <button id="btn-delete-list" class="btn-danger hidden">
+              <i class="fa-solid fa-trash"></i> Apagar Lista
+            </button>
+          </div>
+
+          <div id="playlist-grid" class="media-grid">
+            <!-- O JS vai injetar os filmes/séries aqui -->
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script type="module">
+      import MyList from '/js/pages/mylist.js';
+      document.addEventListener('DOMContentLoaded', () => {
+        const page = new MyList();
+        page.init();
+      });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+.reviews-section {
+  grid-column: 1 / -1;
+  margin-top: 40px;
+}
+
+.reviews-section .section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.reviews-section .section-title i {
+  color: var(--accent);
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.empty-reviews-msg {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.review-card {
+  background: var(--secondary-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.review-author {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.review-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.review-stars {
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  display: flex;
+  gap: 4px;
+}
+
+.review-stars i {
+  color: #333; /* Estrela inativa (cinza escuro) */
+}
+
+.review-stars i.active {
+  color: #eab308; /* Estrela ativa (amarelo) */
+}
+
+.review-comment {
+  color: #ccc;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0;
+  white-space: pre-wrap; /* Preserva quebras de linha */
+}

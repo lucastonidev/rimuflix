@@ -1,0 +1,149 @@
+.card {
+  background-color: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  transition: border-color var(--transition);
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.tab-content {
+  display: none;
+  animation: fadeInTab 0.3s ease-in-out forwards;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeInTab {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+}
+
+.badge.success {
+  background-color: var(--success-bg);
+  color: var(--success);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.badge.warning {
+  background-color: var(--warning-bg);
+  color: var(--warning);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn i {
+  margin-right: 8px;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: white;
+  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--border-light);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.btn-outline {
+  border: 1px solid var(--border-light);
+  color: white;
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all 0.3s;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
+}
+
+.input-group {
+  display: flex;
+  gap: 12px;
+}
+
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-wrapper i {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+  font-size: 0.75rem;
+}

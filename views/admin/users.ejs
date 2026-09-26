@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/styles/admin/pages/admin-users.css">
+    <link rel="stylesheet" href="/styles/admin/global.css">
+    <title>Gerenciar Usuários | Admin Rimuflix</title>
+</head>
+
+<body>
+  <%- include('../partials/admin/sidebar') %>
+    <main class="main-content">
+      <header class="header">
+        <div class="header-title">
+          <h1 class="page-title">Gestão de Usuários</h1>
+        </div>
+      </header>
+    
+      <div class="content-area">
+      
+        <!-- Formulário de Criação de Usuário -->
+        <div class="card mb-6">
+          <h2 class="section-title"><i class="fa-solid fa-user-plus"></i> Novo Usuário</h2>
+          <form id="form-add-user">
+            <div class="grid grid-cols-4">
+      
+              <div class="form-group">
+                <label for="user_name" class="form-label">Nome Completo</label>
+                <input type="text" id="user_name" class="form-control" placeholder="Ex: João Silva" required>
+              </div>
+      
+              <div class="form-group">
+                <label for="user_email" class="form-label">E-mail</label>
+                <input type="email" id="user_email" class="form-control" placeholder="joao@email.com" required>
+              </div>
+      
+              <div class="form-group">
+                <label for="user_role" class="form-label">Nível de Acesso</label>
+                <div class="select-wrapper">
+                  <select id="user_role" class="form-control" required>
+                    <option value="user">Usuário Padrão</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
+      
+            </div>
+      
+            <div class="flex justify-end gap-4 mt-4">
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Cadastrar Usuário</button>
+            </div>
+          </form>
+        </div>
+      
+        <!-- Tabela de Usuários -->
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>ID do Supabase</th>
+                  <th>Data de Cadastro</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-secondary);">Carregando usuários...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer" id="users-count-footer">
+            Total: 0 usuários
+          </div>
+        </div>
+      
+      </div>
+    </main>
+    
+    <script type="module" src="/js/admin/users.js"></script>
+
+</body>
+
+</html>

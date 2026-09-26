@@ -1,0 +1,72 @@
+/* ================= INTRO OVERLAY ================= */
+.hidde-scroll{
+  overflow: hidden !important;
+}
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intro-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#intro-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Botão opcional para pular */
+.skip-btn {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, transform 0.2s;
+  z-index: 10000;
+}
+
+.skip-btn:hover {
+  background: rgba(229, 9, 20, 0.8);
+  border-color: #e50914;
+  transform: scale(1.05);
+}
+
+/* ================= EFEITO ZOOM/SCALE DO CONTEÚDO ================= */
+#page-container {
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.8s ease;
+  will-change: transform, opacity;
+}
+
+/* Estado de entrada durante a intro */
+#page-container.scaling-intro {
+  transform: scale(1.08);
+  opacity: 0.85;
+}
+
+/* Estado normal/final */
+#page-container.ready {
+  transform: scale(1);
+  opacity: 1;
+}

@@ -1,0 +1,69 @@
+<header class="header">
+  <div class="header-container container">
+    <div class="header-logo">
+      <!-- Botão Hambúrguer Mobile -->
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Abrir menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <img src="/img/logo.png" alt="Logo do RimuFlix" class="img-logo">
+      <h1 class="logo hide-mobile-text">RIMUFLIX</h1>
+    </div>
+    
+    <nav class="header-nav" id="header-nav">
+      <!-- Botão Fechar Mobile -->
+      <button class="mobile-close-btn" id="mobile-close-btn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="/">
+            <i class="fa-solid fa-house"></i> Início
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/search">
+            <i class="fa-solid fa-magnifying-glass"></i> Buscar
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/livetv">
+            <i class="fa-solid fa-tv"></i> TV ao Vivo
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/mylist">
+            <i class="fa-solid fa-bookmark"></i> Minha Lista
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <div class="user-menu-container">
+        <button class="user-menu-btn" id="user-menu-btn" aria-label="Menu do Usuário">
+          <div class="header-avatar" id="header-user-avatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+        </button>
+        <div class="user-dropdown hidden" id="user-dropdown">
+          <div class="dropdown-header">
+            <span id="dropdown-username">Carregando...</span>
+            <span id="dropdown-role" style="font-size: 0.75rem; color: #a3a3a3;"></span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a href="/admin" class="dropdown-item" id="dropdown-admin-link" style="display: none;">
+            <i class="fa-solid fa-shield-halved"></i> Painel Admin
+          </a>
+          <a href="/settings" class="dropdown-item" id="dropdown-settings-link" style="display: none;">
+            <i class="fa-solid fa-gear"></i> Configurações
+          </a>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item text-danger" id="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i> Sair
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

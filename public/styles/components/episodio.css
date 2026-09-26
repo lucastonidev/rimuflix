@@ -1,0 +1,251 @@
+.episode-section {
+  width: 100%;
+  margin-top: 40px;
+  padding: 28px 0;
+  color: var(--text-primary);
+}
+
+.episode-section__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.episode-section__label {
+  display: block;
+  margin-bottom: 6px;
+  color: #b3b3b3;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.episode-section__title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.season-picker {
+  width: 100%;
+  max-width: 260px;
+}
+
+.season-picker__label {
+  display: block;
+  margin-bottom: 8px;
+  color: #b3b3b3;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.season-picker__field {
+  position: relative;
+}
+
+.season-picker__field::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--text-primary);
+  border-bottom: 2px solid var(--text-primary);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.season-picker__select {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px 0 16px;
+  border: 1px solid #5f5f5f;
+  border-radius: 2px;
+  background: #141414;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.season-picker__select:hover {
+  border-color: var(--text-primary);
+  background: #1b1b1b;
+}
+
+.season-picker__select:focus {
+  border-color: #e50914;
+  background: #1b1b1b;
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.22);
+}
+
+.season-picker__select option {
+  background: #141414;
+  color: var(--text-primary);
+}
+
+.episode-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.episode-card-link:focus {
+  outline: none;
+}
+
+.episode-card-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
+}
+
+.episode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #2a2a2a;
+}
+
+.episode-item {
+  display: grid;
+  grid-template-columns: 56px 220px 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 16px;
+  background: #181818;
+  transition: background 0.2s ease;
+}
+
+.episode-item:hover {
+  background: #232323;
+}
+
+.episode-item__number {
+  color: #b3b3b3;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.episode-item__thumb {
+  position: relative;
+  width: 220px;
+  height: 124px;
+  overflow: hidden;
+  background: #000000;
+}
+
+.episode-item__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.9;
+}
+
+.episode-item__time {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.78);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.episode-item__content {
+  min-width: 0;
+}
+
+.episode-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.episode-item__top h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.episode-item__content p {
+  margin: 0;
+  color: #b3b3b3;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.episode-item__status {
+  flex-shrink: 0;
+  color: #b3b3b3;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.episode-item.is-watched {
+  background: #1b1b1b;
+}
+
+.episode-item.is-watched .episode-item__number {
+  color: #e50914;
+}
+
+.episode-item.is-watched .episode-item__thumb::after {
+  content: "✓ Assistido";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 8px;
+  background: rgba(20, 20, 20, 0.88);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  border-left: 3px solid #e50914;
+}
+
+.episode-item.is-watched .episode-item__status {
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .episode-item {
+    grid-template-columns: 1fr;
+  }
+
+  .episode-item__number {
+    display: none;
+  }
+
+  .episode-item__thumb {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .episode-item__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .season-picker {
+    max-width: 100%;
+  }
+}

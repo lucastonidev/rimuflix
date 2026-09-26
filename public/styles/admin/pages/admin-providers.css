@@ -1,0 +1,90 @@
+@import '../layout.css';
+@import '../../components/admin-components.css';
+@import '../../components/admin-modal.css';
+@import '../../responsive/admin-responsive.css';
+
+.provider-card {
+  position: relative;
+}
+
+.provider-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.provider-card:hover .provider-actions {
+  opacity: 1;
+}
+
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-action:hover {
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-action.danger:hover {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.provider-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.provider-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.provider-card h3 {
+  font-size: 1.125rem;
+  margin-bottom: 4px;
+}
+
+.provider-card p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.provider-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
