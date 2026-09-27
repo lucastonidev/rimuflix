@@ -1,6 +1,11 @@
 /* =========================================
    CABEÇALHO DESKTOP
    ========================================= */
+
+.sidebar-toggle {
+  display: none;
+}
+
 .header {
   height: 80px;
   display: flex;
@@ -80,7 +85,8 @@
     position: fixed;
     top: 0;
     left: -300px; /* Começa escondida fora da tela à esquerda */
-    height: 100vh;
+    height: 100dvh; /* Troque vh por dvh */
+    max-height: 100%; /* Adicione como fallback */
     width: 280px;
     border-radius: 0;
     border-right: 1px solid var(--border-color);
@@ -139,7 +145,11 @@
 /* =========================================
    MENU MOBILE & RESPONSIVIDADE (Celulares)
    ========================================= */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+  .sidebar-toggle{
+    display: block;
+  }
+
   /* Barra Superior Exclusiva do Mobile */
   .mobile-top-bar {
     display: flex;
@@ -186,14 +196,13 @@
   .sidebar {
     position: fixed;
     top: 0;
-    left: -300px; /* Começa escondida fora da tela à esquerda */
-    height: 100vh;
+    left: -300px;
+    height: 100dvh; /* Troque vh por dvh */
+    max-height: 100%; /* Adicione como fallback */
     width: 280px;
     border-radius: 0;
-    border: none;
     border-right: 1px solid var(--border-color);
-    z-index: 100; /* Fica acima de tudo, incluindo a top-bar */
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
   }
 
   /* Classe injetada pelo seu layout.js para abrir a sidebar */

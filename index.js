@@ -28,8 +28,14 @@ app.use("/", website);
 app.use("/api/v1", api);
 app.use("/admin", admin);
 
-app.listen(3000, () => {
-  console.log("Está rodando Rimuflix");
-  console.log("------------------------------");
-  console.log("http://localhost:3000/");
-});
+// Se estiver rodando localmente (ambiente de desenvolvimento), escuta a porta 3000
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(3000, () => {
+    console.log("Está rodando Rimuflix Localmente");
+    console.log("------------------------------");
+    console.log("http://localhost:3000/");
+  });
+}
+
+// Exporta o app para que a Vercel o execute como uma Serverless Function
+export default app;

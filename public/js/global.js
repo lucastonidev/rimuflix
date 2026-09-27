@@ -1,5 +1,3 @@
-// public/js/global.js
-
 class GlobalApp {
   constructor() {
     this.init();
@@ -7,9 +5,15 @@ class GlobalApp {
 
   init() {
     this.setupTabSync();
-    // Aqui no futuro você pode colocar:
-    // this.setupTheme();
-    // this.setupGlobalToasts();
+    // Registra o Service Worker para o PWA
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then((reg) => console.log("Service Worker registrado!", reg))
+          .catch((err) => console.log("Erro ao registrar Service Worker", err));
+      });
+    }
   }
 
   /**

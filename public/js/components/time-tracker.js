@@ -1,4 +1,8 @@
-import { saveWatchProgress } from "./watch-progress.js";
+import {
+  saveWatchProgress,
+  autoSaveLocalProgress,
+  getWatchProgressState,
+} from "./watch-progress.js";
 
 export class TimeTracker {
   constructor(mediaData) {
@@ -9,25 +13,58 @@ export class TimeTracker {
     this.init();
   }
 
-  init() {
-    this.injectWidget();
+  async init() {
+    // 1. Busca o histórico de progresso (Local ou Nuvem)
+    const progressList = await getWatchProgressState();
+
+    // 2. Filtra para achar o episódio/filme atual
+    const savedProgress = progressList.find(
+      (p) =>
+        String(p.tmdbId) === String(this.media.id) &&
+        (this.media.type === "movie" ||
+          (p.seasonNumber == this.media.season &&
+            p.episodeNumber == this.media.episode)),
+    );
+
+    // 3. Se achou um tempo salvo, converte de HH:MM:SS para segundos totais
+    if (savedProgress && savedProgress.stoppedAt) {
+      const parts = savedProgress.stoppedAt.split(":");
+      if (parts.length === 3) {
+        const h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const s = parseInt(parts[2], 10);
+        this.secondsActive = h * 3600 + m * 60 + s;
+      }
+    }
+
+    this.injectCard();
     this.injectModal();
+
+    // 4. Se tiver um tempo prévio, injeta o card de aviso abaixo do player
+    if (this.secondsActive > 0) {
+      this.injectResumeBanner(this.formatTime(this.secondsActive).string);
+    }
+
     this.startTimer();
     this.setupListeners();
-    this.setupDragAndDrop();
   }
 
   startTimer() {
     if (this.interval) return;
     this.interval = setInterval(() => {
       this.secondsActive++;
-      this.updateWidgetDisplay();
+      this.updateDisplay();
+
+      if (this.secondsActive % 10 === 0) {
+        this.triggerLocalAutoSave();
+      }
     }, 1000);
   }
 
   pauseTimer() {
     clearInterval(this.interval);
     this.interval = null;
+    this.triggerLocalAutoSave();
   }
 
   formatTime(totalSeconds) {
@@ -41,36 +78,91 @@ export class TimeTracker {
     return { h, m, s, string: `${h}:${m}:${s}` };
   }
 
-  updateWidgetDisplay() {
+  updateDisplay() {
     const display = document.getElementById("tracker-time-display");
     if (display) {
       display.textContent = this.formatTime(this.secondsActive).string;
     }
   }
 
-  injectWidget() {
-    const widgetHtml = `
-      <div id="time-tracker-widget" class="time-tracker-widget">
-        <div id="tracker-drag-handle" class="tracker-drag-handle" title="Arraste para mover">
-          <i class="fa-solid fa-grip-vertical"></i>
-        </div>
-        
-        <div id="tracker-content" class="tracker-content">
-          <div class="tracker-info">
-            <i class="fa-solid fa-stopwatch"></i>
-            <span id="tracker-time-display">00:00:00</span>
-          </div>
-          <button id="btn-open-tracker-modal" class="btn-tracker" title="Salvar onde parei">
-            <i class="fa-solid fa-flag-checkered"></i> Salvar
-          </button>
-        </div>
+  triggerLocalAutoSave() {
+    autoSaveLocalProgress({
+      tmdbId: this.media.id,
+      mediaType: this.media.type,
+      seasonNumber: this.media.season,
+      episodeNumber: this.media.episode,
+      stoppedAt: this.formatTime(this.secondsActive).string,
+    });
+  }
 
-        <button id="btn-toggle-tracker" class="btn-tracker-toggle" title="Minimizar">
-          <i class="fa-solid fa-chevron-right"></i>
-        </button>
+  injectCard() {
+    const cardHtml = `
+      <div class="container time-tracker-wrapper">
+        <div id="time-tracker-card" class="time-tracker-card">
+          <div class="tracker-content-left">
+            <div class="tracker-icon-box">
+              <i class="fa-solid fa-stopwatch"></i>
+            </div>
+            <div class="tracker-texts">
+              <h3>Progresso de Sessão</h3>
+              <p>
+                Calculamos o tempo que você assiste e <strong>salvamos localmente de forma automática</strong>. 
+                Sincronize com a nuvem para não perder o progresso caso mude de dispositivo.
+              </p>
+            </div>
+          </div>
+          <div class="tracker-content-right">
+            <div class="tracker-timer">
+              <span class="timer-label" style="margin-bottom: 4px;">Tempo Assistido</span>
+              <strong id="tracker-time-display">${this.formatTime(this.secondsActive).string}</strong>
+            </div>
+            <button id="btn-save-cloud" class="btn-tracker" title="Confirmar e Salvar na Nuvem">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Salvar na Nuvem
+            </button>
+          </div>
+        </div>
       </div>
     `;
-    document.body.insertAdjacentHTML("beforeend", widgetHtml);
+    const playerContainer = document.querySelector(".player-container");
+    if (playerContainer) {
+      playerContainer.insertAdjacentHTML("beforebegin", cardHtml);
+    } else {
+      document.body.insertAdjacentHTML("beforeend", cardHtml);
+    }
+  }
+
+  injectResumeBanner(timeString) {
+    // Evita duplicar se recarregar algo na mesma página
+    const existing = document.getElementById("resume-progress-banner");
+    if (existing) existing.remove();
+
+    const resumeHtml = `
+      <div id="resume-progress-banner" class="resume-progress-banner">
+        <div class="resume-card-inner">
+          <div class="resume-text">
+            <div class="resume-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div class="resume-info">
+               <span class="resume-title">Continuar de onde parou</span>
+               <span class="resume-desc">Sua última sessão foi salva em <strong>${timeString}</strong>. Avance o player para este momento.</span>
+            </div>
+          </div>
+          <button id="btn-dismiss-resume" title="Entendi"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+    `;
+
+    // Injeta DEPOIS do player de vídeo no watch.ejs
+    const watchPlayer = document.querySelector(".watch-player");
+    if (watchPlayer) {
+      watchPlayer.insertAdjacentHTML("afterend", resumeHtml);
+    }
+
+    // Lógica para fechar o card
+    document
+      .getElementById("btn-dismiss-resume")
+      ?.addEventListener("click", (e) => {
+        e.currentTarget.closest("#resume-progress-banner").remove();
+      });
   }
 
   injectModal() {
@@ -78,12 +170,13 @@ export class TimeTracker {
       <div id="time-tracker-modal" class="tracker-modal-overlay">
         <div class="tracker-modal-box">
           <div class="tracker-modal-header">
-            <h3 class="tracker-modal-title"><i class="fa-solid fa-clock"></i> Onde você parou?</h3>
+            <h3 class="tracker-modal-title"><i class="fa-solid fa-cloud-arrow-up"></i> Salvar na Nuvem</h3>
             <button id="close-tracker-modal" class="tracker-modal-close"><i class="fa-solid fa-xmark"></i></button>
           </div>
           <div class="tracker-modal-body" style="text-align: left;">
             <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5;">
-              Calculamos o tempo que você ficou com esta página aberta. Confirme ou ajuste manualmente o momento exato em que parou de assistir.
+              <strong>Confirme ou ajuste o tempo antes de salvar.</strong><br>
+              Caso tenha esquecido a aba aberta ou já assistido parte do episódio em outro lugar, ajuste o cronômetro para marcar o momento exato em que parou.
             </p>
             <div class="tracker-inputs">
               <div class="form-group">
@@ -99,8 +192,8 @@ export class TimeTracker {
                 <input type="number" id="track-s" class="form-control" min="0" max="59" value="00">
               </div>
             </div>
-            <button id="btn-save-tracked-time" class="tracker-btn-submit">
-              Salvar Tempo
+            <button id="btn-confirm-cloud-save" class="tracker-btn-submit">
+              Confirmar e Salvar
             </button>
           </div>
         </div>
@@ -117,45 +210,41 @@ export class TimeTracker {
       else this.startTimer();
     });
 
-    const widget = document.getElementById("time-tracker-widget");
-    const toggleBtn = document.getElementById("btn-toggle-tracker");
     const modal = document.getElementById("time-tracker-modal");
 
-    // Lógica de Minimizar/Expandir
-    toggleBtn.addEventListener("click", () => {
-      widget.classList.toggle("minimized");
-      toggleBtn.title = widget.classList.contains("minimized")
-        ? "Expandir"
-        : "Minimizar";
+    document.getElementById("btn-save-cloud")?.addEventListener("click", () => {
+      const time = this.formatTime(this.secondsActive);
+      document.getElementById("track-h").value = time.h;
+      document.getElementById("track-m").value = time.m;
+      document.getElementById("track-s").value = time.s;
+      modal.classList.add("active");
     });
 
     document
-      .getElementById("btn-open-tracker-modal")
-      .addEventListener("click", () => {
-        const time = this.formatTime(this.secondsActive);
-        document.getElementById("track-h").value = time.h;
-        document.getElementById("track-m").value = time.m;
-        document.getElementById("track-s").value = time.s;
-        modal.classList.add("active");
-      });
-
-    document
       .getElementById("close-tracker-modal")
-      .addEventListener("click", () => {
+      ?.addEventListener("click", () => {
         modal.classList.remove("active");
       });
 
     document
-      .getElementById("btn-save-tracked-time")
-      .addEventListener("click", async (e) => {
+      .getElementById("btn-confirm-cloud-save")
+      ?.addEventListener("click", async (e) => {
         const btn = e.currentTarget;
+        const originalText = btn.innerHTML;
+
         btn.innerHTML =
           '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+        btn.disabled = true;
 
-        const h = document.getElementById("track-h").value.padStart(2, "0");
-        const m = document.getElementById("track-m").value.padStart(2, "0");
-        const s = document.getElementById("track-s").value.padStart(2, "0");
-        const stoppedAtStr = `${h}:${m}:${s}`;
+        const h = parseInt(document.getElementById("track-h").value || 0, 10);
+        const m = parseInt(document.getElementById("track-m").value || 0, 10);
+        const s = parseInt(document.getElementById("track-s").value || 0, 10);
+
+        this.secondsActive = h * 3600 + m * 60 + s;
+        this.updateDisplay();
+        this.triggerLocalAutoSave();
+
+        const stoppedAtStr = this.formatTime(this.secondsActive).string;
 
         await saveWatchProgress({
           tmdbId: this.media.id,
@@ -165,104 +254,13 @@ export class TimeTracker {
           stoppedAt: stoppedAtStr,
         });
 
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvo!';
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvo com sucesso!';
+
         setTimeout(() => {
           modal.classList.remove("active");
-          btn.innerHTML = "Salvar Tempo";
-        }, 1000);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 1500);
       });
-  }
-
-  setupDragAndDrop() {
-    const widget = document.getElementById("time-tracker-widget");
-    const handle = document.getElementById("tracker-drag-handle");
-
-    let isDragging = false;
-    let offsetX, offsetY;
-
-    const startDrag = (e) => {
-      isDragging = true;
-      const clientX = e.type.includes("mouse")
-        ? e.clientX
-        : e.touches[0].clientX;
-      const clientY = e.type.includes("mouse")
-        ? e.clientY
-        : e.touches[0].clientY;
-
-      const rect = widget.getBoundingClientRect();
-      offsetX = clientX - rect.left;
-      offsetY = clientY - rect.top;
-
-      // Remove a transição enquanto arrasta para ficar instantâneo
-      widget.style.transition = "none";
-    };
-
-    const doDrag = (e) => {
-      if (!isDragging) return;
-      e.preventDefault();
-
-      const clientX = e.type.includes("mouse")
-        ? e.clientX
-        : e.touches[0].clientX;
-      const clientY = e.type.includes("mouse")
-        ? e.clientY
-        : e.touches[0].clientY;
-
-      let newX = clientX - offsetX;
-      let newY = clientY - offsetY;
-
-      // Impede que o widget suma para fora da tela enquanto arrasta
-      const rect = widget.getBoundingClientRect();
-      newX = Math.max(0, Math.min(newX, window.innerWidth - rect.width));
-      newY = Math.max(0, Math.min(newY, window.innerHeight - rect.height));
-
-      // Limpa as âncoras para usar posicionamento absoluto
-      widget.style.bottom = "auto";
-      widget.style.right = "auto";
-      widget.style.left = `${newX}px`;
-      widget.style.top = `${newY}px`;
-    };
-
-    const endDrag = () => {
-      if (!isDragging) return;
-      isDragging = false;
-
-      // Devolve as animações suaves
-      widget.style.transition = "all 0.3s ease";
-
-      // ==========================================
-      // LÓGICA DO EFEITO ÍMÃ (SNAP TO EDGE)
-      // ==========================================
-      const rect = widget.getBoundingClientRect();
-      const screenWidth = window.innerWidth;
-      const widgetCenter = rect.left + rect.width / 2;
-
-      // Se soltou na metade esquerda da tela, cola na esquerda
-      if (widgetCenter < screenWidth / 2) {
-        widget.style.left = "20px";
-        widget.style.right = "auto";
-      }
-      // Se soltou na metade direita da tela, cola na direita
-      else {
-        widget.style.left = "auto";
-        widget.style.right = "20px";
-      }
-
-      // Garante que não fique colado demais no topo ou no rodapé
-      if (rect.top < 20) widget.style.top = "20px";
-      if (rect.bottom > window.innerHeight - 20) {
-        widget.style.top = `${window.innerHeight - rect.height - 20}px`;
-      }
-    };
-
-    // Eventos Mouse (Desktop)
-    handle.addEventListener("mousedown", startDrag);
-    document.addEventListener("mousemove", doDrag);
-    document.addEventListener("mouseup", endDrag);
-
-    // Eventos Touch (Mobile)
-    handle.addEventListener("touchstart", startDrag, { passive: false });
-    document.addEventListener("touchmove", doDrag, { passive: false });
-    document.addEventListener("touchend", endDrag);
   }
 }

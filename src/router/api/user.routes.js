@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import multer from "multer";
 import { UserDataModule } from "../../modules/user/user_data.module.js";
 import { requireAuth } from "../../middlewares/auth/auth.middleware.js"; // Ajuste o caminho se necessário
+import { saveWatchProgress } from "../../controllers/user/progress.controller.js";
 import { supabase } from "../../config/supabase.js";
 
 export const userRoute = express.Router();
@@ -111,27 +112,7 @@ userRoute.get("/progress", async (req, res) => {
   res.status(result.success ? 200 : 500).json(result);
 });
 
-userRoute.post("/progress/save", async (req, res) => {
-  const { tmdb_id, media_type, season_number, episode_number, stopped_at } =
-    req.body;
-
-  if (!tmdb_id || !media_type) {
-    return res.status(400).json({
-      success: false,
-      error: "Parâmetros 'tmdb_id' e 'media_type' são obrigatórios.",
-    });
-  }
-
-  const result = await UserDataModule.upsertProgress({
-    user_id: req.user.id,
-    tmdb_id,
-    media_type,
-    season_number,
-    episode_number,
-    stopped_at,
-  });
-  res.status(result.success ? 200 : 500).json(result);
-});
+userRoute.post("/progress/save", saveWatchProgress);
 
 userRoute.delete("/progress/remove/:media_type/:tmdb_id", async (req, res) => {
   const { media_type, tmdb_id } = req.params;

@@ -6,64 +6,99 @@ const isUserLoggedIn = () => {
 };
 
 export const getWatchProgressState = async () => {
+  let cloudData = [];
+
+  // 1. Tenta buscar da Nuvem se estiver logado
   if (isUserLoggedIn()) {
     try {
       const response = await fetch("/api/v1/user/progress");
       const result = await response.json();
+
       if (result.success && result.data) {
-        // Padroniza as chaves do banco para o formato que seu frontend já usa
-        return result.data.map((item) => ({
+        cloudData = result.data.map((item) => ({
           tmdbId: item.tmdb_id,
           mediaType: item.media_type,
           seasonNumber: item.season_number,
           episodeNumber: item.episode_number,
           timestamp: new Date(item.updated_at).getTime(),
+          stoppedAt: item.stopped_at,
         }));
       }
     } catch (error) {
-      console.error("Erro ao buscar progresso na nuvem", error);
+      console.warn(
+        "Erro ao buscar progresso na nuvem. Recorrendo ao LocalStorage...",
+        error,
+      );
     }
   }
 
-  // Fallback para visitante
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)) || [];
+  // 2. Busca os dados do LocalStorage (Sempre)
+  const localData =
+    JSON.parse(localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)) || [];
+
+  // 3. Mescla os dados de forma inteligente
+  const mergedData = [...localData];
+
+  cloudData.forEach((cloudItem) => {
+    const index = mergedData.findIndex(
+      (localItem) => String(localItem.tmdbId) === String(cloudItem.tmdbId),
+    );
+
+    if (index !== -1) {
+      // Se a nuvem retornou null ou vazio para o tempo, resgatamos o tempo do LocalStorage!
+      if (!cloudItem.stoppedAt && mergedData[index].stoppedAt) {
+        cloudItem.stoppedAt = mergedData[index].stoppedAt;
+      }
+
+      // Atualiza o item local com os dados finais validados
+      mergedData[index] = cloudItem;
+    } else {
+      // Se só existir na Nuvem, adiciona à lista final
+      mergedData.push(cloudItem);
+    }
+  });
+
+  return mergedData;
 };
 
 export const saveWatchProgress = async (newItem) => {
+  let savedToCloud = false;
+
   if (isUserLoggedIn()) {
     try {
-      await fetch("/api/v1/user/progress/save", {
+      // Constrói o payload básico com os dados obrigatórios
+      const payload = {
+        tmdb_id: String(newItem.tmdbId),
+        media_type: newItem.mediaType,
+        season_number: newItem.seasonNumber || 1,
+        episode_number: newItem.episodeNumber || 1,
+      };
+
+      // Só anexa o tempo se ele foi gerado pelo cronômetro
+      if (newItem.stoppedAt) {
+        payload.stopped_at = newItem.stoppedAt;
+      }
+
+      const response = await fetch("/api/v1/user/progress/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tmdb_id: String(newItem.tmdbId),
-          media_type: newItem.mediaType,
-          season_number: newItem.seasonNumber || 1,
-          episode_number: newItem.episodeNumber || 1,
-          stopped_at: newItem.stoppedAt || null,
-        }),
+        body: JSON.stringify(payload),
       });
-    } catch (error) {
-      console.error("Erro ao salvar progresso na nuvem", error);
-    }
-  } else {
-    // Fallback para visitante
-    const currentArray =
-      JSON.parse(localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)) || [];
-    const index = currentArray.findIndex(
-      (item) => String(item.tmdbId) === String(newItem.tmdbId),
-    );
 
-    if (index === -1) {
-      currentArray.push(newItem);
-    } else {
-      currentArray[index] = newItem;
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        savedToCloud = true;
+      } else {
+        console.warn("Falha no servidor. Fallback ativado.", result.error);
+      }
+    } catch (error) {
+      console.warn("Sem conexão. Fallback ativado.", error);
     }
-    localStorage.setItem(
-      STORAGE_KEYS.WATCH_PROGRESS,
-      JSON.stringify(currentArray),
-    );
   }
+
+  // Fallback: Sincroniza localmente sempre
+  autoSaveLocalProgress(newItem);
 };
 
 export const removeWatchProgress = async (tmdbId, mediaType = "tv") => {
@@ -87,5 +122,25 @@ export const removeWatchProgress = async (tmdbId, mediaType = "tv") => {
   localStorage.setItem(
     STORAGE_KEYS.WATCH_PROGRESS,
     JSON.stringify(updatedProgress),
+  );
+};
+
+export const autoSaveLocalProgress = (newItem) => {
+  const currentArray =
+    JSON.parse(localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)) || [];
+  const index = currentArray.findIndex(
+    (item) => String(item.tmdbId) === String(newItem.tmdbId),
+  );
+
+  if (index === -1) {
+    currentArray.push(newItem);
+  } else {
+    // 👇 A MÁGICA ACONTECE AQUI: Mescla o dado antigo com o novo, preservando o stoppedAt
+    currentArray[index] = { ...currentArray[index], ...newItem };
+  }
+
+  localStorage.setItem(
+    STORAGE_KEYS.WATCH_PROGRESS,
+    JSON.stringify(currentArray),
   );
 };

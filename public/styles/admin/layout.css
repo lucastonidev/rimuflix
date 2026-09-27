@@ -137,6 +137,7 @@ body {
 
 .user-profile {
   padding: 16px;
+  padding-bottom: 24px; /* Adicionado para dar uma margem de respiro acima da barra do navegador */
   border-top: 1px solid var(--border-color);
 }
 

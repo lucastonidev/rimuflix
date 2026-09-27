@@ -37,7 +37,8 @@ class WatchPage {
   async fetchOptionPlayerMovie() {
     try {
       const response = await this.api.getAllPlayerMovie(this.id);
-      this.players = response.data;
+      // Garante que, se a API não mandar o 'data', ele vira um array vazio
+      this.players = response?.data || [];
     } catch (error) {
       this.players = [];
     }
@@ -50,7 +51,8 @@ class WatchPage {
         this.tv.currentSeason,
         this.tv.currentEpisode,
       );
-      this.players = response.data;
+      // Mesma proteção para a busca de séries
+      this.players = response?.data || [];
     } catch (error) {
       this.players = [];
     }

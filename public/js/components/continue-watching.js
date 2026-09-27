@@ -18,18 +18,23 @@ export const continueWaching = async () => {
 
     const historyResponses = await Promise.all(historyPromises);
 
-    // Mapeia as respostas garantindo que os dados de progresso (temporada/episódio) sejam mantidos
+    // 1. Mapeia PRIMEIRO para manter o 'index' sincronizado com o 'storageData'
+    // 2. Filtra DEPOIS para remover os nulos que falharam na API
     return historyResponses
-      .filter((res) => res.success && res.data) // Pula mídias que deram erro na API
       .map((res, index) => {
+        // Se a API falhou para esta mídia específica, retorna null
+        if (!res.success || !res.data) return null;
+
         const progressInfo = storageData[index];
         return {
           ...res.data,
           seasonNumber: progressInfo.seasonNumber,
           episodeNumber: progressInfo.episodeNumber,
           timestamp: progressInfo.timestamp,
+          stoppedAt: progressInfo.stoppedAt, // Garante o tempo exato repassado
         };
-      });
+      })
+      .filter((item) => item !== null);
   } catch (error) {
     console.error("Erro ao buscar histórico:", error);
     return [];

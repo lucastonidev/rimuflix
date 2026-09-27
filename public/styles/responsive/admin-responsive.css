@@ -47,7 +47,6 @@
   body {
     padding: 0; /* Remove a margem externa no telemóvel */
     gap: 0;
-    /* Muda para scroll normal no body do mobile para evitar bugs do Safari */
     overflow-y: auto; 
     height: auto;
   }
@@ -56,9 +55,8 @@
     border-radius: 0;
     border: none;
     padding-inline: 0;
-    /* Remove a altura fixa e o overflow interno para o scroll ser fluido na página toda */
     height: auto; 
-    overflow: visible;
+    overflow: auto;
   }
 
   .header {
