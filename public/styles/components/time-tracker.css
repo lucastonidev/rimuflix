@@ -1,0 +1,285 @@
+/* ========================================= */
+/* WIDGET FLUTUANTE                          */
+/* ========================================= */
+.time-tracker-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(20, 20, 20, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 9999;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transition: width 0.3s ease, background 0.3s ease, border-radius 0.3s ease;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* Estado Compacto / Minimizado */
+.time-tracker-widget.minimized {
+  background: rgba(229, 9, 20, 0.95);
+  border-color: rgba(229, 9, 20, 1);
+  padding: 10px;
+  border-radius: 50%;
+  gap: 0;
+  cursor: pointer;
+}
+
+.time-tracker-widget.minimized .tracker-content,
+.time-tracker-widget.minimized .tracker-drag-handle {
+  display: none;
+}
+
+/* Alça para Arrastar */
+.tracker-drag-handle {
+  cursor: grab;
+  color: var(--text-secondary);
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.tracker-drag-handle:active {
+  cursor: grabbing;
+}
+
+.tracker-drag-handle:hover {
+  color: white;
+}
+
+/* Conteúdo Interno */
+.tracker-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.tracker-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+.tracker-info i {
+  color: var(--accent);
+}
+
+/* Botões */
+.btn-tracker {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-tracker:hover {
+  background: var(--accent-hover);
+}
+
+.btn-tracker-toggle {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s, color 0.2s;
+}
+
+.btn-tracker-toggle:hover {
+  color: white;
+}
+
+.time-tracker-widget.minimized .btn-tracker-toggle {
+  color: white;
+  transform: rotate(180deg);
+}
+
+/* ========================================= */
+/* MODAL DO TEMPORIZADOR (CENTRALIZADO)      */
+/* ========================================= */
+.tracker-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  z-index: 10000;
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.tracker-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tracker-modal-box {
+  background: var(--secondary-bg, #141414);
+  width: 90%;
+  max-width: 450px;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.tracker-modal-overlay.active .tracker-modal-box {
+  transform: translateY(0);
+}
+
+.tracker-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tracker-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tracker-modal-title i {
+  color: var(--accent);
+}
+
+.tracker-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #a3a3a3);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tracker-modal-close:hover {
+  color: var(--accent, #e50914);
+}
+
+.tracker-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.tracker-inputs .form-group {
+  text-align: center;
+}
+
+.tracker-inputs .form-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.tracker-inputs .form-control {
+  width: 100%;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-family: monospace;
+  background: var(--tertiary-bg, #1a1a1a);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: var(--text-primary, #ffffff);
+  padding: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.tracker-inputs .form-control:focus {
+  border-color: var(--accent);
+}
+
+.tracker-inputs input[type="number"]::-webkit-inner-spin-button,
+.tracker-inputs input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tracker-btn-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.05rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.tracker-btn-submit:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Estado Compacto / Minimizado */
+.time-tracker-widget.minimized {
+  background: rgba(229, 9, 20, 0.95);
+  border-color: rgba(229, 9, 20, 1);
+  padding: 6px 12px;
+  border-radius: 50px; /* Transforma em uma pílula flutuante */
+  gap: 8px;
+}
+
+/* Esconde APENAS os números e o botão salvar. 
+   O ícone de arrastar continua visível! */
+.time-tracker-widget.minimized .tracker-content {
+  display: none;
+}
+
+.time-tracker-widget.minimized .tracker-drag-handle {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 4px;
+}
+
+.time-tracker-widget.minimized .tracker-drag-handle:hover {
+  color: white;
+}
+
+.time-tracker-widget.minimized .btn-tracker-toggle {
+  color: white;
+  transform: rotate(180deg);
+  padding: 4px;
+}

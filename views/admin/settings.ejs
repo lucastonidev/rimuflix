@@ -1,41 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
-<head>
-  <%- include('../partials/head') %>
-    <link rel="stylesheet" href="/styles/admin/pages/admin-media.css">
-    <link rel="stylesheet" href="/styles/admin/global.css">
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/styles/admin/pages/admin-add-media.css" />
+    <link rel="stylesheet" href="/styles/admin/global.css" />
     <title>Configurações | Admin Rimuflix</title>
-</head>
+  </head>
 
-<body>
-  <%- include('../partials/admin/sidebar') %>
+  <body>
+    <%- include('../partials/admin/sidebar') %>
     <main class="main-content">
+      <%- include('../partials/admin/menu-mobile') %>
       <header class="header">
         <div class="header-title">
           <h1 class="page-title">Configurações do Sistema</h1>
         </div>
       </header>
-    
+
       <div class="content-area">
         <form id="form-settings">
-    
           <!-- Chaves de API -->
           <div class="card mb-6">
-            <h2 class="section-title"><i class="fa-solid fa-key"></i> Chaves de Integração</h2>
-    
+            <h2 class="section-title">
+              <i class="fa-solid fa-key"></i> Chaves de Integração
+            </h2>
+
             <div class="form-group">
-              <label for="tmdb_api_key" class="form-label">TMDB API Key (The Movie Database)</label>
-              <input type="text" id="tmdb_api_key" class="form-control" placeholder="Cole sua chave v3 auth do TMDB aqui">
+              <label for="tmdb_api_key" class="form-label"
+                >TMDB API Key (The Movie Database)</label
+              >
+              <input
+                type="text"
+                id="tmdb_api_key"
+                class="form-control"
+                placeholder="Cole sua chave v3 auth do TMDB aqui"
+              />
             </div>
           </div>
-    
+
           <!-- Preferências do Sistema -->
           <div class="card mb-6">
-            <h2 class="section-title"><i class="fa-solid fa-sliders"></i> Preferências do Aplicativo</h2>
+            <h2 class="section-title">
+              <i class="fa-solid fa-sliders"></i> Preferências do Aplicativo
+            </h2>
             <!-- Seletor de Tema -->
             <div class="form-group">
-              <label for="default_theme" class="form-label">Tema Padrão do Frontend</label>
+              <label for="default_theme" class="form-label"
+                >Tema Padrão do Frontend</label
+              >
               <div class="select-wrapper">
                 <select id="default_theme" class="form-control">
                   <option value="dark">Escuro (Dark Mode)</option>
@@ -44,22 +56,19 @@
                 <i class="fa-solid fa-chevron-down"></i>
               </div>
             </div>
-    
           </div>
-    
+
           <!-- Ações -->
-          <div class="flex justify-end mt-4">
+          <div class="flex justify-center mt-4">
             <button type="submit" class="btn btn-primary">
               <i class="fa-solid fa-save"></i> Salvar Configurações
             </button>
           </div>
-    
         </form>
       </div>
     </main>
-    
+
+    <script src="/js/admin/layout.js"></script>
     <script type="module" src="/js/admin/settings.js"></script>
-
-</body>
-
+  </body>
 </html>

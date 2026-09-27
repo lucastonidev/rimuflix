@@ -225,7 +225,30 @@ class App {
           // Se a lista ficar vazia após a remoção
           if (movieList.children.length === 0) {
             container.innerHTML = ""; // Limpa o container
-            this.loadWatchingContinue(); // Recarrega a função para forçar o Empty State a aparecer
+            const emptyArticle = document.createElement("article");
+            emptyArticle.classList.add("movie-section", "container");
+            emptyArticle.innerHTML = `
+              <h2 class="section-title">Continue Assistindo</h2>
+              <div
+                class="empty-list-msg"
+                style="padding: 40px; text-align: center; color: var(--text-secondary); background: var(--secondary-bg); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 20px;"
+              >
+                <i
+                  class="fa-solid fa-clock-rotate-left"
+                  style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"
+                ></i>
+                <h3
+                  style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 8px;"
+                >
+                  Você ainda não assistiu a nada
+                </h3>
+                <p>
+                  Explore nosso catálogo e comece a maratonar! Seus filmes e
+                  séries em andamento aparecerão aqui.
+                </p>
+              </div>
+            `;
+            container.appendChild(emptyArticle);
           }
         });
       });

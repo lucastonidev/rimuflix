@@ -1,69 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/styles/admin/global.css" />
+    <link rel="stylesheet" href="/styles/admin/pages/admin-sagas.css" />
+    <title>Gerenciar Sagas | Admin Rimuflix</title>
+  </head>
 
-<head>
-  <%- include('../partials/head') %>
-  <link rel="stylesheet" href="/styles/admin/global.css">
-  <link rel="stylesheet" href="/styles/admin/pages/admin-sagas.css">
-  <title>Gerenciar Sagas | Admin Rimuflix</title>
-</head>
+  <body>
+    <%- include('../partials/admin/sidebar') %>
+    <main class="main-content">
+      <header class="header">
+        <div class="header-title">
+          <h1 class="page-title">Sagas & Coleções</h1>
+        </div>
+      </header>
 
-<body>
+      <!-- SEÇÃO 1: Adicionar Saga -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="step-badge"><i class="fa-solid fa-layer-group"></i></div>
+          <h3>Adicionar Nova Saga ou Coleção</h3>
+        </div>
 
-  <%- include('../partials/admin/sidebar') %>
-  <main class="main-content">
-    <header class="header">
-      <div class="header-title">
-        <h1 class="page-title">Sagas & Coleções</h1>
-      </div>
-    </header>
-
-    <div class="content-area">
-      <!-- Formulário -->
-      <div class="card mb-6">
-        <h2 class="section-title"><i class="fa-solid fa-plus"></i> Adicionar Nova Saga</h2>
         <form id="form-add-saga">
-          <div class="grid grid-cols-4">
-            <div class="form-group">
-              <label class="form-label">ID (TMDB Collection ID)</label>
-              <input type="text" id="saga_id" class="form-control" placeholder="Ex: 86311" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Nome da Saga</label>
-              <input type="text" id="saga_name" class="form-control" placeholder="Ex: Universo Marvel" required>
-            </div>
+          <div class="grid grid-cols-2 gap-4">
             <div class="form-group">
               <label class="form-label">Tipo</label>
               <div class="select-wrapper">
                 <select id="saga_type" class="form-control" required>
                   <option value="collection">Collection (TMDB)</option>
-                  <option value="keyword">Keyword (TMDB)</option>
-                  <option value="list">Lista (TMDB)</option> <!-- 👈 Nova opção adicionada -->
+                  <option value="list">List (TMDB)</option>
                 </select>
                 <i class="fa-solid fa-chevron-down"></i>
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">URL da Imagem</label>
-              <input type="url" id="saga_image" class="form-control" placeholder="https://image.tmdb...">
+              <label class="form-label">ID (TMDB Collection/List ID)</label>
+              <input
+                type="number"
+                id="saga_id"
+                class="form-control"
+                placeholder="Ex: 86311"
+                required
+              />
             </div>
           </div>
-          <div class="flex justify-end mt-4">
-            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Salvar Saga</button>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-group">
+              <label class="form-label">Nome da Saga</label>
+              <input
+                type="text"
+                id="saga_name"
+                class="form-control"
+                placeholder="Ex: Universo Marvel"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL da Imagem (Capa)</label>
+              <input
+                type="url"
+                id="saga_image"
+                class="form-control"
+                placeholder="https://image.tmdb.org/..."
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-actions" style="margin-top: 10px; text-align: right">
+            <button
+              type="submit"
+              id="btn-submit-saga"
+              class="btn-primary"
+              style="padding: 12px 24px"
+            >
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Saga
+            </button>
           </div>
         </form>
       </div>
 
-      <!-- Lista de Sagas -->
-      <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Sagas Ativas</h2>
-      <div class="saga-grid" id="sagas-grid">
-        <p style="color: var(--text-secondary);">Carregando...</p>
+      <!-- SEÇÃO 2: Grade de Sagas -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="step-badge" style="background-color: #3b82f6">
+            <i class="fa-solid fa-table-cells-large"></i>
+          </div>
+          <h3>Sagas Ativas</h3>
+        </div>
+        <div id="sagas-grid" class="saga-grid">
+          <!-- Renderizado via JS -->
+        </div>
       </div>
+    </main>
 
-    </div>
-  </main>
-
-  <script type="module" src="/js/admin/sagas.js"></script>
-</body>
-
+    <script type="module" src="/js/admin/sagas.js"></script>
+  </body>
 </html>

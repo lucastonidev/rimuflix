@@ -1,0 +1,157 @@
+@import '../layout.css'; 
+@import '../components/components.css';
+@import '../components/modal.css';
+@import '../components/header.css';
+@import '../../responsive/admin-responsive.css';
+
+/* Seções do Formulário */
+.form-section {
+  background-color: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 12px;
+}
+
+.step-badge {
+  background-color: var(--accent);
+  color: white;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-right: 12px;
+}
+
+.section-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Input de Busca com Botão Acoplado */
+.input-with-btn {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-btn .form-control {
+  flex: 1;
+}
+
+.input-with-btn .btn-primary {
+  padding: 0 20px;
+  white-space: nowrap;
+}
+
+/* Melhorias no Preview */
+.media-preview {
+  display: none;
+  align-items: center;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(34, 197, 94, 0.3); /* Borda esverdeada indicando sucesso */
+  margin-top: 16px;
+  animation: fadeInTab 0.3s ease;
+}
+
+.media-preview.active {
+  display: flex;
+}
+
+.media-preview img {
+  width: 70px;
+  height: 105px;
+  border-radius: 6px;
+  object-fit: cover;
+  margin-right: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.media-preview-info h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.text-muted {
+  font-size: 0.8rem;
+  color: #22c55e; /* Verde indicando sucesso no preenchimento */
+}
+
+/* Seletor de Tipo de Link (Pills) */
+.link-type-selector {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 6px;
+  border-radius: 10px;
+  width: 100%;
+  border: 1px solid var(--border-color);
+}
+
+.btn-link-type {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-link-type:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-link-type.active {
+  background: var(--tertiary-bg);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Utilitários para ocultar e ajustar o Grid dinamicamente */
+.hidden-field {
+  display: none !important;
+}
+
+#links-container {
+  transition: all 0.3s ease;
+}
+
+/* Quando exibir só um campo, ele ocupa a largura toda ao invés de ficar esmagado */
+#links-container.single-column {
+  grid-template-columns: 1fr;
+}
+
+.justify-center{
+  justify-content: center;
+}
+
+.justify-center .btn-primary{
+  width: 90%;
+}

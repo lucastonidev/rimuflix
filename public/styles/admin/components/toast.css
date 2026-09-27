@@ -1,0 +1,57 @@
+/* =========================================
+   SISTEMA DE TOAST (NOTIFICAÇÕES)
+   ========================================= */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none; /* Para não bloquear cliques na tela */
+}
+
+.toast {
+  min-width: 250px;
+  max-width: 350px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  background: var(--tertiary-bg);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateX(120%);
+  opacity: 0;
+  animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-left: 4px solid transparent;
+  pointer-events: auto; /* Reativa os cliques apenas no toast */
+}
+
+.toast i {
+  font-size: 1.2rem;
+}
+
+.toast.success { border-left-color: var(--success); }
+.toast.success i { color: var(--success); }
+
+.toast.error { border-left-color: var(--danger); }
+.toast.error i { color: var(--danger); }
+
+.toast.warning { border-left-color: var(--warning); }
+.toast.warning i { color: var(--warning); }
+
+.toast.hiding {
+  animation: slideOutToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInToast {
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOutToast {
+  to { transform: translateX(120%); opacity: 0; }
+}

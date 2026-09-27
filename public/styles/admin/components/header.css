@@ -1,0 +1,221 @@
+/* =========================================
+   CABEÇALHO DESKTOP
+   ========================================= */
+.header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 40px;
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 16px 16px 0 0;
+  z-index: 10;
+}
+
+/* Esconde a barra mobile no desktop por padrão */
+.mobile-top-bar {
+  display: none;
+}
+
+/* Esconde o overlay de fundo no desktop */
+.sidebar-overlay {
+  display: none;
+}
+
+/* =========================================
+   MENU MOBILE & RESPONSIVIDADE (Celulares)
+   ========================================= */
+@media (max-width: 768px) {
+  /* Oculta o cabeçalho original no mobile para dar espaço à barra mobile */
+  .header {
+    display: none;
+  }
+
+  /* Barra Superior Exclusiva do Mobile */
+  .mobile-top-bar {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--secondary-bg);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 16px;
+    gap: 16px;
+    border-radius: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  .mobile-top-bar .mobile-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Botão Hambúrguer */
+  .btn-mobile-menu {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+  }
+
+  .btn-mobile-menu:hover {
+    color: var(--accent);
+  }
+
+  /* =========================================
+     COMPORTAMENTO DA SIDEBAR NO MOBILE
+     ========================================= */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px; /* Começa escondida fora da tela à esquerda */
+    height: 100vh;
+    width: 280px;
+    border-radius: 0;
+    border-right: 1px solid var(--border-color);
+    z-index: 100; /* Fica acima de tudo, incluindo a top-bar */
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background-color: var(--secondary-bg);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .sidebar-toggle {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  /* Classe injetada pelo seu layout.js para abrir a sidebar */
+  .sidebar.open {
+    left: 0;
+  }
+
+  /* Fundo escuro (Overlay) quando o menu está aberto */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 90; /* Fica abaixo da sidebar, mas acima do resto */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Esconde a barra mobile no desktop por padrão */
+.mobile-top-bar {
+  display: none;
+}
+
+/* Esconde o overlay de fundo no desktop */
+.sidebar-overlay {
+  display: none;
+}
+
+/* =========================================
+   MENU MOBILE & RESPONSIVIDADE (Celulares)
+   ========================================= */
+@media (max-width: 768px) {
+  /* Barra Superior Exclusiva do Mobile */
+  .mobile-top-bar {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--secondary-bg);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 24px;
+    gap: 16px;
+    border-radius: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  .mobile-top-bar .mobile-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Botão Hambúrguer */
+  .btn-mobile-menu {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+  }
+
+  .btn-mobile-menu:hover {
+    color: var(--accent);
+  }
+
+  /* =========================================
+     COMPORTAMENTO DA SIDEBAR NO MOBILE
+     ========================================= */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px; /* Começa escondida fora da tela à esquerda */
+    height: 100vh;
+    width: 280px;
+    border-radius: 0;
+    border: none;
+    border-right: 1px solid var(--border-color);
+    z-index: 100; /* Fica acima de tudo, incluindo a top-bar */
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Classe injetada pelo seu layout.js para abrir a sidebar */
+  .sidebar.open {
+    left: 0;
+  }
+
+  /* Fundo escuro (Overlay) quando o menu está aberto */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 90; /* Fica abaixo da sidebar, mas acima do resto */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

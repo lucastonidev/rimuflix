@@ -26,8 +26,24 @@ admin.get("/", (req, res) => {
   res.render("admin/dashboard");
 });
 
+admin.get("/media/add", (req, res) => {
+  res.render("admin/add-media", {
+    path: "/admin/media/add",
+    // passe outras variáveis que você costuma passar (ex: user)
+  });
+});
+
+// 👇 NOVA: Rota para a página de Editar Mídia
+admin.get("/media/edit/:id", (req, res) => {
+  // Reutilizamos a exata mesma view! O JavaScript do add-media.js
+  // vai ler a URL, ver que tem um ID e preencher tudo sozinho.
+  res.render("admin/add-media", {
+    path: "/admin/media", // Mantém o menu "Gerenciar Mídias" ativo na sidebar, se usar essa lógica
+  });
+});
+
 admin.get("/media", (req, res) => {
-  res.render("admin/media");
+  res.render("admin/manage-media.ejs");
 });
 
 admin.get("/providers", (req, res) => {

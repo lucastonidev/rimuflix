@@ -1,43 +1,108 @@
+/* public/styles/responsive/admin-responsive.css */
+
 .sidebar-overlay {
   display: none;
 }
 
 @media (max-width: 1024px) {
-  .grid-cols-4 {
+  .grid-cols-4, .grid-cols-3 {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .grid-cols-3 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .header {
     padding: 0 24px;
   }
-
   .content-area {
     padding: 24px;
   }
 }
 
-@media (max-width: 768px) {
+/* =========================================
+   1. REGRAS GLOBAIS (DESKTOP FIRST)
+   ========================================= */
+.sidebar-overlay {
+  display: none;
+}
+
+/* Esconde a barra mobile no computador. Tem de ficar AQUI em cima! */
+.mobile-top-bar {
+  display: none;
+}
+
+/* =========================================
+   2. MEDIA QUERIES (TABLETS E TELEMÓVEIS)
+   ========================================= */
+@media (max-width: 1024px) {
+  .grid-cols-4, .grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .header {
+    padding: 0 24px;
+  }
+  .content-area {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  body {
+    padding: 0; /* Remove a margem externa no telemóvel */
+    gap: 0;
+    /* Muda para scroll normal no body do mobile para evitar bugs do Safari */
+    overflow-y: auto; 
+    height: auto;
+  }
+
+  .main-content {
+    border-radius: 0;
+    border: none;
+    padding-inline: 0;
+    /* Remove a altura fixa e o overflow interno para o scroll ser fluido na página toda */
+    height: auto; 
+    overflow: visible;
+  }
+
+  .header {
+    display: none; /* Oculta totalmente o header desktop no mobile */
+  }
+
+  /* Exibe o botão de abrir menu */
+  .btn-mobile-menu {
+    display: block;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Configuração da Sidebar Mobile (Escondida por padrão) */
   .sidebar {
-    position: absolute;
-    height: 100%;
-    transform: translateX(-100%);
+    position: fixed;
+    top: 0;
+    left: -300px;
+    height: 100vh;
+    width: 280px;
+    border-radius: 0;
+    border-right: 1px solid var(--border-color);
+    z-index: 1000; /* Super alto para ficar acima de tudo */
   }
 
+  /* Classe que será adicionada via JS para exibir o menu */
   .sidebar.open {
-    transform: translateX(0);
+    left: 0;
   }
 
+  /* Fundo escuro quando o menu estiver aberto */
   .sidebar-overlay {
     display: block;
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(2px);
-    z-index: 30;
+    z-index: 900;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s;
@@ -48,31 +113,39 @@
     pointer-events: auto;
   }
 
-  .grid-cols-4,
-  .grid-cols-3,
-  .grid-cols-2 {
+  .grid-cols-4, .grid-cols-3, .grid-cols-2 {
     grid-template-columns: 1fr;
-  }
-
-  .hide-mobile {
-    display: none;
   }
 
   .page-title {
     font-size: 1.5rem;
   }
 
-  .input-group {
-    flex-direction: column;
-  }
-
-  .content-header-mobile {
-    flex-direction: column;
-    align-items: flex-start;
+  /* BARRA MOBILE: Agora flui com o conteúdo, sem sticky! */
+  .mobile-top-bar {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary-bg); /* Igual ao fundo do body */
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
     gap: 16px;
+    border-radius: 0; /* Fica colada às bordas no telemóvel */
+    position: static; /* Remove o sticky que estava a causar o bug visual */
   }
 
-  .content-header-mobile .w-full {
-    width: 100%;
+  .mobile-top-bar .mobile-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Área do conteúdo (onde está o "Gestão de Usuários") ganha padding normal */
+  .content-area {
+    padding: 0 0px 80px 0px;
+    flex: none;
+    overflow-y: visible;
   }
 }

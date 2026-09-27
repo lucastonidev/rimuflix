@@ -1,7 +1,11 @@
-@import '../layout.css';
-@import '../../components/admin-components.css';
-@import '../../components/admin-modal.css';
-@import '../../responsive/admin-responsive.css';
+@import "../layout.css";
+@import "../components/components.css";
+@import "../components/modal.css";
+@import "../../responsive/admin-responsive.css";
+
+.main-content {
+  width: 100%;
+}
 
 .table-wrapper {
   background-color: var(--tertiary-bg);
@@ -113,4 +117,57 @@ tr:hover td {
   background-color: rgba(20, 20, 20, 0.3);
   font-size: 0.875rem;
   color: var(--text-secondary);
+}
+
+/* =========================================
+   BOTÕES DE AÇÃO DA TABELA
+   ========================================= */
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-action:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-action.danger:hover {
+  background-color: var(--danger-bg);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.btn-action.danger:hover i {
+  color: var(--danger) !important;
+}
+
+@media (max-width: 900px) {
+  #form-add-user {
+  width: 100%;
+  }
+
+  #form-add-user .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-area .card{
+    padding: 24px 8px 24px 8px;
+  }
 }

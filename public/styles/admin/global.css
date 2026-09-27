@@ -20,9 +20,6 @@
   --info-bg: rgba(59, 130, 246, 0.2);
 }
 
-@import '../components/admin-components.css';
-@import '../responsive/admin-responsive.css';
-
 * {
   margin: 0;
   padding: 0;

@@ -1,12 +1,25 @@
+/* public/styles/admin/layout.css */
+
+body {
+  background-color: #000000; /* Fundo mais escuro para destacar os blocos */
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  padding: 16px; /* Espaço ao redor de toda a tela */
+  gap: 16px; /* Espaço entre o menu e o conteúdo */
+}
+
 .sidebar {
   width: 260px;
   background-color: var(--secondary-bg);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px; /* Bordas arredondadas no menu */
   flex-shrink: 0;
-  transition: transform var(--transition);
+  transition: all 0.3s ease;
   z-index: 40;
+  height: 100%;
 }
 
 .main-content {
@@ -15,6 +28,10 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  background-color: var(--primary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 10px 20px;
 }
 
 .header {
@@ -23,10 +40,26 @@
   align-items: center;
   justify-content: space-between;
   padding: 0px 40px;
-  background: rgba(26, 26, 26, 0.7);
+  background: rgba(10, 10, 10, 0.7);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-color);
+  border-radius: 16px 16px 0 0;
   z-index: 10;
+}
+
+/* Botão Hambúrguer - Escondido no Desktop */
+.btn-mobile-menu {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-mobile-menu:hover {
+  color: var(--accent);
 }
 
 .content-area {
@@ -40,13 +73,10 @@
   height: 80px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  border-bottom: 1px solid var(--border-color);
+  justify-content: center;
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 1px;
-  text-transform: uppercase;
   color: var(--accent);
 }
 
@@ -157,35 +187,4 @@
 .btn-logout:hover {
   background-color: var(--tertiary-bg);
   color: var(--text-primary);
-}
-
-.btn-icon {
-  color: var(--text-secondary);
-  font-size: 1.25rem;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.2s;
-  position: relative;
-}
-
-.btn-icon:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
-}
-
-.notification-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: var(--accent);
-  color: white;
-  font-size: 0.6rem;
-  font-weight: bold;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--primary-bg);
 }

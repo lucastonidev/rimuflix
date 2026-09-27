@@ -1,47 +1,74 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
-<head>
-  <%- include('../partials/head') %>
-    <link rel="stylesheet" href="/styles/admin/pages/admin-providers.css">
-    <link rel="stylesheet" href="/styles/admin/global.css">
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/styles/admin/pages/admin-providers.css" />
+    <link rel="stylesheet" href="/styles/admin/global.css" />
     <title>Gerenciar Provedores | Admin Rimuflix</title>
-</head>
+  </head>
 
-<body>
-  <%- include('../partials/admin/sidebar') %>
+  <body>
+    <%- include('../partials/admin/sidebar') %>
     <main class="main-content">
+      <%- include('../partials/admin/menu-mobile') %>
+
       <header class="header">
         <div class="header-title">
           <h1 class="page-title">Provedores de Streaming</h1>
         </div>
       </header>
-    
+
       <div class="content-area">
         <div class="grid grid-cols-3">
-    
           <!-- Formulário para Adicionar -->
-          <div class="card" style="grid-column: span 1; height: fit-content;">
-            <h2 class="section-title"><i class="fa-solid fa-plus"></i> Novo Provedor</h2>
+          <div class="card" style="grid-column: span 1; height: fit-content">
+            <h2 class="section-title">
+              <i class="fa-solid fa-plus"></i> Novo Provedor
+            </h2>
             <form id="form-add-provider">
               <div class="form-group">
-                <label for="provider_name" class="form-label">Nome do Provedor</label>
-                <input type="text" id="provider_name" class="form-control" placeholder="Ex: Superflix API" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="provider_url" class="form-label">URL Base ou Endpoint</label>
-                <input type="url" id="provider_url" class="form-control" placeholder="https://api.superflix.com/..."
-                  required>
+                <label for="provider_name" class="form-label"
+                  >Nome do Provedor</label
+                >
+                <input
+                  type="text"
+                  id="provider_name"
+                  class="form-control"
+                  placeholder="Ex: Superflix API"
+                  required
+                />
               </div>
 
               <div class="form-group">
-                <label for="provider_url_icon" class="form-label">URL do Ícone</label>
-                <input type="url" id="provider_url_icon" class="form-control" placeholder="https://api.superflix.com/icon.png" required>
+                <label for="provider_url" class="form-label"
+                  >URL Base ou Endpoint</label
+                >
+                <input
+                  type="url"
+                  id="provider_url"
+                  class="form-control"
+                  placeholder="https://api.superflix.com/..."
+                  required
+                />
               </div>
-    
+
               <div class="form-group">
-                <label for="provider_type" class="form-label">Tipo de Integração</label>
+                <label for="provider_url_icon" class="form-label"
+                  >URL do Ícone</label
+                >
+                <input
+                  type="url"
+                  id="provider_url_icon"
+                  class="form-control"
+                  placeholder="https://api.superflix.com/icon.png"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="provider_type" class="form-label"
+                  >Tipo de Integração</label
+                >
                 <div class="select-wrapper">
                   <select id="provider_type" class="form-control" required>
                     <option value="API">API (JSON)</option>
@@ -51,25 +78,29 @@
                   <i class="fa-solid fa-chevron-down"></i>
                 </div>
               </div>
-    
-              <button type="submit" class="btn btn-primary w-full mt-4"><i class="fa-solid fa-save"></i> Adicionar
-                Provedor</button>
+
+              <button type="submit" class="btn btn-primary w-full mt-4">
+                <i class="fa-solid fa-save"></i> Adicionar Provedor
+              </button>
             </form>
           </div>
-    
+
           <!-- Grid de Provedores Ativos -->
-          <div style="grid-column: span 2;">
-            <h2 class="section-title mb-6"><i class="fa-solid fa-server"></i> Provedores Ativos</h2>
+          <div style="grid-column: span 2">
+            <h2 class="section-title mb-6">
+              <i class="fa-solid fa-server"></i> Provedores Ativos
+            </h2>
             <div id="providers-grid" class="grid grid-cols-2">
-              <p style="color: var(--text-secondary);">Carregando provedores...</p>
+              <p style="color: var(--text-secondary)">
+                Carregando provedores...
+              </p>
             </div>
           </div>
-    
         </div>
       </div>
     </main>
-    
-    <script type="module" src="/js/admin/providers.js"></script>
-</body>
 
+    <script type="module" src="/js/admin/layout.js"></script>
+    <script type="module" src="/js/admin/providers.js"></script>
+  </body>
 </html>

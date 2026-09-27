@@ -3,6 +3,7 @@ import { renderMovieInfo, renderTvInfo } from "../components/media-info.js";
 import * as watchProgress from "../components/watch-progress.js";
 import { WatchSwitcher } from "../components/watch-switcher.js";
 import { WatchEpisodes } from "../components/watch-episodes.js";
+import { TimeTracker } from "../components/time-tracker.js";
 
 class WatchPage {
   constructor() {
@@ -84,6 +85,14 @@ class WatchPage {
         timestamp: Date.now(),
       });
 
+      // Inicializa o rastreador de tempo para filmes
+      new TimeTracker({
+        id: this.id,
+        type: this.type,
+        season: 1,
+        episode: 1,
+      });
+
       await this.fetchOptionPlayerMovie();
       this.renderMediaInfo();
 
@@ -110,6 +119,14 @@ class WatchPage {
       mediaType: this.type,
       seasonNumber: this.tv.currentSeason,
       episodeNumber: this.tv.currentEpisode,
+    });
+
+    // Inicializa o rastreador de tempo para séries
+    new TimeTracker({
+      id: this.id,
+      type: this.type,
+      season: this.tv.currentSeason,
+      episode: this.tv.currentEpisode,
     });
 
     await this.fetchSeasonDetails(this.tv.currentSeason);

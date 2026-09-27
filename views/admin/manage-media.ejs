@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include('../partials/head') %>
+    <!-- CSS Global e da Página -->
+    <link rel="stylesheet" href="/styles/admin/global.css" />
+    <link rel="stylesheet" href="/styles/admin/pages/admin-manage-media.css" />
+  </head>
+  <body>
+    <!-- Inclua seu menu lateral aqui (ajuste o caminho do include conforme seu projeto) -->
+    <%- include('../partials/admin/sidebar') %>
+
+    <main class="main-content">
+      <%- include('../partials/admin/menu-mobile') %>
+
+      <div class="content-area">
+        <!-- Cabeçalho da Página -->
+        <div
+          class="flex justify-between items-center mb-6"
+          style="flex-wrap: wrap; gap: 16px"
+        >
+          <div>
+            <h1 class="page-title">Gerenciar Mídias</h1>
+            <p class="page-subtitle">
+              Liste, edite e remova os filmes e séries do catálogo.
+            </p>
+          </div>
+          <a href="/admin/media/add" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Adicionar Nova
+          </a>
+        </div>
+
+        <!-- Barra de Busca -->
+        <div class="card mb-6 search-filter-bar">
+          <div class="input-group">
+            <input
+              type="text"
+              id="search-media"
+              class="form-control"
+              placeholder="Buscar por título ou ID do TMDB..."
+            />
+            <button class="btn btn-secondary">
+              <i class="fa-solid fa-search"></i> Buscar
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela de Mídias -->
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Tipo</th>
+                  <th>Temp / Ep</th>
+                  <!-- NOVA COLUNA -->
+                  <th>TMDB ID</th>
+                  <th>Adicionado em</th>
+                  <th style="text-align: right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="media-table-body">
+                <tr>
+                  <td
+                    colspan="6"
+                    style="text-align: center; color: var(--text-secondary)"
+                  >
+                    Carregando mídias...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/js/admin/layout.js"></script>
+    <script type="module" src="/js/admin/manage-media.js"></script>
+  </body>
+</html>

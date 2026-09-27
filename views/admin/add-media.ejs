@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <%- include('../partials/head') %>
+    <script src="/js/admin/layout.js" defer></script>
+
+    <link rel="stylesheet" href="/styles/admin/global.css" />
+    <link rel="stylesheet" href="/styles/admin/pages/admin-add-media.css" />
+    <title>Adicionar/Editar Mídia | Admin Rimuflix</title>
+  </head>
+
+  <body>
+    <%- include('../partials/admin/sidebar') %>
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      <%- include('../partials/admin/menu-mobile') %>
+
+      <div class="content-area">
+        <div class="flex justify-between items-center mb-6">
+          <!-- 👇 ID "page-title" adicionado para o JS alterar o texto -->
+          <h1 class="page-title" id="page-title">Adicionar Nova Mídia</h1>
+        </div>
+
+        <div class="card">
+          <form id="form-add-media" class="admin-form">
+            <!-- SEÇÃO 1: Busca e Identificação -->
+            <div class="form-section">
+              <div class="section-header">
+                <span class="step-badge">1</span>
+                <h3>Identificação da Mídia</h3>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                  <label class="form-label">Tipo de Mídia</label>
+                  <div class="select-wrapper">
+                    <select id="media_type" class="form-control">
+                      <option value="movie">Filme</option>
+                      <option value="tv">Série / Dorama / Novela</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">ID do TMDB</label>
+                  <div class="input-with-btn">
+                    <input
+                      type="number"
+                      id="tmdb_id"
+                      class="form-control"
+                      placeholder="Ex: 533535"
+                      required
+                    />
+                    <button
+                      type="button"
+                      id="btn-search-tmdb"
+                      class="btn-primary"
+                      title="Buscar no TMDB"
+                    >
+                      <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Preview com Feedback Visual da Busca -->
+              <div id="media-preview" class="media-preview">
+                <img
+                  id="preview-image"
+                  src="/img/fallback.png"
+                  alt="Capa da mídia"
+                />
+                <div class="media-preview-info">
+                  <span id="preview-type" class="badge warning">Filme</span>
+                  <h4 id="preview-title">Aguardando busca...</h4>
+                  <p class="text-muted">
+                    <i class="fa-solid fa-circle-check"></i> Título preenchido
+                    automaticamente
+                  </p>
+                  <!-- Campo invisível para manter a lógica do seu JS enviando o título -->
+                  <input type="hidden" id="title" />
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 2: Episódio e Temporada (Só aparece para Séries) -->
+            <div
+              class="form-section"
+              id="tv-fields-section"
+              style="display: none"
+            >
+              <div class="section-header">
+                <span class="step-badge">2</span>
+                <h3>Detalhes do Episódio</h3>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                  <label class="form-label">Número da Temporada</label>
+                  <input
+                    type="number"
+                    id="season_number"
+                    class="form-control"
+                    placeholder="Ex: 1"
+                    min="0"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Número do Episódio</label>
+                  <input
+                    type="number"
+                    id="episode_number"
+                    class="form-control"
+                    placeholder="Ex: 1"
+                    min="0"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO 3: Fontes de Mídia (Links) -->
+            <div class="form-section">
+              <div class="section-header">
+                <span class="step-badge" id="step-links-badge">2</span>
+                <h3>Fontes de Reprodução</h3>
+              </div>
+
+              <!-- NOVO: Seletor de Tipo de Link -->
+              <div class="link-type-selector">
+                <button
+                  type="button"
+                  class="btn-link-type active"
+                  data-show="torrent"
+                >
+                  <i class="fa-solid fa-magnet"></i> Somente Torrent
+                </button>
+                <button type="button" class="btn-link-type" data-show="drive">
+                  <i class="fa-brands fa-google-drive"></i> Somente Drive
+                </button>
+                <button type="button" class="btn-link-type" data-show="both">
+                  <i class="fa-solid fa-layer-group"></i> Ambos
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4" id="links-container">
+                <div class="form-group" id="group-torrent">
+                  <label class="form-label"
+                    ><i class="fa-solid fa-magnet" style="color: #3b82f6"></i>
+                    Links Torrent (Magnet)</label
+                  >
+                  <textarea
+                    id="torrent_links"
+                    class="form-control custom-scroll"
+                    rows="5"
+                    placeholder="Cole um magnet link por linha..."
+                  ></textarea>
+                </div>
+
+                <!-- Inicia escondido pelo CSS usando a classe hidden-field -->
+                <div class="form-group hidden-field" id="group-drive">
+                  <label class="form-label"
+                    ><i
+                      class="fa-brands fa-google-drive"
+                      style="color: #10b981"
+                    ></i>
+                    Links Externos / Drive</label
+                  >
+                  <textarea
+                    id="drive_links"
+                    class="form-control custom-scroll"
+                    rows="5"
+                    placeholder="Cole um link por linha (Drive, Mega, etc)..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- RODAPÉ DO FORMULÁRIO -->
+            <div
+              class="form-actions"
+              style="margin-top: 30px; text-align: right"
+            >
+              <button
+                type="submit"
+                id="btn-submit-media"
+                class="btn-primary"
+                style="padding: 14px 32px; font-size: 1rem"
+              >
+                <i class="fa-solid fa-cloud-arrow-up"></i> Adicionar ao Catálogo
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script src="/js/admin/layout.js"></script>
+    <script type="module" src="/js/admin/add-media.js"></script>
+  </body>
+</html>

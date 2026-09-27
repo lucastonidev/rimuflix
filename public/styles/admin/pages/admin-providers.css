@@ -1,10 +1,50 @@
-@import '../layout.css';
-@import '../../components/admin-components.css';
-@import '../../components/admin-modal.css';
-@import '../../responsive/admin-responsive.css';
+@import "../layout.css";
+@import "../components/components.css";
+@import "../components/modal.css";
+@import "../../responsive/admin-responsive.css";
+
+/* Bloco principal seguindo o padrão de seções */
+.form-section {
+  background-color: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 12px;
+}
+
+.section-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Grade de provedores ajustável no Desktop */
+.providers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
 
 .provider-card {
   position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.provider-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .provider-actions {
@@ -21,22 +61,32 @@
   opacity: 1;
 }
 
+/* Em dispositivos Touch (Mobile), as ações de deletar ficam sempre visíveis */
+@media (hover: none) {
+  .provider-actions {
+    opacity: 1;
+  }
+}
+
 .btn-action {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background-color: var(--secondary-bg);
+  background-color: rgba(0, 0, 0, 0.6);
   border: 1px solid var(--border-light);
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
 }
 
 .btn-action:hover {
   color: var(--text-primary);
   border-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--secondary-bg);
 }
 
 .btn-action.danger:hover {
@@ -87,4 +137,50 @@
   align-items: center;
   padding-top: 16px;
   border-top: 1px solid var(--border-color);
+}
+
+/* =========================================
+   RESPONSIVIDADE (Telemóveis e Tablets pequenos)
+   ========================================= */
+@media (max-width: 900px) {
+  /* Dá uma margem de segurança nas laterais do ecrã */
+  .content-area {
+    padding: 16px !important;
+  }
+
+  .content-area .grid{
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .form-section {
+    padding: 16px;
+  }
+
+  /* Força a grelha a ter sempre 1 coluna que ocupa tudo sem transbordar */
+  .providers-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .provider-card {
+    width: 100%;
+  }
+
+  /* Empilha os inputs do formulário de novo provedor na vertical */
+  #form-add-provider .grid {
+    display: flex;
+    flex-direction: column !important;
+    gap: 16px;
+  }
+
+  #form-add-provider {
+    width: 100%;
+  }
+  
+  /* Estica o botão para ser mais fácil clicar no ecrã touch */
+  .form-actions button {
+    width: 100%;
+    justify-content: center;
+  }
 }

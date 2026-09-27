@@ -1,42 +1,69 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
-<head>
-  <%- include('../partials/head') %>
-    <link rel="stylesheet" href="/styles/admin/pages/admin-users.css">
-    <link rel="stylesheet" href="/styles/admin/global.css">
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/styles/admin/pages/admin-users.css" />
+    <link rel="stylesheet" href="/styles/admin/global.css" />
     <title>Gerenciar Usuários | Admin Rimuflix</title>
-</head>
+  </head>
 
-<body>
-  <%- include('../partials/admin/sidebar') %>
+  <body>
+    <%- include('../partials/admin/sidebar') %>
     <main class="main-content">
-      <header class="header">
+      
+      <%- include('../partials/admin/menu-mobile') %>
+      
+      <div class="header">
         <div class="header-title">
           <h1 class="page-title">Gestão de Usuários</h1>
         </div>
-      </header>
-    
+      </div>
+
       <div class="content-area">
-      
         <!-- Formulário de Criação de Usuário -->
         <div class="card mb-6">
-          <h2 class="section-title"><i class="fa-solid fa-user-plus"></i> Novo Usuário</h2>
+          <h2 class="section-title">
+            <i class="fa-solid fa-user-plus"></i> Novo Usuário
+          </h2>
           <form id="form-add-user">
             <div class="grid grid-cols-4">
-      
               <div class="form-group">
                 <label for="user_name" class="form-label">Nome Completo</label>
-                <input type="text" id="user_name" class="form-control" placeholder="Ex: João Silva" required>
+                <input
+                  type="text"
+                  id="user_name"
+                  class="form-control"
+                  placeholder="Ex: João Silva"
+                  required
+                />
               </div>
-      
+
               <div class="form-group">
                 <label for="user_email" class="form-label">E-mail</label>
-                <input type="email" id="user_email" class="form-control" placeholder="joao@email.com" required>
+                <input
+                  type="email"
+                  id="user_email"
+                  class="form-control"
+                  placeholder="joao@email.com"
+                  required
+                />
               </div>
-      
+
               <div class="form-group">
-                <label for="user_role" class="form-label">Nível de Acesso</label>
+                <label for="user_password" class="form-label">Senha:</label>
+                <input
+                  type="text"
+                  id="user_password"
+                  class="form-control"
+                  placeholder="123456"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="user_role" class="form-label"
+                  >Nível de Acesso</label
+                >
                 <div class="select-wrapper">
                   <select id="user_role" class="form-control" required>
                     <option value="user">Usuário Padrão</option>
@@ -45,15 +72,16 @@
                   <i class="fa-solid fa-chevron-down"></i>
                 </div>
               </div>
-      
             </div>
-      
+
             <div class="flex justify-end gap-4 mt-4">
-              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Cadastrar Usuário</button>
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-save"></i> Cadastrar Usuário
+              </button>
             </div>
           </form>
         </div>
-      
+
         <!-- Tabela de Usuários -->
         <div class="table-wrapper">
           <div class="table-responsive">
@@ -64,12 +92,17 @@
                   <th>ID do Supabase</th>
                   <th>Data de Cadastro</th>
                   <th>Status</th>
-                  <th style="text-align: right;">Ações</th>
+                  <th style="text-align: right">Ações</th>
                 </tr>
               </thead>
               <tbody id="users-table-body">
                 <tr>
-                  <td colspan="5" style="text-align: center; color: var(--text-secondary);">Carregando usuários...</td>
+                  <td
+                    colspan="5"
+                    style="text-align: center; color: var(--text-secondary)"
+                  >
+                    Carregando usuários...
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -78,12 +111,86 @@
             Total: 0 usuários
           </div>
         </div>
-      
       </div>
     </main>
-    
+
+    <div class="modal-overlay" id="edit-user-modal">
+      <div class="modal-box" style="max-width: 500px">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <i class="fa-solid fa-user-pen" style="color: var(--accent)"></i>
+            Editar Usuário
+          </h3>
+          <button class="modal-close-icon" id="close-edit-modal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body" style="text-align: left">
+          <form id="form-edit-user">
+            <input type="hidden" id="edit_user_id" />
+
+            <div class="form-group">
+              <label class="form-label">Nome Completurn</label>
+              <input
+                type="text"
+                id="edit_user_name"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">E-mail</label>
+              <input
+                type="email"
+                id="edit_user_email"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">Nível de Acesso</label>
+                <div class="select-wrapper">
+                  <select id="edit_user_role" class="form-control" required>
+                    <option value="user">Usuário Padrão</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Nova Senha</label>
+                <input
+                  type="password"
+                  id="edit_user_password"
+                  class="form-control"
+                  placeholder="Deixe em branco para manter"
+                />
+              </div>
+            </div>
+
+            <div
+              class="form-actions"
+              style="margin-top: 20px; text-align: right"
+            >
+              <button
+                type="submit"
+                id="btn-save-edit"
+                class="btn btn-primary w-full"
+              >
+                Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/admin/layout.js"></script>
     <script type="module" src="/js/admin/users.js"></script>
-
-</body>
-
+  </body>
 </html>

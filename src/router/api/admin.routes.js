@@ -3,6 +3,8 @@ import { getDashboardStats } from "../../controllers/admin/dashboard.controller.
 import {
   getMediaController as getMedia,
   addMediaController as addMedia,
+  updateMediaController as updateMedia,
+  deleteMediaController as deleteMedia,
 } from "../../controllers/admin/media.controller.js";
 import {
   getProvidersController as getProviders,
@@ -12,6 +14,7 @@ import {
   getUsersController as getUsers,
   toggleUserStatusController as toggleStatus,
   createUserController as createUser,
+  updateUserController as updateUser,
 } from "../../controllers/admin/users.controller.js";
 import {
   addSagaController as addSaga,
@@ -27,11 +30,14 @@ const router = express.Router();
 router.get("/dashboard", getDashboardStats);
 router.get("/media", getMedia);
 router.post("/media", addMedia);
+router.put("/media/:id", updateMedia);
+router.delete("/media/:id", deleteMedia);
 router.get("/providers", getProviders);
 router.post("/providers", saveProviders);
 router.get("/users", getUsers);
 router.post("/users", createUser);
 router.patch("/users/:id/status", toggleStatus);
+router.patch("/users/:id", updateUser);
 router.post("/sagas", addSaga);
 router.delete("/sagas/:id", deleteSaga);
 router.get("/settings", getSettings);

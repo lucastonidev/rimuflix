@@ -1,85 +1,170 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
-<head>
-  <%- include('../partials/head') %>
-    <link rel="stylesheet" href="/styles/admin/pages/admin-dashboard.css">
-    <link rel="stylesheet" href="/styles/admin/global.css">
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/styles/admin/pages/admin-dashboard.css" />
+    <link rel="stylesheet" href="/styles/admin/global.css" />
     <title>Dashboard | Admin Rimuflix</title>
-</head>
+  </head>
 
-<body>
-  <%- include('../partials/admin/sidebar') %>
+  <body>
+    <%- include('../partials/admin/sidebar') %>
+    
     <main class="main-content">
-      <header class="header">
-        <div class="header-title">
-          <h1 class="page-title">Visão Geral</h1>
-        </div>
-      </header>
-    
-      <div class="content-area">
-    
-        <!-- Cards de Estatísticas -->
-        <div class="grid grid-cols-4 mb-6">
-          <div class="card stat-card">
-            <div class="stat-icon blue"><i class="fa-solid fa-film"></i></div>
-            <div class="stat-info">
-              <p>Mídias no Banco</p>
-              <h3 id="stat-media">0</h3>
-            </div>
+      <%- include('../partials/admin/menu-mobile') %>
+      
+      <div class="dashboard-header mb-6">
+        <h1 class="page-title">
+          <span id="admin-greeting">Olá</span>,
+          <span id="admin-name" style="color: var(--accent)">Admin</span> 👋
+        </h1>
+        <p class="page-subtitle">
+          Visão geral do sistema e atalhos rápidos para gerenciamento.
+        </p>
+      </div>
+
+      <!-- Grid de Estatísticas -->
+      <div class="grid grid-cols-4 mb-6 statistics-grid">
+        <!-- Card: Mídias -->
+        <div class="card stat-card hover-lift">
+          <div class="stat-icon blue">
+            <i class="fa-solid fa-photo-film"></i>
           </div>
-    
-          <div class="card stat-card">
-            <div class="stat-icon green"><i class="fa-solid fa-users"></i></div>
-            <div class="stat-info">
-              <p>Usuários Cadastrados</p>
-              <h3 id="stat-users">0</h3>
-            </div>
-          </div>
-    
-          <div class="card stat-card">
-            <div class="stat-icon purple"><i class="fa-solid fa-list-check"></i></div>
-            <div class="stat-info">
-              <p>Listas Criadas</p>
-              <h3 id="stat-lists">0</h3>
-            </div>
-          </div>
-    
-          <div class="card stat-card">
-            <div class="stat-icon red"><i class="fa-solid fa-star"></i></div>
-            <div class="stat-info">
-              <p>Avaliações</p>
-              <h3 id="stat-reviews">0</h3>
-            </div>
+          <div class="stat-info">
+            <p>Total de Mídias</p>
+            <h3 id="stat-media">0</h3>
           </div>
         </div>
-    
-        <!-- Área de Atividades Recentes -->
-        <div class="grid grid-cols-2">
-          <!-- Últimas Mídias Adicionadas -->
-          <div class="card">
-            <h2 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Últimas Adições</h2>
+
+        <!-- Card: Usuários -->
+        <div class="card stat-card hover-lift">
+          <div class="stat-icon green"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-info">
+            <p>Usuários Ativos</p>
+            <h3 id="stat-users">0</h3>
+          </div>
+        </div>
+
+        <!-- Card: Listas -->
+        <div class="card stat-card hover-lift">
+          <div class="stat-icon purple">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div class="stat-info">
+            <p>Listas Criadas</p>
+            <h3 id="stat-lists">0</h3>
+          </div>
+        </div>
+
+        <!-- Card: Avaliações -->
+        <div class="card stat-card hover-lift">
+          <div class="stat-icon red"><i class="fa-solid fa-star"></i></div>
+          <div class="stat-info">
+            <p>Avaliações</p>
+            <h3 id="stat-reviews">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layout Dividido -->
+      <div class="dashboard-split grid grid-cols-3 gap-4">
+        <!-- Coluna Esquerda: Ações Rápidas (Ocupa 2 colunas) -->
+        <div class="col-span-2">
+          <div class="card" style="height: 100%">
+            <h2 class="section-title">
+              <i class="fa-solid fa-bolt"></i> Ações Rápidas
+            </h2>
+
+            <div class="quick-actions-grid">
+              <a href="/admin/media" class="quick-action-btn">
+                <div
+                  class="qa-icon"
+                  style="background: rgba(59, 130, 246, 0.1); color: #3b82f6"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                </div>
+                <div class="qa-text">
+                  <h4>Adicionar Mídia</h4>
+                  <p>Cadastre novos filmes ou séries no banco</p>
+                </div>
+              </a>
+
+              <a href="/admin/users" class="quick-action-btn">
+                <div
+                  class="qa-icon"
+                  style="background: rgba(34, 197, 94, 0.1); color: #22c55e"
+                >
+                  <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div class="qa-text">
+                  <h4>Gerenciar Usuários</h4>
+                  <p>Aprove, bloqueie ou adicione membros</p>
+                </div>
+              </a>
+
+              <a href="/admin/sagas" class="quick-action-btn">
+                <div
+                  class="qa-icon"
+                  style="background: rgba(168, 85, 247, 0.1); color: #a855f7"
+                >
+                  <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div class="qa-text">
+                  <h4>Coleções e Sagas</h4>
+                  <p>Organize mídias por franquias</p>
+                </div>
+              </a>
+
+              <a href="/admin/settings" class="quick-action-btn">
+                <div
+                  class="qa-icon"
+                  style="background: rgba(234, 179, 8, 0.1); color: #eab308"
+                >
+                  <i class="fa-solid fa-gear"></i>
+                </div>
+                <div class="qa-text">
+                  <h4>Configurações</h4>
+                  <p>Ajuste chaves de API e preferências</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: Timeline (Ocupa 1 coluna) -->
+        <div class="col-span-1">
+          <div class="card" style="height: 100%">
+            <h2 class="section-title">
+              <i class="fa-solid fa-clock-rotate-left"></i> Últimas Adições
+            </h2>
             <div class="timeline" id="recent-media-timeline">
-              <p style="color: var(--text-secondary); font-size: 0.85rem;">Carregando...</p>
+              <!-- Injetado via JS -->
+              <div
+                style="
+                  text-align: center;
+                  padding: 20px;
+                  color: var(--text-secondary);
+                "
+              >
+                <i class="fa-solid fa-spinner fa-spin"></i> Carregando...
+              </div>
             </div>
-          </div>
-    
-          <!-- Espaço para uso futuro (Ex: Últimos usuários ou Configurações) -->
-          <div class="card">
-            <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Ações Rápidas</h2>
-            <div class="flex flex-col gap-4 mt-4">
-              <a href="/admin/media" class="btn btn-primary w-full"><i class="fa-solid fa-plus"></i> Adicionar Nova
-                Mídia</a>
-              <a href="/admin/users" class="btn btn-secondary w-full"><i class="fa-solid fa-users-viewfinder"></i> Gerenciar
-                Usuários</a>
+
+            <div style="margin-top: 20px; text-align: center">
+              <a
+                href="/admin/media"
+                class="btn btn-outline w-full"
+                style="padding: 8px; font-size: 0.8rem"
+              >
+                Ver todas as mídias
+              </a>
             </div>
           </div>
         </div>
-    
       </div>
     </main>
-    
-    <script type="module" src="/js/admin/dashboard.js"></script>
-    </body>
 
+    <script src="/js/admin/layout.js"></script>
+    <script type="module" src="/js/admin/dashboard.js"></script>
+  </body>
 </html>

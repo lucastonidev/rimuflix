@@ -1,0 +1,258 @@
+/* Importa o layout base do admin */
+@import "../layout.css";
+@import "../components/components.css";
+@import "../components/modal.css";
+@import '../components/header.css';
+@import "../../responsive/admin-responsive.css";
+
+/* =========================================
+   BARRA DE BUSCA E FILTROS
+   ========================================= */
+.search-filter-bar {
+  padding: 20px;
+  background: var(--tertiary-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-filter-bar .input-group {
+  display: flex;
+  flex: 1;
+  max-width: 500px;
+  position: relative;
+}
+
+.search-filter-bar .input-group i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+}
+
+/* Espaço extra à esquerda para não sobrepor o ícone da lupa */
+.search-filter-bar .input-group .form-control {
+  width: 100%;
+  padding-left: 44px; 
+  border-radius: 8px;
+}
+
+/* =========================================
+   ESTILOS DA TABELA (DESKTOP)
+   ========================================= */
+.table-wrapper {
+  background-color: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  padding: 16px 20px;
+  background-color: rgba(15, 15, 15, 0.95);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* =========================================
+   ELEMENTOS INTERNOS DA TABELA
+   ========================================= */
+.media-title-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.media-title-cell i {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.05);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* =========================================
+   RESPONSIVIDADE: MÁGICA DO TABLE-TO-CARD
+   ========================================= */
+@media (max-width: 900px) {
+  .content-area {
+    padding: 16px !important; 
+    overflow-x: hidden; 
+  }
+
+  /* Ajusta a barra de pesquisa */
+  .search-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-filter-bar .input-group {
+    max-width: 100%;
+  }
+
+  /* Tira as bordas da tabela raiz, pois as linhas vão virar os cartões */
+  .table-wrapper {
+    background: transparent;
+    border: none;
+    overflow: visible;
+  }
+  
+  .table-responsive {
+    overflow: visible;
+  }
+
+  /* Força a tabela e as células a empilharem verticalmente em vez de horizontalmente */
+  table, thead, tbody, th, td, tr {
+    display: block;
+    width: 100%;
+  }
+  
+  /* Esconde o cabeçalho original da tabela no telemóvel */
+  thead {
+    display: none;
+  }
+  
+  /* Cada LINHA (tr) transforma-se num CARTÃO */
+  tr {
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espaço entre as células dentro do cartão */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+
+  tr:hover td {
+    background-color: transparent; /* Remove o hover do desktop para não piscar no mobile */
+  }
+  
+  /* Reseta os espaços das células antigas */
+  td {
+    padding: 0;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Joga os rótulos gerados abaixo para as pontas */
+  }
+
+  /* 1ª Coluna: Título do Filme/Série */
+  td:nth-child(1) {
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 12px;
+    margin-bottom: 4px;
+  }
+  
+  .media-title-cell {
+    width: 100%;
+    font-size: 1.1rem;
+  }
+
+  /* 2ª Coluna: Badge (Tipo Filme/Série) */
+  td:nth-child(2) {
+    display: inline-flex;
+    width: auto;
+  }
+
+  /* 3ª Coluna: Temporada/Episódio (Posicionado na lateral como destaque) */
+  td:nth-child(3) {
+    position: absolute;
+    top: 75px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    width: auto;
+  }
+
+  /* 4ª Coluna: ID do TMDB com um Rótulo dinâmico inserido via CSS */
+  td:nth-child(4)::before {
+    content: "ID TMDB:";
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  td:nth-child(4) {
+    font-size: 0.85rem;
+  }
+
+  /* 5ª Coluna: Data de Cadastro */
+  td:nth-child(5)::before {
+    content: "Adicionado em:";
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  td:nth-child(5) {
+    font-size: 0.85rem;
+  }
+
+  /* 6ª Coluna: Botões de Ação (Editar e Deletar) */
+  td:nth-child(6) {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 12px;
+  }
+
+  /* Faz os botões esticarem para facilitar o toque com o dedo */
+  td:nth-child(6) .btn-outline {
+    flex: 1; 
+    justify-content: center;
+    padding: 12px;
+  }
+}

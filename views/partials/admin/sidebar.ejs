@@ -1,46 +1,59 @@
-<aside id="sidebar" class="sidebar">
-  <div class="sidebar-logo">
-    <div><i class="fa-solid fa-play" style="margin-right: 8px;"></i>Rimu<span>Admin</span></div>
-    <button id="close-sidebar-btn" class="btn-icon hide-desktop" style="display: none;"><i
-        class="fa-solid fa-xmark"></i></button>
+<!-- Fundo escuro para fechar o menu no celular -->
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      Rimu<span style="color: var(--text-primary)">flix</span>
+    </div>
+    <button class="sidebar-toggle" id="btn-close-sidebar">
+      <i class="fa-solid fa-bars"></i>
+    </button>
   </div>
 
-  <nav class="nav-menu">
-    <p class="nav-label">Menu Principal</p>
-    <a href="/admin" class="nav-item active" data-target="dashboard">
-      <i class="fa-solid fa-chart-line"></i> Dashboard
-    </a>
-    <a href="/admin/media" class="nav-item" data-target="media">
-      <i class="fa-solid fa-film"></i> Adicionar Mídia
-    </a>
-    <a href="/admin/providers" class="nav-item" data-target="providers">
-      <i class="fa-solid fa-server"></i> Provedores
-    </a>
-    <a href="/admin/users" class="nav-item" data-target="users">
-      <i class="fa-solid fa-users"></i> Perfis & Usuários
-    </a>
-    <a href="/admin/sagas" class="nav-item" data-target="sagas">
-      <i class="fa-solid fa-book"></i> Sagas
+  <!-- Menu de Navegação -->
+  <nav class="nav-menu custom-scroll">
+    <div class="nav-label">Geral</div>
+    <a href="/admin" class="nav-item">
+      <i class="fa-solid fa-chart-pie"></i> Dashboard
     </a>
 
-    <p class="nav-label">Sistema</p>
-    <a href="/admin/settings" class="nav-item" data-target="settings">
+    <div class="nav-label">Conteúdo</div>
+    <a href="/admin/media" class="nav-item">
+      <i class="fa-solid fa-film"></i> Gerenciar Mídias
+    </a>
+    <a href="/admin/sagas" class="nav-item">
+      <i class="fa-solid fa-layer-group"></i> Sagas e Coleções
+    </a>
+
+    <div class="nav-label">Sistema</div>
+    <a href="/admin/users" class="nav-item">
+      <i class="fa-solid fa-users"></i> Usuários
+    </a>
+    <a href="/admin/providers" class="nav-item">
+      <i class="fa-solid fa-server"></i> Provedores
+    </a>
+    <a href="/admin/settings" class="nav-item">
       <i class="fa-solid fa-gear"></i> Configurações
     </a>
   </nav>
 
+  <!-- Rodapé da Sidebar (Perfil do Admin) -->
   <div class="user-profile">
     <div class="user-card">
-      <img src="https://placehold.co/100x100/e50914/ffffff?text=AD" alt="Admin">
+      <!-- O JS depois pode atualizar essa imagem/nome dinamicamente se quiser -->
+      <img
+        src="/img/account-icon.png"
+        alt="Admin Avatar"
+        id="sidebar-user-avatar"
+      />
       <div class="user-info">
-        <h4>Rimublinda</h4>
-        <p>Super Admin</p>
+        <h4 id="sidebar-user-name">Admin</h4>
+        <p>Administrador</p>
       </div>
     </div>
-    <a href="/admin/auth/logout" class="btn-logout">
-      <i class="fa-solid fa-sign-out-alt" style="margin-right: 8px;"></i> Sair do Painel
+    <a href="/" class="btn-logout text-danger">
+      <i class="fa-solid fa-right-from-bracket"></i> Sair do Sistema
     </a>
   </div>
 </aside>
-
-<div id="sidebar-overlay" class="sidebar-overlay"></div>
