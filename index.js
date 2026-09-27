@@ -1,26 +1,22 @@
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
-import { fileURLToPath } from "url";
 import { website } from "./src/router/website.js";
 import { api } from "./src/router/api.js";
 import { admin } from "./src/router/admin.js";
 import cookieParser from "cookie-parser";
 
-// Define __dirname em ambiente ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, ".env") });
+// Pode chamar o dotenv puro, ele acha na raiz automaticamente
+dotenv.config();
 
 const app = express();
 
-// Configuração do EJS com caminho absoluto
+// 👇 A MUDANÇA PRINCIPAL: Usando process.cwd() para a Vercel achar as pastas
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(process.cwd(), "views"));
 
-// Configuração dos arquivos estáticos com caminho absoluto
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(process.cwd(), "public")));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -28,8 +24,8 @@ app.use("/", website);
 app.use("/api/v1", api);
 app.use("/admin", admin);
 
-// Se estiver rodando localmente (ambiente de desenvolvimento), escuta a porta 3000
-if (process.env.NODE_ENV !== 'production') {
+// Mantemos a trava de execução local vs produção
+if (process.env.NODE_ENV !== "production") {
   app.listen(3000, () => {
     console.log("Está rodando Rimuflix Localmente");
     console.log("------------------------------");
@@ -37,5 +33,5 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
-// Exporta o app para que a Vercel o execute como uma Serverless Function
+// Exporta para a Vercel ler
 export default app;
