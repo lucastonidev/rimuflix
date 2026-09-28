@@ -1,5 +1,5 @@
 // Mude a versão aqui (ex: v2, v3) sempre que quiser forçar a limpeza e atualização
-const CACHE_NAME = "rimuflix-static-v2";
+const CACHE_NAME = "rimuflix-static-v3";
 
 const STATIC_ASSETS = [
   "/",
@@ -42,6 +42,21 @@ self.addEventListener("activate", (event) => {
 
 // 3. INTERCEPTAÇÃO DE REQUISIÇÕES (Fetch)
 self.addEventListener("fetch", (event) => {
+  const requestUrl = new URL(event.request.url);
+
+  // 1. Domínios que o Service Worker NÃO deve salvar no cache local
+  const ignoredDomains = [
+    'image.tmdb.org',
+    'media.themoviedb.org',
+    'placehold.co' // Ignora também o site que gera os placeholders
+  ];
+
+  // 2. Se a requisição for para um desses domínios, faz o fetch normal pela internet 
+  // e ignora toda a lógica de cache do Service Worker que vem abaixo
+  if (ignoredDomains.includes(requestUrl.hostname)) {
+    return event.respondWith(fetch(event.request));
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       // Retorna o cache se existir, senão busca na rede

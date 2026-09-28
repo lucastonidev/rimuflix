@@ -67,10 +67,19 @@ class HeroGenerator {
     const movie = data;
     const article = document.createElement("article");
     article.classList.add("hero");
-    article.setAttribute(
-      "style",
-      `--hero-bg: url(https://image.tmdb.org/t/p/w1280/${movie.backdrop_path})`,
-    );
+    // Substitua a injeção do background por isso:
+    if (movie.backdrop_path) {
+      article.setAttribute(
+        "style",
+        `--hero-bg: url("https://image.tmdb.org/t/p/w1280${movie.backdrop_path}")`,
+      );
+    } else {
+      // Fallback para quando não houver imagem de fundo
+      article.setAttribute(
+        "style",
+        `--hero-bg: linear-gradient(to bottom, #141414, #000)`,
+      );
+    }
 
     const watchUrl = `/${type}/watch/${movie.id}`;
     let primaryButton = "";

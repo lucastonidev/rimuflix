@@ -17,7 +17,7 @@ const renderEpisodeSeason = (seasonData, alreadyWatched, id) => {
         <div class="episode-item__number">${episode.episode_number}</div>
 
         <div class="episode-item__thumb">
-          <img src="${episode.still_path ? `https://media.themoviedb.org/t/p/w300_and_h450_face${episode.still_path}` : "https://placehold.co/600x400"}" alt="Thumb do episÃ³dio ${episode.episode_number}" loading="lazy" />
+          <img src="${episode.still_path ? `https://image.tmdb.org/t/p/w300${episode.still_path}` : "https://placehold.co/300x170/141414/a3a3a3?text=Sem+Imagem"}" alt="Thumb do episódio ${episode.episode_number}" loading="lazy" />
           <span class="episode-item__time">${episode.runtime || "00"} min</span>
         </div>
 

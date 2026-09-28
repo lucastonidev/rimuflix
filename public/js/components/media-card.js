@@ -8,7 +8,7 @@ export function createMediaCard(movie, type) {
   const rating = movie?.vote_average ? movie.vote_average.toFixed(1) : "0.0";
 
   const poster = movie?.poster_path
-    ? `https://media.themoviedb.org/t/p/w300_and_h450_face${movie.poster_path}`
+    ? `https://image.tmdb.org/t/p/w300_and_h450_face${movie.poster_path}`
     : "";
 
   const isMovie = type === "movie" || type === "Filme";
