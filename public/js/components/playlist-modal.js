@@ -128,7 +128,7 @@ export class PlaylistModal {
           result = await listService.addFavorite(this.data.id, this.type);
         }
       } else {
-        result = await listService.removeFavorite(
+        result = await listService.toggleCustomList(
           this.data.id,
           this.type,
           listName,

@@ -1,108 +1,51 @@
-const CACHE_NAME = "rimuflix-static-v1";
+// Mude a versão aqui (ex: v2, v3) sempre que quiser forçar a limpeza e atualização
+const CACHE_NAME = "rimuflix-static-v2";
 
 const STATIC_ASSETS = [
   "/",
   "/styles/reset.css",
   "/styles/style.css",
   "/js/global.js",
-  "/js/utils.js",
-  "/img/logo.png",
-  "/img/favicon.ico",
-  "/img/android-chrome-192x192.png",
-  "/img/android-chrome-512x512.png",
+  // adicione aqui os outros caminhos dos seus assets estáticos
 ];
 
-const IGNORED_ROUTES = [
-  "/api/",
-  "/admin/",
-  "/video/",
-  "webtor.io",
-  "tmdb.org",
-  "supabase",
-];
-
+// 1. INSTALAÇÃO: Salva os arquivos no cache
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log(
-        "[Service Worker] Instalando e cacheando assets estáticos...",
-      );
-      return cache
-        .addAll(STATIC_ASSETS)
-        .catch((err) => console.warn("Erro ao fazer pré-cache", err));
+      console.log("[Service Worker] Fazendo cache dos arquivos estáticos");
+      return cache.addAll(STATIC_ASSETS);
     }),
   );
+  // Força o novo Service Worker a assumir o controle imediatamente
   self.skipWaiting();
 });
 
+// 2. ATIVAÇÃO: Remove os caches antigos
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) {
-            console.log("[Service Worker] Limpando cache antigo:", name);
-            return caches.delete(name);
+        cacheNames.map((cacheName) => {
+          // Se o nome do cache salvo for diferente do atual (CACHE_NAME), ele deleta
+          if (cacheName !== CACHE_NAME) {
+            console.log("[Service Worker] Deletando cache antigo:", cacheName);
+            return caches.delete(cacheName);
           }
         }),
       );
     }),
   );
+  // Garante que o Service Worker controle as páginas abertas imediatamente
   self.clients.claim();
 });
 
+// 3. INTERCEPTAÇÃO DE REQUISIÇÕES (Fetch)
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
-
-  const shouldIgnore = IGNORED_ROUTES.some((route) => url.href.includes(route));
-  if (event.request.method !== "GET" || shouldIgnore) {
-    return;
-  }
-
-  if (
-    url.pathname.startsWith("/styles/") ||
-    url.pathname.startsWith("/js/") ||
-    url.pathname.startsWith("/img/")
-  ) {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        const fetchPromise = fetch(event.request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              // CLONE FEITO DE FORMA SÍNCRONA AQUI
-              const responseToCache = networkResponse.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-            }
-            return networkResponse;
-          })
-          .catch(() => {});
-
-        return cachedResponse || fetchPromise;
-      }),
-    );
-    return;
-  }
-
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          // CLONE FEITO DE FORMA SÍNCRONA AQUI
-          const responseToCache = response.clone();
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-            return response;
-          });
-        })
-        .catch(() => {
-          console.log(
-            "[Service Worker] Usuário offline, servindo página do cache.",
-          );
-          return caches.match(event.request);
-        }),
-    );
-    return;
-  }
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      // Retorna o cache se existir, senão busca na rede
+      return cachedResponse || fetch(event.request);
+    }),
+  );
 });
