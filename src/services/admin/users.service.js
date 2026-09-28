@@ -1,5 +1,6 @@
 import { supabase } from "../../config/supabase.js";
 
+// 1. BUSCAR TODOS OS USUÁRIOS
 export const getAllUsers = async () => {
   const { data, error } = await supabase
     .from("users")
@@ -10,8 +11,8 @@ export const getAllUsers = async () => {
   return data;
 };
 
+// 2. BLOQUEAR / DESBLOQUEAR USUÁRIO
 export const toggleUserStatus = async (userId, currentStatus) => {
-  // Inverte o status atual (se era true, vira false e vice-versa)
   const { data, error } = await supabase
     .from("users")
     .update({ is_active: !currentStatus })
@@ -22,35 +23,174 @@ export const toggleUserStatus = async (userId, currentStatus) => {
   return data[0];
 };
 
-export const createUser = async ({ email, password, name, role }) => {
-  // Exemplo de como deve ficar a lógica no seu Backend (Node.js)
+// 3. CRIAR NOVO USUÁRIO (Corrigido para salvar o Nome no Auth)
+export const createUser = async ({ name, email, role, password }) => {
+  if (!name || !name.trim())
+    return { success: false, error: "O campo Nome é obrigatório." };
+  if (!email || !email.trim())
+    return { success: false, error: "O campo E-mail é obrigatório." };
+  if (!password || !password.trim())
+    return { success: false, error: "O campo Senha é obrigatório." };
 
-  // 1. Cria o usuário no Auth (Authentication)
-  const { data: authData, error: authError } =
-    await supabase.auth.admin.createUser({
-      email: email,
-      password: password,
-      user_metadata: { name: name, role: role }, // Passando os meta dados
-    });
-
-  if (authError) {
-    throw new Error(`Erro ao criar usuário: ${authError.message}`);
+  if (password.length < 6) {
+    return {
+      success: false,
+      error: "A senha deve ter pelo menos 6 caracteres.",
+    };
   }
 
-  // 2. Com o usuário criado no Auth, nós INSERIMOS ele na tabela public.users
-  const { error: dbError } = await supabase.from("users").insert([
-    {
-      id: authData.user.id, // ID gerado pelo Auth
-      email: email,
-      name: name,
-      role: role,
-    },
-  ]);
-
-  if (dbError) {
-    throw new Error(`Erro ao criar usuário: ${dbError.message}`);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { success: false, error: "Forneça um endereço de e-mail válido." };
   }
 
-  // Sucesso!
-  return authData.user;
-};;
+  const cleanEmail = email.trim().toLowerCase();
+
+  try {
+    // Cria na tabela interna do Supabase (Auth)
+    const { data: authData, error: authError } =
+      await supabase.auth.admin.createUser({
+        email: cleanEmail,
+        password: password,
+        email_confirm: true,
+        user_metadata: {
+          name: name.trim(), // <--- Garante que o nome não suma!
+          role: role || "member",
+        },
+      });
+
+    if (authError) {
+      if (
+        authError.message.includes("already registered") ||
+        authError.status === 422
+      ) {
+        return {
+          success: false,
+          error: "Este e-mail já está registrado no sistema.",
+        };
+      }
+      return {
+        success: false,
+        error: `Falha na autenticação: ${authError.message}`,
+      };
+    }
+
+    const newUserId = authData.user.id;
+
+    // Cria na tabela pública
+    const { data, error: dbError } = await supabase
+      .from("users")
+      .insert([
+        {
+          id: newUserId,
+          name: name.trim(),
+          email: cleanEmail,
+          role: role || "member",
+          password: password,
+          is_active: true,
+        },
+      ])
+      .select();
+
+    if (dbError) {
+      if (dbError.code === "23505") {
+        return {
+          success: false,
+          error: "Este e-mail já existe na tabela de perfis.",
+        };
+      }
+      return {
+        success: false,
+        error: `Erro ao salvar perfil: ${dbError.message}`,
+      };
+    }
+
+    return { success: true, data: data[0] };
+  } catch (error) {
+    console.error("Erro interno no createUser:", error);
+    return {
+      success: false,
+      error: "Erro interno no servidor ao tentar criar o usuário.",
+    };
+  }
+};
+
+// 4. ATUALIZAR USUÁRIO (Criado de forma inteligente)
+export const updateUser = async (userId, { name, email, role, password }) => {
+  try {
+    // A) Atualiza o Auth do Supabase (Senhas, Emails e Metadados)
+    const authUpdates = {};
+    if (email) authUpdates.email = email.trim().toLowerCase();
+
+    // Atualiza o nome nos metadados da tabela secreta
+    if (name) {
+      authUpdates.user_metadata = { name: name.trim() };
+    }
+
+    if (password && password.trim().length > 0) {
+      if (password.length < 6) {
+        return {
+          success: false,
+          error: "A nova senha deve ter pelo menos 6 caracteres.",
+        };
+      }
+      authUpdates.password = password.trim();
+    }
+
+    // Se houver algo para atualizar no Auth, executa:
+    if (Object.keys(authUpdates).length > 0) {
+      const { error: authError } = await supabase.auth.admin.updateUserById(
+        userId,
+        authUpdates,
+      );
+
+      if (authError) {
+        if (authError.message.includes("already registered")) {
+          return {
+            success: false,
+            error: "Este e-mail já está em uso por outra conta.",
+          };
+        }
+        return {
+          success: false,
+          error: `Falha ao atualizar acesso: ${authError.message}`,
+        };
+      }
+    }
+
+    // B) Atualiza a tabela pública 'users'
+    const publicUpdates = {};
+    if (name) publicUpdates.name = name.trim();
+    if (email) publicUpdates.email = email.trim().toLowerCase();
+    if (role) publicUpdates.role = role;
+    if (password && password.trim().length > 0)
+      publicUpdates.password = password.trim(); // Atualiza a senha visual se for o caso
+
+    const { data, error: dbError } = await supabase
+      .from("users")
+      .update(publicUpdates)
+      .eq("id", userId)
+      .select();
+
+    if (dbError) {
+      if (dbError.code === "23505") {
+        return {
+          success: false,
+          error: "Este e-mail já existe na tabela de perfis.",
+        };
+      }
+      return {
+        success: false,
+        error: `Erro no banco de dados: ${dbError.message}`,
+      };
+    }
+
+    return { success: true, data: data[0] };
+  } catch (error) {
+    console.error("Erro interno no updateUser:", error);
+    return {
+      success: false,
+      error: "Erro interno no servidor ao tentar atualizar o usuário.",
+    };
+  }
+};

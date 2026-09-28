@@ -76,7 +76,7 @@ class AdminUsers {
     const payload = {
       name: document.getElementById("user_name").value.trim(),
       email: document.getElementById("user_email").value.trim(),
-      password: "defaultpassword",
+      password: document.getElementById("user_password").value.trim(),
       role: document.getElementById("user_role").value,
     };
 

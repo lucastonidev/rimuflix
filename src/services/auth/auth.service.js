@@ -1,6 +1,6 @@
 import { supabase } from "../../config/supabase.js";
 
-export async function authenticateUser(identifier) {
+export async function authenticateUser(identifier, password) {
   // Verifica se o identificador recebido é um e-mail
   const isEmail = identifier.includes("@");
 
@@ -18,11 +18,18 @@ export async function authenticateUser(identifier) {
   const { data: user, error } = await query.single();
 
   if (error || !user) {
-    // Mensagem de erro atualizada para abranger ambos os casos
-    throw new Error("Usuário ou e-mail incorreto.");
+    throw new Error("Usuário ou e-mail não encontrado.");
   }
 
-  // Verifica se a conta está bloqueada (baseado no seu painel admin anterior)
+  // 👇 A TRAVA QUE FALTAVA: Compara a senha do banco com a digitada
+  console.log(`Comparando senha do banco: ${user.password} com a digitada: ${password}`);
+  console.log("DADOS DO USUÁRIO RETORNADO PELO SUPABASE:", user);
+  
+  if (user.password !== password) {
+    throw new Error("Senha incorreta.");
+  }
+
+  // Verifica se a conta está bloqueada
   if (user.is_active === false) {
     throw new Error("Esta conta está bloqueada. Contate o administrador.");
   }

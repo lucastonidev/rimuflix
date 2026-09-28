@@ -5,7 +5,7 @@ const sanitizeUsername = (text) => {
   return text.replace(/[^\p{L}\p{N}\s\-_]/gu, "").trim();
 };
 
-export const getUsersController = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
     const data = await usersService.getAllUsers();
     return res.status(200).json({ success: true, data });
@@ -14,7 +14,7 @@ export const getUsersController = async (req, res) => {
   }
 };
 
-export const toggleUserStatusController = async (req, res) => {
+export const toggleUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { currentStatus } = req.body;
@@ -33,7 +33,7 @@ export const toggleUserStatusController = async (req, res) => {
   }
 };
 
-export const createUserController = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
@@ -71,40 +71,14 @@ export const createUserController = async (req, res) => {
   }
 };
 
-export const updateUserController = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, email, password, role } = req.body;
+export const updateUser = async (req, res) => {
+  const userId = req.params.id;
+  
+  const result = await usersService.updateUser(userId, req.body);
 
-    if (!id) {
-      return res
-        .status(400)
-        .json({ success: false, error: "ID do usuário não fornecido." });
-    }
-
-    const cleanName = sanitizeUsername(name);
-    if (cleanName && cleanName.length < 3) {
-      return res.status(400).json({
-        success: false,
-        error:
-          "O nome de usuário deve ter pelo menos 3 letras/números válidos.",
-      });
-    }
-
-    // Passa os dados para o service tratar a atualização no banco (Supabase)
-    const updatedUser = await usersService.updateUser(id, {
-      name: cleanName,
-      email: email ? email.trim().toLowerCase() : undefined,
-      password: password || undefined, // Só envia a senha se o admin tiver digitado uma nova
-      role: role || undefined,
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Usuário atualizado com sucesso!",
-      data: updatedUser,
-    });
-  } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+  if (!result.success) {
+    return res.status(400).json(result); 
   }
+
+  return res.json(result);
 };

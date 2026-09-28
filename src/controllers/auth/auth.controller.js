@@ -18,7 +18,7 @@ const getCookieOptions = (maxAge) => ({
 
 export const login = async (req, res) => {
   try {
-    const { email, username, password } = req.body;
+    const { username, email, password } = req.body;
     const identifier = email || username;
 
     if (!identifier || identifier.trim() === "") {
@@ -98,10 +98,9 @@ export const login = async (req, res) => {
       data: jwtPayload,
     });
   } catch (error) {
-    console.error("Erro no controlador de login:", error);
     return res.status(500).json({
       success: false,
-      error: "Erro interno do servidor.",
+      error: error.message,
     });
   }
 };

@@ -45,7 +45,16 @@ router.get("/search", (req, res) => {
 });
 
 router.get("/livetv", (req, res) => {
-  res.render("livetv", { user: req.user });
+  // Puxa o cookie que usamos para identificar quem está logado
+  const userId = req.cookies["rimuflix:userId"];
+
+  // Se não tem cookie, expulsa para o login avisando que precisa de conta
+  if (!userId) {
+    return res.redirect("/login?error=auth_required&continue=/livetv");
+  }
+
+  // Se tem cookie, renderiza o EJS da TV normalmente
+  res.render("livetv");
 });
 
 // Para rotas em que o usuário PRECISA estar logado, usamos o requireAuth
