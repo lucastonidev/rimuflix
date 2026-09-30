@@ -50,11 +50,11 @@ export const createUser = async ({ name, email, role, password }) => {
     // Cria na tabela interna do Supabase (Auth)
     const { data: authData, error: authError } =
       await supabase.auth.admin.createUser({
-        email: cleanEmail,
+        email: cleanEmail.toLowerCase(),
         password: password,
         email_confirm: true,
         user_metadata: {
-          name: name.trim(), // <--- Garante que o nome não suma!
+          name: name.toLowerCase().trim(),
           role: role || "member",
         },
       });
