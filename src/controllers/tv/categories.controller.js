@@ -10,7 +10,7 @@ export async function getCategories(req, res) {
     
   } catch (error) {
     return res.status(error.status || 500).json({
-      success: false, // Adicionado aqui também para manter o padrão
+      success: false,
       error: error.message || "Erro ao buscar as categorias",
     });
   }

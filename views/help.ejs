@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Central de Ajuda - Rimuflix</title>
+  <!-- Usamos barra no início para o caminho ser absoluto na raiz -->
+  <link rel="stylesheet" href="/styles/pages/help.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Inclusão do seu Header global -->
+  <%- include('partials/header') %>
+
+  <main class="help-container container">
+    <header class="help-header">
+      <h1 class="page-title">
+        <i class="fa-solid fa-circle-question" style="color: var(--accent);"></i> 
+        Central de Ajuda
+      </h1>
+      <p class="page-subtitle">Como podemos melhorar sua experiência hoje?</p>
+    </header>
+
+    <!-- Laço EJS para as Categorias (Topics) -->
+    <% topics.forEach(topic => { %>
+      <section class="help-topic-section">
+        
+        <!-- Cabeçalho da Categoria -->
+        <h2 class="topic-title">
+          <i class="fa-solid <%= topic.icon %>"></i> <%= topic.title %>
+        </h2>
+        
+        <!-- Grid de Cartões -->
+        <div class="help-grid">
+          
+          <!-- Laço EJS para os Artigos dentro da Categoria -->
+          <% topic.articles.forEach(article => { %>
+            
+            <!-- Link corrigido injetando a variável slug! -->
+            <a href="/help/<%= article.slug %>" class="help-card">
+              <div class="help-card-icon">
+                <i class="fa-solid <%= article.icon %>"></i>
+              </div>
+              
+              <div class="help-card-content">
+                <h3 class="help-card-title"><%= article.title %></h3>
+                <p class="help-card-desc"><%= article.description %></p>
+              </div>
+              
+              <div class="help-card-action">
+                <span>Ler tutorial</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </a>
+            
+          <% }) %>
+
+        </div>
+      </section>
+    <% }) %>
+
+  </main>
+
+<script type="module" src="/js/pages/help.js"></script>
+</body>
+</html>

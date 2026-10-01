@@ -1,8 +1,7 @@
 import NodeCache from "node-cache";
 
-const channelsCache = new NodeCache({ stdTTL: 3600 }); // Cache de 1 hora
+const channelsCache = new NodeCache({ stdTTL: 3600 });
 
-// Utilitário para limpar os nomes
 const normalizeName = (name) => {
   if (!name || typeof name !== "string") return "";
   return name
@@ -104,7 +103,7 @@ export const getLiveTvChannelsService = async () => {
       epg: [],
     });
 
-    // 👇 CORREÇÃO: Agora buscamos por embed_url para o player da Superflix aparecer
+    // Agora buscamos por embed_url para o player da Superflix aparecer
     const playerUrl =
       ch.embed_url || ch.player || ch.url || ch.link || ch.embed;
     if (playerUrl) {
@@ -194,7 +193,6 @@ export const getLiveTvChannelsService = async () => {
     }
 
     const channelObj = channelsMap.get(normName);
-    
     const playerUrl = ch["embeds"][0]["embed_url"];
 
     if (playerUrl) {
@@ -202,9 +200,6 @@ export const getLiveTvChannelsService = async () => {
         title: "Servidor 3 (Extra)",
         url: playerUrl,
       });
-
-      console.log(channelObj);
-      
     }
   });
 

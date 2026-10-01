@@ -155,7 +155,11 @@ class LiveTV {
       this.elements.livePlayer,
     );
 
-    if (window.innerWidth < 768) this.openMobilePlayer();
+    if (window.innerWidth < 768) {
+      const sidebar = document.querySelector(".livetv-sidebar");
+      if (sidebar) sidebar.classList.add("collapsed"); // Encolhe o menu
+      window.scrollTo({ top: 0, behavior: "smooth" }); // Rola suavemente pro topo para ver o vídeo
+    }
   }
 
   // --- MOBILE LOGIC ---
@@ -170,11 +174,19 @@ class LiveTV {
     this.elements.mobileEpgSlot.appendChild(this.elements.epgList);
 
     this.elements.mobileView.classList.remove("hidden");
+
+    // 👇 ADICIONE: Trava a rolagem da página de fundo
+    document.body.style.overflow = "hidden";
+
     setTimeout(() => this.elements.mobileView.classList.add("active"), 10);
   }
 
   closeMobilePlayer() {
     this.elements.mobileView.classList.remove("active");
+
+    // 👇 ADICIONE: Libera a rolagem da página de fundo
+    document.body.style.overflow = "";
+
     setTimeout(() => {
       this.elements.mobileView.classList.add("hidden");
       this.elements.videoWrapper.appendChild(

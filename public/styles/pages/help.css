@@ -1,0 +1,173 @@
+@import '../reset.css';
+@import '../components/header.css';
+
+/* =========================================
+   ESTRUTURA PRINCIPAL - CENTRAL DE AJUDA
+   ========================================= */
+.help-container {
+  margin-top: 120px;
+  padding-bottom: 80px;
+  min-height: calc(100vh - 120px);
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.help-header {
+  margin-bottom: 50px;
+  text-align: left;
+}
+
+.help-header .page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary, #fff);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.help-header .page-subtitle {
+  font-size: 1.15rem;
+  color: var(--text-secondary, #a3a3a3);
+  font-weight: 400;
+}
+
+/* =========================================
+   SEÇÃO DE TÓPICOS
+   ========================================= */
+.help-topic-section {
+  margin-bottom: 60px;
+}
+
+.topic-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.topic-title i {
+  color: var(--accent, #e50914);
+}
+
+/* =========================================
+   GRID DE CARTÕES DE AJUDA
+   ========================================= */
+.help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.help-card {
+  background: rgba(20, 20, 24, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efeito de brilho de fundo no Hover */
+.help-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--accent, #e50914);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.help-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  background: rgba(30, 30, 35, 0.8);
+}
+
+.help-card:hover::before {
+  transform: scaleX(1);
+}
+
+.help-card-icon {
+  background: rgba(229, 9, 20, 0.15);
+  color: var(--accent, #e50914);
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 24px;
+  transition: transform 0.3s ease;
+}
+
+.help-card:hover .help-card-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.help-card-content {
+  flex: 1; /* Empurra a 'action' para baixo */
+}
+
+.help-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.help-card-desc {
+  color: var(--text-secondary, #a3a3a3);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.help-card-action {
+  color: var(--accent, #e50914);
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  transition: gap 0.3s ease;
+}
+
+.help-card:hover .help-card-action {
+  gap: 14px; 
+}
+
+/* === RESPONSIVIDADE === */
+@media (max-width: 768px) {
+  .help-container {
+    margin-top: 100px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .help-header .page-title {
+    font-size: 2rem;
+  }
+  .help-grid {
+    grid-template-columns: 1fr; 
+  }
+}

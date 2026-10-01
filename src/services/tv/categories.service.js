@@ -39,10 +39,9 @@ export const GetCategoriesLiveTvService = async () => {
 
       if (typeof name === "string") {
         const cleanName = name.trim();
-        // 🛡️ Filtro de segurança: ignora textos longos de erro ou palavras específicas de erro
         if (
           cleanName.length > 0 &&
-          cleanName.length < 25 && // Categorias normais são palavras curtas
+          cleanName.length < 25 &&
           !cleanName.toLowerCase().includes("requisições") &&
           !cleanName.toLowerCase().includes("erro")
         ) {

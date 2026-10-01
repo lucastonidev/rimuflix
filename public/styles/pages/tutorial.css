@@ -1,0 +1,179 @@
+@import '../reset.css';
+@import '../components/header.css';
+
+/* =========================================
+   TELA INTERNA DO TUTORIAL
+   ========================================= */
+.tutorial-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 120px auto 60px;
+  min-height: calc(100vh - 180px);
+}
+
+.btn-back-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary, #a3a3a3);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 20px;
+  border-radius: 50px;
+  margin-bottom: 40px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btn-back-help:hover {
+  color: var(--text-primary, #fff);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(-4px);
+}
+
+.tutorial-content-box {
+  background: var(--secondary-bg, #141414);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 20px;
+  padding: 50px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.tutorial-html {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+/* Tipografia e espaçamento nativo do Markdown */
+.tutorial-html p { margin-bottom: 20px; }
+.tutorial-html h2 { margin: 40px 0 20px; color: var(--text-primary); font-size: 1.8rem; }
+.tutorial-html h3 { margin: 30px 0 15px; color: var(--text-primary); font-size: 1.4rem; }
+.tutorial-html ul, .tutorial-html ol { margin-bottom: 24px; padding-left: 24px; }
+.tutorial-html li { margin-bottom: 10px; }
+.tutorial-html hr { border-color: rgba(255, 255, 255, 0.1); margin: 40px 0; }
+.tutorial-html strong { color: var(--text-primary); }
+
+.tutorial-html code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: 'Roboto Mono', monospace;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tutorial-html blockquote {
+  border-left: 4px solid var(--accent, #e50914);
+  background: rgba(229, 9, 20, 0.05);
+  padding: 20px 24px;
+  margin: 32px 0;
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+}
+
+/* =========================================
+   ZIGUEZAGUE DOS PASSOS (MARKDOWN DIVS)
+   ========================================= */
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin: 40px 0;
+  background-color: var(--tertiary-bg, #1a1a1a);
+  border-radius: 16px;
+  padding: 40px;
+  border-left: 4px solid var(--accent);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 768px) {
+  .step {
+    flex-direction: row;
+    align-items: center;
+  }
+  .step:nth-child(even) {
+    flex-direction: row-reverse;
+    border-left: none;
+    border-right: 4px solid var(--accent);
+  }
+}
+
+.step-text {
+  flex: 1;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--accent), #b30000);
+  color: white;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+}
+
+.step-text h3 {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  margin-top: 0;
+}
+
+.step-image-placeholder {
+  flex: 1;
+  background-color: var(--secondary-bg, #141414);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.step-image-placeholder:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.step-image-placeholder i {
+  color: var(--accent);
+  opacity: 0.9;
+}
+
+/* === RESPONSIVIDADE === */
+/* === RESPONSIVIDADE === */
+@media (max-width: 768px) {
+  .tutorial-container {
+    padding: 0; /* Remove o espaçamento lateral para ocupar 100% da largura */
+    margin-top: 100px;
+  }
+
+  .btn-back-help {
+    margin-left: 20px; /* Mantém o botão alinhado com o texto interno */
+    margin-bottom: 20px;
+  }
+
+  .tutorial-content-box {
+    padding: 30px 20px; /* Mantém apenas o respiro interno para o texto não colar nas bordas do ecrã */
+    border-radius: 0; /* Remove o arredondamento para encostar perfeitamente nas laterais */
+    border-left: none;
+    border-right: none;
+  }
+
+  .step {
+    padding: 24px 20px;
+  }
+}

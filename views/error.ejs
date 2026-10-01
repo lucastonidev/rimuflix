@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+
+<main class="error-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; text-align: center;">
+  <i class="fa-solid fa-triangle-exclamation" style="font-size: 4rem; color: var(--accent); margin-bottom: 20px;"></i>
+  <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Erro 404</h1>
+  <p style="color: var(--text-secondary); margin-bottom: 30px;"><%= message || 'Página não encontrada.' %></p>
+  
+  <div style="display: flex; gap: 15px;">
+    <a href="/" class="btn-primary">Voltar ao Início</a>
+    <a href="/help" class="btn-secondary"><i class="fa-solid fa-life-ring"></i> Central de Ajuda</a>
+  </div>
+
+  <% if (locals.suggestionSlug) { %>
+    <div style="margin-top: 40px; padding: 20px; background: var(--secondary-bg); border-radius: 12px; border: 1px solid var(--border-color);">
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px;">Dica recomendada:</p>
+      <a href="/help/<%= suggestionSlug %>" style="color: var(--text-primary); font-weight: bold;">
+        Acessar tutorial sugerido <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+  <% } %>
+</main>

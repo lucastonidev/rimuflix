@@ -12,6 +12,10 @@ export function renderCategoryMenu(
 
   listContainer.innerHTML = "";
 
+  // Garante que o menu expanda se estava encolhido
+  const sidebar = listContainer.closest(".livetv-sidebar");
+  if (sidebar) sidebar.classList.remove("collapsed");
+
   categories.forEach((cat) => {
     const catName = cat.name || cat.nome || cat.categoria || cat;
     const item = document.createElement("div");
@@ -38,28 +42,39 @@ export function renderChannelList(
   callbacks,
 ) {
   headerContainer.innerHTML = `
-    <button id="mini-btn-prev" class="cat-nav-btn" title="Canal Anterior">
-      <i class="fa-solid fa-chevron-left"></i> Voltar
+    <button id="mini-btn-prev" class="cat-nav-btn" title="Voltar para Categorias">
+      <i class="fa-solid fa-chevron-left"></i> Categorias
     </button>
-    <button id="mini-btn-menu" class="cat-nav-btn" title="Voltar para Categorias">
+    <button id="mini-btn-menu" class="cat-nav-btn" title="Ocultar/Mostrar Lista">
       <i class="fa-solid fa-bars"></i> Menu
     </button>
-    <button id="mini-btn-next" class="cat-nav-btn" title="Próximo Canal">
-      Avançar <i class="fa-solid fa-chevron-right"></i>
+    <button id="mini-btn-next" class="cat-nav-btn" title="Selecionar Canal">
+      Selecionar <i class="fa-solid fa-check"></i>
     </button>
   `;
 
   document
-    .getElementById("mini-btn-menu")
-    .addEventListener("click", callbacks.onMenuClick);
-  document
     .getElementById("mini-btn-prev")
-    .addEventListener("click", () => callbacks.onNavigate(-1));
-  document
-    .getElementById("mini-btn-next")
-    .addEventListener("click", () => callbacks.onNavigate(1));
+    .addEventListener("click", callbacks.onMenuClick);
+
+  // 👇 A MÁGICA AQUI: Oculta a Sidebar inteira
+  document.getElementById("mini-btn-menu").addEventListener("click", () => {
+    const sidebar = listContainer.closest(".livetv-sidebar");
+    if (sidebar) sidebar.classList.toggle("collapsed");
+  });
+
+  document.getElementById("mini-btn-next").addEventListener("click", () => {
+    const activeItem =
+      listContainer.querySelector(".channel-item.active") ||
+      listContainer.querySelector(".channel-item");
+    if (activeItem) activeItem.click();
+  });
 
   listContainer.innerHTML = "";
+
+  // Garante que o menu expanda ao renderizar uma nova lista
+  const sidebar = listContainer.closest(".livetv-sidebar");
+  if (sidebar) sidebar.classList.remove("collapsed");
 
   if (channels.length === 0) {
     listContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: #9ca3af;">Nenhum canal encontrado nesta categoria.</div>`;
