@@ -123,9 +123,17 @@ export class TimeTracker {
         </div>
       </div>
     `;
+
+    const menuContainer = document.querySelector(".menu-container");
+    const watchPlayer = document.querySelector(".watch-player");
     const playerContainer = document.querySelector(".player-container");
-    if (playerContainer) {
-      playerContainer.insertAdjacentHTML("beforebegin", cardHtml);
+
+    if (menuContainer) {
+      menuContainer.insertAdjacentHTML("afterend", cardHtml);
+    } else if (watchPlayer) {
+      watchPlayer.insertAdjacentHTML("afterend", cardHtml);
+    } else if (playerContainer) {
+      playerContainer.insertAdjacentHTML("afterend", cardHtml);
     } else {
       document.body.insertAdjacentHTML("beforeend", cardHtml);
     }
@@ -151,9 +159,12 @@ export class TimeTracker {
       </div>
     `;
 
-    // Injeta DEPOIS do player de vídeo no watch.ejs
+    const menuContainer = document.querySelector(".menu-container");
     const watchPlayer = document.querySelector(".watch-player");
-    if (watchPlayer) {
+
+    if (menuContainer) {
+      menuContainer.insertAdjacentHTML("afterend", resumeHtml);
+    } else if (watchPlayer) {
       watchPlayer.insertAdjacentHTML("afterend", resumeHtml);
     }
 

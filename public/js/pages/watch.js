@@ -129,7 +129,6 @@ class WatchPage {
           </div>
         `;
 
-        // Injetar logo após o Container do Player
         const playerWrapper =
           document.querySelector(".watch-player") ||
           document.getElementById("playerSwitcher");
