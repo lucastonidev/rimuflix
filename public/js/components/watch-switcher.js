@@ -58,7 +58,6 @@ export class WatchSwitcher {
       const btn = document.createElement("button");
       btn.className = `player-option ${index === 0 ? "active" : ""}`;
 
-      // 👇 CORREÇÃO: Suporta tanto o formato antigo quanto o formato novo da base de dados
       const playerTitle = player.title || player.name || `Player ${index + 1}`;
       const playerUrl = player.url || player.embed;
 
@@ -75,15 +74,19 @@ export class WatchSwitcher {
         return;
       }
 
-      // Renderiza os botões normais de Embed
-      // Adicionado fallback de erro na imagem caso o URL do ícone esteja quebrado
       btn.innerHTML = `<img class="player-option__icon" src="${player.icon}" alt="${playerTitle}" onerror="this.outerHTML='<i class=\\'fa-solid fa-play\\'></i>'" /> ${playerTitle}`;
-      btn.dataset.url = playerUrl; // <-- CORREÇÃO AQUI
+      btn.dataset.url = playerUrl;
       btn.dataset.type = "iframe";
       listContainer.appendChild(btn);
     });
 
     this.setupListeners();
+
+    // 👇 AUTO-PLAY: Inicia o primeiro player da lista automaticamente
+    const firstBtn = listContainer.querySelector(".player-option");
+    if (firstBtn) {
+      firstBtn.click();
+    }
   }
 
   setupListeners() {
@@ -187,21 +190,29 @@ export class WatchSwitcher {
     `;
 
     torrentList.forEach((t) => {
-      // Fallbacks para garantir que a interface não quebre se a API mudar
       const quality = t.quality || t.resolution || "Auto";
-      const size = t.size || "-- GB";
+      const size = t.size || "--";
       const seeders = t.seeders || t.seeds || 0;
+      const title = t.title || t.name || "Torrent Release";
+      const source = t.source || "P2P";
 
-      // Inteligência de cores: Verde (Rápido), Amarelo (Médio), Vermelho (Lento/Morto)
       const healthColor =
         seeders > 40 ? "#10b981" : seeders > 10 ? "#f59e0b" : "#ef4444";
 
       menuHtml += `
         <button class="torrent-file-btn" data-magnet="${t.magnet}">
-          <div class="torrent-file-btn__quality">${quality}</div>
-          <div class="torrent-file-btn__info">
-            <span title="Tamanho do Arquivo"><i class="fa-solid fa-hard-drive"></i> ${size}</span>
-            <span title="Semeadores Ativos" style="color: ${healthColor};"><i class="fa-solid fa-arrow-up"></i> ${seeders}</span>
+          <div class="torrent-file-btn__title" title="${title}">
+            ${title}
+          </div>
+          <div class="torrent-file-btn__bottom">
+            <div class="torrent-file-btn__quality">
+              ${quality}
+            </div>
+            <div class="torrent-file-btn__info">
+              <span class="torrent-source-badge">${source}</span>
+              <span title="Tamanho do Arquivo"><i class="fa-solid fa-hard-drive"></i> ${size}</span>
+              <span title="Semeadores Ativos" style="color: ${healthColor};"><i class="fa-solid fa-arrow-up"></i> ${seeders}</span>
+            </div>
           </div>
         </button>
       `;

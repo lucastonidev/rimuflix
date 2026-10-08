@@ -154,11 +154,6 @@ class WatchPage {
     await this.fetchDetailsFromId();
     if (!this.data) return;
 
-    if (this.players.length > 0) {
-      const firstPlayerUrl = this.players[0].url || this.players[0].embed;
-      switcher.updateFrameSrc(firstPlayerUrl);
-    }
-
     if (this.type === "movie") {
       watchProgress.saveWatchProgress({
         tmdbId: this.id,

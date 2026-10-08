@@ -3,9 +3,15 @@
   margin: 1.25rem 0 1rem;
   padding: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(20, 20, 20, 0.92), rgba(10, 10, 10, 0.96));
+  background: linear-gradient(
+    180deg,
+    rgba(20, 20, 20, 0.92),
+    rgba(10, 10, 10, 0.96)
+  );
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .player-switcher__header {
@@ -70,7 +76,7 @@
   background: rgba(255, 255, 255, 0.04);
   color: #f5f5f5;
   border-radius: 999px;
-  padding: 0.70rem 1.1rem;
+  padding: 0.7rem 1.1rem;
   min-height: 46px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -79,10 +85,16 @@
   justify-content: center;
   gap: 0.65rem;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.player-option__icon { width: 25px; }
+.player-option__icon {
+  width: 25px;
+}
 
 .player-option:hover {
   transform: translateY(-1px);
@@ -98,21 +110,39 @@
 }
 
 /* ===== TORRENT SMART MENU ===== */
-.torrent-mini-menu {
+.torrent-mini-menu{
+  background: linear-gradient(
+    180deg,
+    rgba(20, 20, 20, 0.92),
+    rgba(10, 10, 10, 0.96)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  padding: 1.2rem;
+
+}
+
+.torrent-mini-menu__list {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  flex-direction: column; 
+  gap: 12px;
   width: 100%;
-  background: linear-gradient(135deg, #09090b 0%, #18181b 100%);
-  padding: 30px 20px;
-  text-align: center;
-  animation: fadeIn 0.3s ease;
-  min-height: 400px;
+  max-width: 700px;
+  max-height: 450px; 
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  margin: 0 auto;
 }
 
 .torrent-mini-menu__header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 30px;
 }
 
@@ -142,7 +172,7 @@
   gap: 15px;
   justify-content: center;
   max-width: 800px;
-  max-height: 250px; /* Impede que cresça infinitamente */
+  max-height: 250px;
   overflow-y: auto;
   padding: 10px;
 }
@@ -151,20 +181,21 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 18px 25px;
-  min-width: 160px;
+  padding: 15px 20px;
+  width: 100%;
   cursor: pointer;
   transition: all 0.25s ease;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 12px;
+  text-align: left;
 }
 
 .torrent-file-btn:hover {
   background: rgba(59, 130, 246, 0.15);
   border-color: #3b82f6;
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
@@ -182,9 +213,57 @@
   font-weight: 600;
 }
 
+.torrent-file-btn__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.torrent-file-btn__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.torrent-file-btn__quality {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #3b82f6;
+}
+
+.torrent-file-btn__info {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  align-items: center;
+}
+
+.torrent-source-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #fff;
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 768px) {
@@ -219,7 +298,13 @@
 }
 
 @media (max-width: 480px) {
-  .player-switcher__list { grid-template-columns: 1fr; }
-  .player-switcher__header h3 { font-size: 0.95rem; }
-  .player-switcher__hint { font-size: 0.82rem; }
+  .player-switcher__list {
+    grid-template-columns: 1fr;
+  }
+  .player-switcher__header h3 {
+    font-size: 0.95rem;
+  }
+  .player-switcher__hint {
+    font-size: 0.82rem;
+  }
 }
