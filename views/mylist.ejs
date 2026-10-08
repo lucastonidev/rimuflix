@@ -9,79 +9,16 @@
   <body>
     <%- include("./partials/header.ejs") %>
     <main class="mylist-container container">
+  <div class="mylist-header">
+    <div>
       <h1 class="page-title">Minhas Listas</h1>
+      <p class="page-subtitle">Organize seus filmes, séries e animes em coleções.</p>
+    </div>
+    <div class="mylist-actions" id="mylist-actions"></div>
+  </div>
 
-      <div class="mylist-layout">
-        <!-- Barra lateral com os nomes das listas -->
-        <aside class="mylist-sidebar">
-          <div class="sidebar-header">
-            <h3>Suas Playlists</h3>
-          </div>
-          <ul id="playlist-tabs" class="playlist-tabs">
-            <!-- O JS vai injetar as abas aqui -->
-          </ul>
-        </aside>
-
-        <!-- Área dos cards -->
-        <section class="mylist-content">
-          <!-- Cabeçalho da Lista e Controle de Privacidade -->
-          <div class="content-header">
-            <div class="list-title-area">
-              <h1 id="current-list-title" class="page-title">Minha Lista</h1>
-
-              <!-- Preparando o ambiente para o Supabase: Toggle de Privacidade -->
-              <div
-                class="privacy-control"
-                title="Defina se outras pessoas podem ver sua lista"
-              >
-                <i class="fa-solid fa-lock" id="privacy-icon"></i>
-                <span id="privacy-text">Privada</span>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="privacy-toggle" />
-                  <div class="toggle-bg"><div class="toggle-dot"></div></div>
-                </label>
-              </div>
-            </div>
-
-            <button id="btn-delete-list" class="btn-danger hidden">
-              <i class="fa-solid fa-trash"></i> Apagar Lista
-            </button>
-          </div>
-
-          <!-- Dashboard de Estatísticas (NOVO) -->
-          <div class="stats-dashboard" id="stats-dashboard">
-            <div class="stat-card">
-              <div class="stat-icon red"><i class="fa-solid fa-clock"></i></div>
-              <div class="stat-info">
-                <span class="stat-label">Tempo Assistido</span>
-                <strong class="stat-value" id="stat-time">0h 0m</strong>
-              </div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-icon blue"><i class="fa-solid fa-film"></i></div>
-              <div class="stat-info">
-                <span class="stat-label">Títulos na Lista</span>
-                <strong class="stat-value" id="stat-count">0</strong>
-              </div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-icon purple">
-                <i class="fa-solid fa-masks-theater"></i>
-              </div>
-              <div class="stat-info">
-                <span class="stat-label">Gênero Favorito</span>
-                <strong class="stat-value" id="stat-genre">-</strong>
-              </div>
-            </div>
-          </div>
-
-          <!-- Grid de Filmes/Séries -->
-          <div id="playlist-grid" class="media-grid"></div>
-        </section>
-      </div>
-    </main>
+  <div class="folders-grid" id="folders-grid"></div>
+</main>
 
     <script type="module">
       import MyList from "/js/pages/mylist.js";
