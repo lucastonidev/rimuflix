@@ -28,7 +28,7 @@ export class WatchSwitcher {
     const playerSwitcher = document.getElementById("playerSwitcher");
     if (!playerSwitcher) return;
 
-    // 👇 LÓGICA NOVA: Injeta o botão de Torrent nativo caso ele não venha da API de provedores
+    // Injeta o botão de Torrent nativo caso ele não venha da API de provedores
     const hasTorrent = this.players.some((p) => p.type === "Torrent");
     if (!hasTorrent) {
       this.players.push({
@@ -58,13 +58,16 @@ export class WatchSwitcher {
       const btn = document.createElement("button");
       btn.className = `player-option ${index === 0 ? "active" : ""}`;
 
+      // 👇 CORREÇÃO: Suporta tanto o formato antigo quanto o formato novo da base de dados
+      const playerTitle = player.title || player.name || `Player ${index + 1}`;
+      const playerUrl = player.url || player.embed;
+
       if (player.type === "Torrent") {
-        // Renderiza o botão nativo do Torrent usando o ícone do FontAwesome
         btn.innerHTML = `
-          <div class="player-option__icon" data-type="torrent" title="${player.title}">
+          <div class="player-option__icon" data-type="torrent" title="${playerTitle}">
             ${player.icon}
           </div>
-          ${player.title}
+          ${playerTitle}
         `;
         btn.dataset.url = "";
         btn.dataset.type = "torrent";
@@ -73,8 +76,9 @@ export class WatchSwitcher {
       }
 
       // Renderiza os botões normais de Embed
-      btn.innerHTML = `<img class="player-option__icon" src="${player.icon}" alt="${player.title}" /> ${player.title}`;
-      btn.dataset.url = player.embed;
+      // Adicionado fallback de erro na imagem caso o URL do ícone esteja quebrado
+      btn.innerHTML = `<img class="player-option__icon" src="${player.icon}" alt="${playerTitle}" onerror="this.outerHTML='<i class=\\'fa-solid fa-play\\'></i>'" /> ${playerTitle}`;
+      btn.dataset.url = playerUrl; // <-- CORREÇÃO AQUI
       btn.dataset.type = "iframe";
       listContainer.appendChild(btn);
     });

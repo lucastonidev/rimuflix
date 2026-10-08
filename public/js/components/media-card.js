@@ -12,7 +12,28 @@ export function createMediaCard(movie, type) {
     : "";
 
   const isMovie = type === "movie" || type === "Filme";
-  const displayType = isMovie ? "Filme" : "Série";
+  let displayType = isMovie ? "Filme" : "Série";
+
+  // 👇 LÓGICA DO ANIME APRIMORADA (Japão, Coreia do Sul e China + Animação)
+  if (!isMovie) {
+    const countries = movie?.origin_country || [];
+
+    // Verifica se a produção tem origem num destes 3 países
+    const isAsianProduction =
+      countries.includes("JP") ||
+      countries.includes("KR") ||
+      countries.includes("CN");
+
+    // Verifica obrigatoriamente se possui o género Animação
+    const hasAnimationGenre =
+      movie?.genre_ids?.includes(16) || movie?.genres?.some((g) => g.id === 16);
+
+    // Só vira "Anime" se cumprir os dois requisitos
+    if (isAsianProduction && hasAnimationGenre) {
+      displayType = "Anime";
+    }
+  }
+
   const href = isMovie ? `/movie/${movie.id}` : `/tv/${movie.id}`;
 
   return `
@@ -38,7 +59,6 @@ export function createMediaCard(movie, type) {
         </div>
       </div>
       
-      <!-- Link movido para cá e usando class em vez de ID -->
       <a href="${href}" class="card-link" aria-label="Acessar ${title}"></a>
     </div>
   `;

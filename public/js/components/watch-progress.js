@@ -1,15 +1,25 @@
 import { STORAGE_KEYS } from "./storageKeys.js";
 
-// Função auxiliar para saber se está logado
-const isUserLoggedIn = () => {
-  return !!localStorage.getItem("rimuflix:userId");
+// Função melhorada que não confia apenas no localStorage
+const checkAuthStatus = async () => {
+  if (!localStorage.getItem(STORAGE_KEYS.USER_ID)) return false;
+
+  try {
+    const res = await fetch("/api/v1/auth/me");
+    const json = await res.json();
+    return json.success; // Se o servidor disse que o token é válido, retorna true
+  } catch (e) {
+    return false;
+  }
 };
 
 export const getWatchProgressState = async () => {
   let cloudData = [];
 
-  // 1. Tenta buscar da Nuvem se estiver logado
-  if (isUserLoggedIn()) {
+  // 1. Verificamos a sessão de forma segura
+  const isLoggedIn = await checkAuthStatus();
+
+  if (isLoggedIn) {
     try {
       const response = await fetch("/api/v1/user/progress");
       const result = await response.json();
@@ -32,11 +42,9 @@ export const getWatchProgressState = async () => {
     }
   }
 
-  // 2. Busca os dados do LocalStorage (Sempre)
+  // 2. Mescla com o local data independentemente de estar logado ou não
   const localData =
     JSON.parse(localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)) || [];
-
-  // 3. Mescla os dados de forma inteligente
   const mergedData = [...localData];
 
   cloudData.forEach((cloudItem) => {
@@ -45,15 +53,11 @@ export const getWatchProgressState = async () => {
     );
 
     if (index !== -1) {
-      // Se a nuvem retornou null ou vazio para o tempo, resgatamos o tempo do LocalStorage!
       if (!cloudItem.stoppedAt && mergedData[index].stoppedAt) {
         cloudItem.stoppedAt = mergedData[index].stoppedAt;
       }
-
-      // Atualiza o item local com os dados finais validados
       mergedData[index] = cloudItem;
     } else {
-      // Se só existir na Nuvem, adiciona à lista final
       mergedData.push(cloudItem);
     }
   });
@@ -62,11 +66,10 @@ export const getWatchProgressState = async () => {
 };
 
 export const saveWatchProgress = async (newItem) => {
-  let savedToCloud = false;
+  const isLoggedIn = await checkAuthStatus();
 
-  if (isUserLoggedIn()) {
+  if (isLoggedIn) {
     try {
-      // Constrói o payload básico com os dados obrigatórios
       const payload = {
         tmdb_id: String(newItem.tmdbId),
         media_type: newItem.mediaType,
@@ -74,7 +77,6 @@ export const saveWatchProgress = async (newItem) => {
         episode_number: newItem.episodeNumber || 1,
       };
 
-      // Só anexa o tempo se ele foi gerado pelo cronômetro
       if (newItem.stoppedAt) {
         payload.stopped_at = newItem.stoppedAt;
       }
@@ -87,9 +89,7 @@ export const saveWatchProgress = async (newItem) => {
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
-        savedToCloud = true;
-      } else {
+      if (!response.ok || !result.success) {
         console.warn("Falha no servidor. Fallback ativado.", result.error);
       }
     } catch (error) {
@@ -97,14 +97,14 @@ export const saveWatchProgress = async (newItem) => {
     }
   }
 
-  // Fallback: Sincroniza localmente sempre
   autoSaveLocalProgress(newItem);
 };
 
 export const removeWatchProgress = async (tmdbId, mediaType = "tv") => {
-  if (isUserLoggedIn()) {
+  const isLoggedIn = await checkAuthStatus();
+
+  if (isLoggedIn) {
     try {
-      // Manda os dados na URL, em vez de usar body!
       await fetch(`/api/v1/user/progress/remove/${mediaType}/${tmdbId}`, {
         method: "DELETE",
       });
@@ -113,7 +113,6 @@ export const removeWatchProgress = async (tmdbId, mediaType = "tv") => {
     }
   }
 
-  // Fallback visitante
   const currentProgress =
     JSON.parse(localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)) || [];
   const updatedProgress = currentProgress.filter(
@@ -135,7 +134,6 @@ export const autoSaveLocalProgress = (newItem) => {
   if (index === -1) {
     currentArray.push(newItem);
   } else {
-    // 👇 A MÁGICA ACONTECE AQUI: Mescla o dado antigo com o novo, preservando o stoppedAt
     currentArray[index] = { ...currentArray[index], ...newItem };
   }
 

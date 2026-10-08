@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+  <%- include('partials/head') %>
+
+  <link rel="stylesheet" href="/styles/pages/playlist.css">
+  <title>Playlist | Rimuflix</title>  
+</head>
+<body class="hidde-scroll">
+  
+  <%- include('partials/header') %>
+
+  <main class="playlist-page">
+    <!-- 1. HERO SECTION: Capa borrada, Título, Criador e Botões principais -->
+    <section id="playlist-hero" class="playlist-hero">
+      <div class="hero-loader">
+        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+      </div>
+    </section>
+
+    <!-- 2. CONTEÚDO: Estatísticas e Grid de Mídias -->
+    <div class="playlist-content">
+      
+      <!-- Estatísticas Detalhadas -->
+      <div id="playlist-stats" class="playlist-stats-bar">
+        <!-- Injetado via JS -->
+      </div>
+
+      <!-- Controles da Lista (Busca Interna e Filtros) -->
+      <div class="playlist-controls">
+        <div class="search-internal">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="input-filter-list" placeholder="Buscar nesta lista...">
+        </div>
+        
+        <div class="layout-toggles">
+          <span id="items-count-label">Carregando...</span>
+        </div>
+      </div>
+
+      <!-- Grid de Mídias -->
+      <div id="playlist-grid" class="media-grid">
+        <!-- Cards injetados via JS -->
+      </div>
+
+    </div>
+  </main>
+
+  <script type="module" src="/js/pages/playlist.js"></script>
+</body>
+</html>

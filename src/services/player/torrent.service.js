@@ -1,12 +1,8 @@
-// src/services/player/torrent.service.js
 import { searchAPIBay } from "../torrent/apibay.service.js";
 import { searchEZTV } from "../torrent/eztv.service.js";
-
-// Função fictícia pra você substituir pela sua importação real do TMDB
 import { getMediaData } from "../tmdb/details.service.js";
 
 export async function getTorrentsForMedia(type, tmdbId, season, episode) {
-  // 1. Pega o nome do filme/série original lá do TMDB
   const tmdbData = await getMediaData(type, tmdbId);
   const mediaTitle =
     tmdbData.original_title ||

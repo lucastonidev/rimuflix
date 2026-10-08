@@ -1,200 +1,149 @@
 import { STORAGE_KEYS } from "./storageKeys.js";
 
-function loadFromLocalStorage(key, defaultValue = []) {
+// Função utilitária para manter fallback local para visitantes
+function loadLocalLists() {
   try {
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : defaultValue;
-  } catch (error) {
-    console.error(`Erro ao ler ${key} do localStorage:`, error);
-    return defaultValue;
+    const data = localStorage.getItem("rimuflix:playlists");
+    // Se não existir, cria a lista Favoritos por padrão localmente
+    return data
+      ? JSON.parse(data)
+      : [{ id: "default", name: "Favoritos", is_public: false, items: [] }];
+  } catch (e) {
+    return [{ id: "default", name: "Favoritos", is_public: false, items: [] }];
   }
 }
 
-function saveToLocalStorage(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (error) {
-    console.error(`Erro ao salvar ${key} no localStorage:`, error);
-  }
+function saveLocalLists(data) {
+  localStorage.setItem("rimuflix:playlists", JSON.stringify(data));
 }
 
-// --- Autenticação ---
 export async function isUserLoggedIn() {
   const userId = localStorage.getItem("rimuflix:userId");
   if (!userId) return false;
-
   try {
-    const DataFromUser = await fetch("/api/v1/auth/me")
-      .then((res) => res.json())
-      .then((res) => {
-        return res;
-      });
-    return DataFromUser.success;
+    const res = await fetch("/api/v1/auth/me").then((r) => r.json());
+    return res.success;
   } catch (error) {
-    console.error("Erro ao verificar status de login:", error);
     return false;
   }
 }
 
-// --- Operações de Favoritos ---
-export async function getFavorites() {
+// 1. Busca todas as listas (A API agora deve retornar [{ id, name, is_public, items: [{media_id, media_type}] }])
+export async function getUserLists() {
   if (await isUserLoggedIn()) {
     try {
-      const Favorites = await fetch("/api/v1/user/watchlist").then((res) =>
-        res.json(),
-      );
-
-      if (Favorites.success) {
-        // Correção: Extraímos o array contido em .data
-        const dataArray = Favorites.data || [];
-        saveToLocalStorage(STORAGE_KEYS.FAVORITES, dataArray);
-        return dataArray;
+      const res = await fetch("/api/v1/user/lists").then((r) => r.json());
+      if (res.success) {
+        saveLocalLists(res.data); // Sincroniza localmente
+        return res.data || [];
       }
-      return [];
     } catch (error) {
-      console.error("Erro ao buscar favoritos na API. Usando fallback.", error);
+      console.error("Erro ao buscar listas na API:", error);
     }
   }
-  return loadFromLocalStorage(STORAGE_KEYS.FAVORITES);
+  return loadLocalLists();
 }
 
-export async function addFavorite(tmdbId, mediaType) {
+// 2. Cria uma nova lista
+export async function createList(name) {
   if (await isUserLoggedIn()) {
-    try {
-      const res = await fetch("/api/v1/user/watchlist/toggle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tmdb_id: tmdbId, media_type: mediaType }),
-      });
-      if (!res.ok) throw new Error("Falha na API");
-      return await res.json();
-    } catch (error) {
-      console.error("Erro ao alternar favorito na API:", error);
-      throw new Error("Falha ao salvar nos favoritos. Tente novamente.");
-    }
+    const res = await fetch("/api/v1/user/lists", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    }).then((r) => r.json());
+    if (!res.success) throw new Error(res.error);
+    return res;
   } else {
-    console.log("Salvando na local");
-    const favorites = loadFromLocalStorage(STORAGE_KEYS.FAVORITES);
-    const index = favorites.findIndex(
-      (item) => item.id === tmdbId && item.type === mediaType,
-    );
+    const lists = loadLocalLists();
 
-    let action;
-    if (index > -1) {
-      favorites.splice(index, 1);
-      action = "removed";
-    } else {
-      favorites.push({ id: tmdbId, type: mediaType });
-      action = "added";
-    }
+    // 👇 Correção: Precisamos guardar a lista numa variável para poder retornar o ID dela!
+    const newList = {
+      id: crypto.randomUUID(),
+      name,
+      is_public: false,
+      items: [],
+    };
 
-    saveToLocalStorage(STORAGE_KEYS.FAVORITES, favorites);
-    return { success: true, action };
+    lists.push(newList);
+    saveLocalLists(lists);
+
+    // 👇 Retornamos o data para que o PlaylistModal consiga achar o ID
+    return { success: true, data: newList };
   }
 }
 
-export async function removeFavorite(tmdbId, mediaType) {
+// 3. Deleta uma lista (Não permite deletar a Favoritos)
+export async function deleteList(listId) {
   if (await isUserLoggedIn()) {
-    try {
-      const res = await fetch("/api/v1/user/watchlist/", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tmdb_id: tmdbId, media_type: mediaType }),
-      });
-      if (!res.ok) throw new Error("Falha na API");
-      return await res.json();
-    } catch (error) {
-      console.error("Erro ao alternar favorito na API:", error);
-      throw new Error("Falha ao salvar nos favoritos. Tente novamente.");
-    }
+    const res = await fetch(`/api/v1/user/lists/${listId}`, {
+      method: "DELETE",
+    }).then((r) => r.json());
+    if (!res.success) throw new Error(res.error);
+    return res;
   } else {
-    console.log("Salvando na local");
-    const favorites = loadFromLocalStorage(STORAGE_KEYS.FAVORITES);
-    const index = favorites.findIndex(
-      (item) => item.id === tmdbId && item.type === mediaType,
-    );
-
-    let action;
-    if (index > -1) {
-      favorites.splice(index, 1);
-      action = "removed";
-    } else {
-      favorites.push({ id: tmdbId, type: mediaType });
-      action = "added";
-    }
-
-    saveToLocalStorage(STORAGE_KEYS.FAVORITES, favorites);
-    return { success: true, action };
+    let lists = loadLocalLists();
+    lists = lists.filter((l) => l.id !== listId);
+    saveLocalLists(lists);
+    return { success: true };
   }
 }
 
-// --- Operações de Listas Personalizadas ---
-export async function getCustomLists() {
+// 4. Adiciona ou Remove um item da lista
+export async function toggleListItem(listId, mediaId, mediaType) {
   if (await isUserLoggedIn()) {
-    try {
-      const CustomLists = await fetch("/api/v1/user/custom-lists")
-        .then((res) => res.json());
-
-      if (CustomLists.success) {
-        const dataArray = CustomLists.data || [];
-        saveToLocalStorage(STORAGE_KEYS.CUSTOM_LISTS, dataArray);
-        return dataArray;
-      }
-      return [];
-    } catch (error) {
-      console.error(
-        "Erro ao buscar listas personalizadas na API. Usando fallback.",
-        error,
-      );
-    }
-  }
-  return loadFromLocalStorage(STORAGE_KEYS.CUSTOM_LISTS);
-}
-
-export async function toggleCustomList(tmdbId, mediaType, listName) {
-  if (await isUserLoggedIn()) {
-    try {
-      const res = await fetch("/api/v1/user/custom-lists/toggle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tmdb_id: tmdbId,
-          media_type: mediaType,
-          list_name: listName,
-        }),
-      });
-      if (!res.ok) throw new Error("Falha na API");
-      return await res.json();
-    } catch (error) {
-      console.error("Erro ao alternar item na lista personalizada:", error);
-      throw new Error(
-        `Falha ao atualizar a lista "${listName}". Tente novamente.`,
-      );
-    }
+    const res = await fetch(`/api/v1/user/lists/${listId}/toggle`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        media_id: String(mediaId),
+        media_type: mediaType,
+      }),
+    }).then((r) => r.json());
+    if (!res.success) throw new Error("Falha na API");
+    return res;
   } else {
-    const customLists = loadFromLocalStorage(STORAGE_KEYS.CUSTOM_LISTS);
-    let list = customLists.find((l) => l.name === listName);
-
-    if (!list) {
-      // Cria a lista caso não exista no localStorage
-      list = { id: crypto.randomUUID(), name: listName, items: [] };
-      customLists.push(list);
-    }
+    const lists = loadLocalLists();
+    const list = lists.find((l) => l.id === listId);
+    if (!list) throw new Error("Lista não encontrada");
 
     const index = list.items.findIndex(
-      (item) => item.id === tmdbId && item.type === mediaType,
+      (i) =>
+        String(i.media_id) === String(mediaId) && i.media_type === mediaType,
     );
-    let action;
 
+    let action;
     if (index > -1) {
       list.items.splice(index, 1);
       action = "removed";
     } else {
-      list.items.push({ id: tmdbId, type: mediaType });
+      list.items.push({ media_id: String(mediaId), media_type: mediaType });
       action = "added";
     }
 
-    saveToLocalStorage(STORAGE_KEYS.CUSTOM_LISTS, customLists);
+    saveLocalLists(lists);
     return { success: true, action };
+  }
+}
+
+export async function updateListVisibility(listId, isPublic) {
+  if (await isUserLoggedIn()) {
+    const res = await fetch(`/api/v1/user/lists/${listId}/visibility`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isPublic }),
+    }).then((r) => r.json());
+
+    if (!res.success) throw new Error(res.error);
+    return res;
+  } else {
+    // Modo Visitante (Local)
+    const lists = loadLocalLists();
+    const list = lists.find((l) => l.id === listId);
+    if (list) {
+      list.is_public = isPublic;
+      saveLocalLists(lists);
+    }
+    return { success: true };
   }
 }

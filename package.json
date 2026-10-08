@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "start:dev": "nodemon index.js",
+    "start:dev": "cross-env NODE_ENV=development nodemon index.js",
+    "start:supabase": "npx supabase start",
     "electron": "electron .",
     "electron:build:win": "electron-builder --win --x64 --publish always",
     "electron:build:linux": "electron-builder --linux deb",
@@ -54,8 +55,10 @@
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "electron": "^43.1.1",
-    "electron-builder": "^26.15.3"
+    "electron-builder": "^26.15.3",
+    "supabase": "^2.119.0"
   },
   "allowScripts": {
     "electron-winstaller@5.4.0": true

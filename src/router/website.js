@@ -116,4 +116,9 @@ router.get('/error', (req, res) => {
   });
 });
 
+// Rota para a página dedicada da Playlist
+router.get("/playlist/:id", (req, res) => {
+  res.render("playlist");
+});
+
 export { router as website };

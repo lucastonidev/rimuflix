@@ -139,7 +139,7 @@ export const me = (req, res) => {
       // 1. TENTA VALIDAR O TOKEN DE 15 MINUTOS PRIMEIRO
       const decoded = jwt.verify(
         accessToken,
-        process.env.JWT_SECRET || "sua_chave_secreta_aqui",
+        process.env.JWT_SECRET,
       );
       return res.status(200).json({ success: true, data: decoded });
     } catch (accessError) {
@@ -148,7 +148,7 @@ export const me = (req, res) => {
         try {
           const decodedRefresh = jwt.verify(
             refreshToken,
-            process.env.JWT_REFRESH_SECRET || "sua_chave_refresh_aqui",
+            process.env.JWT_REFRESH_SECRET,
           );
 
           // Remove campos de tempo velhos para gerar um novo token limpo
@@ -157,7 +157,7 @@ export const me = (req, res) => {
           // Gera um NOVO Access Token de 15 minutos
           const newAccessToken = jwt.sign(
             userData,
-            process.env.JWT_SECRET || "sua_chave_secreta_aqui",
+            process.env.JWT_SECRET,
             { expiresIn: ACCESS_EXPIRES_IN },
           );
 

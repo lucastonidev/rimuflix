@@ -1,234 +1,54 @@
 import express from "express";
-import jwt from "jsonwebtoken";
-import multer from "multer";
-import { UserDataModule } from "../../modules/user/user_data.module.js";
-import { requireAuth } from "../../middlewares/auth/auth.middleware.js"; // Ajuste o caminho se necessário
-import { saveWatchProgress } from "../../controllers/user/progress.controller.js";
-import { supabase } from "../../config/supabase.js";
+import multer from "multer"; // Necessário para o upload do avatar no settings.js
+import UsersController from "../../controllers/user/user.controller.js";
 
-export const userRoute = express.Router();
+const userRouter = express.Router();
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 2 * 1024 * 1024 }, // Limite de 2MB de segurança no Back-end também
-});
-
-userRoute.use(requireAuth);
-
-// Obter Favoritos
-userRoute.get("/watchlist", async (req, res) => {
-  const userId = req.user.id;
-  const data = await UserDataModule.getWatchlist(userId);
-
-  if (data.success) {
-    if (data.data) {
-      const formattedData = data.data.map((item) => ({
-        id: item.tmdb_id,
-        type: item.media_type,
-      }));
-      return res.json(formattedData);
-    }
-    return res.json({
-      success: true,
-      data,
-    });
-  }
-  return res.status(500).json({ success: false, error: data.error });
-});
-
-userRoute.post("/watchlist", async (req, res) => {
-  const userId = req.user.id;
-  const { tmdb_id, media_type } = req.body;
-
-  const data = await UserDataModule.AddWatchlist({
-    user_id: userId,
-    tmdb_id,
-    media_type,
-  });
-
-  if (data.success) {
-    return res
-      .status(201)
-      .json({ success: true, action: "Criado com sucesso" });
-  }
-  return res.status(data.status).json({ success: false, error: data.error });
-});
-
-userRoute.delete("/watchlist", async (req, res) => {
-  const userId = req.user.id;
-  const { tmdb_id, media_type } = req.body;
-
-  const data = await UserDataModule.RemoveWatchlist({
-    user_id: userId,
-    tmdb_id,
-    media_type,
-  });
-
-  if (data.success) {
-    return res.json({ success: true, action: data.action });
-  }
-  return res.status(data.status).json({ success: false, error: data.error });
-});
-
-// -------------------------------------------------------------
-// 2. LISTAS CUSTOMIZADAS (Tabela: custom_lists)
-// -------------------------------------------------------------
-
-// Obter Listas Customizadas
-userRoute.get("/custom-lists", async (req, res) => {
-  const userId = req.user.id;
-
-  const data = await UserDataModule.getCustomLists(userId);
-
-  if (data.success) {
-    return res.json(data);
-  }
-  return res.status(500).json({ success: false, error: data.error });
-});
-
-// Adicionar/Remover de uma Lista Customizada (Toggle)
-userRoute.post("/custom-lists/toggle", async (req, res) => {
-  const userId = req.user.id;
-  const { tmdb_id, media_type, list_name } = req.body;
-
-  const data = await UserDataModule.toggleCustomList({
-    user_id: userId,
-    tmdb_id,
-    media_type,
-    list_name,
-  });
-
-  if (data.success) {
-    return res.json({ success: true, action: data.action });
-  }
-  return res.status(500).json({ success: false, error: data.error });
-});
+// Configuração básica do multer (Apenas memória)
+const upload = multer({ storage: multer.memoryStorage() });
 
 // ==========================================
-// PROGRESSO (Continue Assistindo)
+// ROTAS DE LISTAS (Substitui as antigas rotas de watchlist)
 // ==========================================
-userRoute.get("/progress", async (req, res) => {
-  const result = await UserDataModule.getProgress(req.user.id);
-  res.status(result.success ? 200 : 500).json(result);
-});
+userRouter.get("/lists", (req, res) => UsersController.getLists(req, res));
+userRouter.post("/lists", (req, res) => UsersController.createList(req, res));
+userRouter.delete("/lists/:listId", (req, res) =>
+  UsersController.deleteList(req, res),
+);
+userRouter.post("/lists/:listId/toggle", (req, res) =>
+  UsersController.toggleListItem(req, res),
+);
 
-userRoute.post("/progress/save", saveWatchProgress);
+userRouter.patch("/lists/:listId/visibility", (req, res) =>
+  UsersController.updateListVisibility(req, res),
+);
 
-userRoute.delete("/progress/remove/:media_type/:tmdb_id", async (req, res) => {
-  const { media_type, tmdb_id } = req.params;
-  const result = await UserDataModule.removeProgress(
-    req.user.id,
-    tmdb_id,
-    media_type,
-  );
-  res.status(result.success ? 200 : 500).json(result);
-});
+userRouter.get("/lists/:id", UsersController.getListDetails);
 
 // ==========================================
-// CONFIGURAÇÕES DO USUÁRIO
+// ROTAS DE PROGRESSO (Continue Watching)
 // ==========================================
-userRoute.patch("/profile", upload.single("avatar"), async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { name, email, password } = req.body; // <--- Adicionamos o password aqui
-    let finalAvatarUrl = null;
+userRouter.get("/progress", (req, res) =>
+  UsersController.getProgress(req, res),
+);
+userRouter.post("/progress/save", (req, res) =>
+  UsersController.saveProgress(req, res),
+);
+userRouter.delete("/progress/remove/:mediaType/:tmdbId", (req, res) =>
+  UsersController.removeProgress(req, res),
+);
 
-    // 1. Limpa o nome
-    const cleanName = UserDataModule.sanitizeUsername(name);
-    if (cleanName.length < 3) {
-      return res.status(400).json({ success: false, error: "Nome inválido." });
-    }
+// ==========================================
+// ROTAS DE PERFIL
+// ==========================================
+userRouter.patch("/profile", upload.single("avatar"), (req, res) =>
+  UsersController.updateProfile(req, res),
+);
 
-    // 2. SE O USUÁRIO MANDOU UMA FOTO NOVA, FAZ O UPLOAD PRO SUPABASE STORAGE
-    if (req.file) {
-      const fileExt = req.file.originalname.split(".").pop();
-      const fileName = `${userId}-${Date.now()}.${fileExt}`;
+// ==========================================
+// ROTAS DE AVALIAÇÕES (Reviews)
+// ==========================================
+userRouter.get("/reviews/:mediaType/:tmdbId", (req, res) => UsersController.getReviews(req, res));
+userRouter.post("/reviews/internal", (req, res) => UsersController.addInternalReview(req, res));
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, req.file.buffer, {
-          contentType: req.file.mimetype,
-          upsert: true,
-        });
-
-      if (uploadError) {
-        throw new Error(`Erro ao enviar imagem: ${uploadError.message}`);
-      }
-
-      const { data: publicUrlData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
-      finalAvatarUrl = publicUrlData.publicUrl;
-    }
-
-    // 3. Monta os dados para salvar no banco 
-    const updateData = {
-      name: cleanName,
-      email: email ? email.trim().toLowerCase() : req.user.email,
-    };
-    
-    // Se o usuário digitou uma senha nova, anexa ela no objeto de update
-    if (password) {
-      updateData.password = password.trim();
-    }
-    
-    if (finalAvatarUrl) {
-      updateData.avatar_url = finalAvatarUrl;
-    }
-
-    // 4. Salva no banco de dados
-    const result = await UserDataModule.updateProfile(userId, updateData);
-    if (!result.success) {
-      // Retorna o erro específico do banco (ex: "Password should be at least 6 characters")
-      return res.status(400).json({ success: false, error: result.error });
-    }
-
-    const returnedAvatar =
-      finalAvatarUrl || result.data?.avatar_url || req.user.avatar_url || "";
-
-    // 5. ATUALIZA OS COOKIES DE SESSÃO COM O NOME NOVO, O ID E A FOTO
-    const newPayload = {
-      id: userId,
-      name: cleanName,
-      role: req.user.role,
-      avatar_url: returnedAvatar,
-    };
-
-    const newAccessToken = jwt.sign(newPayload, process.env.JWT_SECRET, {
-      expiresIn: "15m",
-    });
-    const newRefreshToken = jwt.sign(
-      newPayload,
-      process.env.JWT_REFRESH_SECRET,
-      { expiresIn: "7d" },
-    );
-
-    const cookiePrefix = req.user.role === "admin" ? "admin" : "user";
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      path: "/",
-    };
-
-    res.cookie(`${cookiePrefix}_access`, newAccessToken, {
-      ...cookieOptions,
-      maxAge: 15 * 60 * 1000,
-    });
-    res.cookie(`${cookiePrefix}_refresh`, newRefreshToken, {
-      ...cookieOptions,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Perfil atualizado com sucesso!",
-      data: newPayload, 
-    });
-  } catch (error) {
-    console.error("Erro na rota de atualizar perfil:", error);
-    return res
-      .status(500)
-      .json({ success: false, error: "Erro interno do servidor." });
-  }
-});
+export default userRouter;

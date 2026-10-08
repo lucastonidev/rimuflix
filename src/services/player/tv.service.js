@@ -1,4 +1,4 @@
-import { supabase } from "../../config/supabase.js";
+import * as clientPlayer from "./player.client.js";
 import { getCustomMediaPlayers } from "../database/mediaDrive.service.js";
 
 const buildUrlEmbedPlayerTv = (url, title, season, episode, id) => {
@@ -37,27 +37,23 @@ const buildUrlEmbedPlayerTv = (url, title, season, episode, id) => {
 
 export const getAllEmbedLink = async (id, season, episode) => {
   try {
-    const { data: appSettings, error } = await supabase
-      .from("app_settings")
-      .select("active_providers")
-      .eq("id", "global")
-      .single();
+    const providers = await clientPlayer.getAllProviders();
 
-    if (error && error.code !== "PGRST116") throw error;
-
-    const activeProviders = appSettings?.active_providers || [];
+    const activeProviders = providers || [];
     const embedLinks = [];
 
-    activeProviders.forEach((player) => {
-      const baseUrl = player.url || player.embed || "";
-
+    providers.map((player) => {
+      const embedUrl = buildUrlEmbedPlayerTv(
+        player.embed,
+        player.title,
+        season,
+        episode,
+        id
+      );
       embedLinks.push({
-        title: player.name || player.title,
-        embed: buildUrlEmbedPlayerTv(baseUrl, player.name, season, episode, id),
-        icon:
-          player.type === "Torrent"
-            ? '<i class="fa-solid fa-magnet"></i>'
-            : player.icon || '<i class="fa-solid fa-play"></i>',
+        title: player.title,
+        embed: embedUrl,
+        icon: player.icon,
         type: player.type,
       });
     });

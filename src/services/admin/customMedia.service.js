@@ -1,8 +1,8 @@
-import { supabase } from "../../config/supabase.js";
+import { supabaseAdmin } from "../../config/supabase.js";
 
-// 👇 1. Criar Nova Mídia (POST)
+
 export const addMedia = async (data) => {
-  const { data: result, error } = await supabase
+  const { data: result, error } = await supabaseAdmin
     .from("custom_media")
     .insert([data])
     .select();
@@ -13,7 +13,7 @@ export const addMedia = async (data) => {
 
 // 👇 2. Atualizar Mídia Existente (PUT)
 export const updateMedia = async (id, data) => {
-  const { data: result, error } = await supabase
+  const { data: result, error } = await supabaseAdmin
     .from("custom_media")
     .update(data)
     .eq("id", id)
@@ -25,7 +25,7 @@ export const updateMedia = async (id, data) => {
 
 // 👇 3. Listar Mídias (GET)
 export const getAllCustomMedia = async () => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("custom_media")
     .select("*")
     .order("created_at", { ascending: false });
@@ -36,7 +36,10 @@ export const getAllCustomMedia = async () => {
 
 // 👇 4. Excluir Mídia (DELETE)
 export const deleteCustomMedia = async (id) => {
-  const { error } = await supabase.from("custom_media").delete().eq("id", id);
+  const { error } = await supabaseAdmin
+    .from("custom_media")
+    .delete()
+    .eq("id", id);
 
   if (error) throw new Error(error.message);
   return true;

@@ -6,13 +6,10 @@ import { renderSidebarInfo } from "../components/sidebar-info.js";
 import { createMediaCard } from "../components/media-card.js";
 import * as watchProgress from "../components/watch-progress.js";
 import { createErrorState } from "../components/error-feedback.js";
-import {
-  getFavorites,
-  addFavorite,
-  removeFavorite,
-} from "../components/list-service.js";
+import { getUserLists, toggleListItem } from "../components/list-service.js";
 import { PlaylistModal } from "../components/playlist-modal.js";
 import { renderReviewSection } from "../components/review-section.js";
+import { showToastGlobal } from "../utils/utils.js";
 
 export default class DetailPage {
   constructor() {
@@ -24,12 +21,25 @@ export default class DetailPage {
     };
     this.currentProgress = [];
     this.season = 1;
+
+    this.favListId = null;
   }
 
   async init(id, type) {
     this.id = id;
     this.type = type;
     this.currentProgress = await watchProgress.getWatchProgressState();
+
+    // 👇 2. Busca as listas do utilizador e encontra a de "Favoritos"
+    const allLists = (await getUserLists()) || [];
+    const favList = allLists.find((l) => l.name === "Favoritos") || allLists[0];
+
+    if (favList) {
+      this.favListId = favList.id;
+      this.currentWatchlist = favList.items || [];
+    } else {
+      this.currentWatchlist = [];
+    }
 
     const detalhesCarregados = await this.fetchDetails();
     if (!detalhesCarregados) {
@@ -61,6 +71,7 @@ export default class DetailPage {
       this.renderSelectSeason();
       this.renderSidebarInfo();
       this.RenderRecomendations();
+      this.loadReviews();
     }
   }
 
@@ -69,11 +80,9 @@ export default class DetailPage {
     if (!btnReview) return;
 
     btnReview.addEventListener("click", () => {
-      // 1. Injeta o HTML do modal na tela (se não existir)
       if (!document.getElementById("review-modal")) {
         this.injectReviewModalHTML();
       }
-      // 2. Mostra o modal
       document.getElementById("review-modal").classList.add("active");
     });
   }
@@ -82,14 +91,12 @@ export default class DetailPage {
     const modalHtml = `
       <div class="modal-overlay" id="review-modal">
         <div class="modal-box review-modal-box">
-          
           <div class="review-modal-header">
             <h3 class="review-modal-title">Avaliar: ${this.data.detail.title || this.data.detail.name}</h3>
             <button id="close-review-modal" class="modal-close-icon">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
-          
           <div class="review-form-group">
             <label class="form-label">Onde deseja avaliar?</label>
             <select id="review-destination" class="form-control">
@@ -97,17 +104,14 @@ export default class DetailPage {
               <option value="tmdb">Servidor TMDB (Apenas Nota)</option>
             </select>
           </div>
-
           <div class="review-form-group">
             <label class="form-label">Sua Nota (1 a 5):</label>
             <input type="number" id="review-rating" class="form-control" min="1" max="5" value="5">
           </div>
-
           <div class="review-form-group" id="review-comment-group">
             <label class="form-label">Comentário:</label>
             <textarea id="review-comment" class="form-control" rows="3" placeholder="O que você achou?"></textarea>
           </div>
-
           <button id="submit-review" class="btn-primary review-submit-btn">Enviar Avaliação</button>
         </div>
       </div>
@@ -123,14 +127,12 @@ export default class DetailPage {
           e.target.value === "tmdb" ? "none" : "block";
       });
 
-    // Lógica para fechar o modal
     document
       .getElementById("close-review-modal")
       .addEventListener("click", () => {
         document.getElementById("review-modal").classList.remove("active");
       });
 
-    // Lógica de envio
     document
       .getElementById("submit-review")
       .addEventListener("click", () => this.submitReview());
@@ -140,11 +142,13 @@ export default class DetailPage {
     const destination = document.getElementById("review-destination").value;
     const rating = document.getElementById("review-rating").value;
     const comment = document.getElementById("review-comment").value;
-    // O user_id idealmente deve vir da sessão/cookie guardado no navegador do usuário
     const userId = localStorage.getItem("rimuflix:userId");
 
     if (destination === "internal" && !userId) {
-      alert("Você precisa estar logado para avaliar na comunidade.");
+      showToastGlobal(
+        "Você precisa estar logado para avaliar na comunidade.",
+        "warning",
+      );
       return;
     }
 
@@ -170,13 +174,26 @@ export default class DetailPage {
 
       const result = await response.json();
       if (result.success) {
-        alert("Obrigado pela sua avaliação!");
+        showToastGlobal("Obrigado pela sua avaliação!", "success");
         document.getElementById("review-modal").classList.remove("active");
+
+        if (destination === "internal") {
+          this.loadReviews(true);
+        }
       } else {
-        alert("Erro: " + result.error);
+        console.error(
+          "[DEV] Erro ao salvar avaliação no servidor:",
+          result.error,
+        );
+        showToastGlobal(
+          "Não foi possível salvar sua avaliação. Tente novamente.",
+          "error",
+        );
       }
     } catch (error) {
-      alert("Erro de conexão ao enviar avaliação.");
+      // Log técnico para o desenvolvedor
+      console.error("[DEV] Falha na requisição fetch da avaliação:", error);
+      showToastGlobal("Erro de conexão ao enviar a avaliação.", "error");
     }
   }
 
@@ -199,7 +216,6 @@ export default class DetailPage {
         `/api/v1/media/recomendations/${this.type}/${this.id}`,
       );
       if (!response.ok) throw new Error("Falha na rede ou na API");
-
       this.data.recomendations = await response.json();
     } catch (error) {
       console.error("Erro ao buscar recomendações:", error);
@@ -221,7 +237,6 @@ export default class DetailPage {
 
     const heroContainer = document.querySelector(".hero-container");
 
-    // 1. Captura o progresso salvo apenas se a mídia atual for do tipo série (TV)
     let progressItem = null;
     if (this.type === "tv") {
       progressItem = this.currentProgress?.find(
@@ -229,15 +244,22 @@ export default class DetailPage {
       );
     }
 
-    // 2. Define APENAS os botões EXTRAS da página de detalhes (O Hero cuidará do principal)
     const extraActionsHtml = `
-      <button class="btn-secondary" id="btn-add-watchlist">
-        <i class="fa-solid fa-plus"></i>
-        Adicionar à lista
-      </button>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn-secondary" id="btn-open-review" title="Avaliar este título">
+          <i class="fa-solid fa-star"></i>
+          Avaliar
+        </button>
+        <button class="btn-secondary" id="btn-add-watchlist" title="Adicionar aos Favoritos">
+          <i class="fa-regular fa-heart"></i>
+          Favoritar
+        </button>
+        <button class="btn-secondary" id="btn-open-playlists" title="Salvar em outra lista..." style="padding: 0 16px;">
+          <i class="fa-solid fa-folder-plus"></i>
+        </button>
+      </div>
     `;
 
-    // 3. Chama a função renderHero inteligente repassando tudo
     const banner = await new HeroGenerator().renderHero(
       data,
       this.type,
@@ -245,11 +267,11 @@ export default class DetailPage {
       progressItem,
     );
 
-    // 4. Injeta no DOM
     heroContainer.appendChild(banner);
-
-    // 5. Inicia o comportamento da Playlist e atualiza o estado do botão Watchlist
     new PlaylistModal(data, this.type);
+
+    // Adicione esta linha para ativar o modal de avaliação:
+    this.setupReviewSystem();
 
     if (typeof this.renderBtnAddToWatchlist === "function") {
       this.renderBtnAddToWatchlist(data);
@@ -261,32 +283,40 @@ export default class DetailPage {
     if (!button) return;
 
     const updateButtonState = () => {
-      // Verifica se a mídia atual está na lista que veio do banco de dados
+      if (!this.currentWatchlist) this.currentWatchlist = [];
+
       const isInWatchlist = this.currentWatchlist.some(
         (item) =>
-          String(item.id) === String(data.id) && item.type === this.type,
+          String(item.media_id) === String(data.id) &&
+          item.media_type === this.type,
       );
 
       button.innerHTML = isInWatchlist
-        ? `<i class="fa-solid fa-xmark"></i> Remover da lista`
-        : `<i class="fa-solid fa-plus"></i> Adicionar à lista`;
+        ? `<i class="fa-solid fa-heart" style="color: var(--accent);"></i> Favoritado`
+        : `<i class="fa-regular fa-heart"></i> Favoritar`;
     };
 
-    updateButtonState(); // Roda ao carregar o botão
+    updateButtonState();
 
     button.onclick = async () => {
-      // Feedback visual para o usuário não clicar duas vezes rápido
       button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Atualizando...`;
       button.style.pointerEvents = "none";
 
-      // Envia para o nosso serviço inteligente (vai pro Supabase se estiver logado)
-      await toggleWatchlistState(data.id, this.type);
+      try {
+        if (this.favListId) {
+          await toggleListItem(this.favListId, data.id, this.type);
+        }
 
-      // Puxa a lista atualizada do banco para refletir a mudança correta
-      this.currentWatchlist = await getWatchlistState();
+        const allLists = (await getUserLists()) || [];
+        const favList = allLists.find((l) => l.id === this.favListId);
+        this.currentWatchlist = favList ? favList.items : [];
+      } catch (error) {
+        console.error("[DEV] Erro ao atualizar lista de favoritos:", error);
+        showToastGlobal("Não foi possível atualizar os favoritos.", "error");
+      }
 
       button.style.pointerEvents = "auto";
-      updateButtonState(); // Troca o ícone (Plus para X, ou vice-versa)
+      updateButtonState();
     };
   }
 
@@ -297,8 +327,6 @@ export default class DetailPage {
       seasonNumber: Number(linkElement.dataset.seasonnumber),
       episodeNumber: Number(linkElement.dataset.episodenumber),
     };
-
-    // Deixamos a nossa nova função inteligente fazer o trabalho pesado
     watchProgress.saveWatchProgress(newProgress);
   }
 
@@ -335,14 +363,12 @@ export default class DetailPage {
     const seasons = this.data.detail["seasons"];
 
     if (seasonContainer) {
-      // Limpa o container para evitar duplicação caso a função seja chamada novamente
       seasonContainer.innerHTML = "";
 
       const selectElement = document.createElement("select");
       selectElement.id = "seasonSelect";
       selectElement.className = "season-picker__select";
 
-      // 1. Filtra a "Temporada 0" (Especiais do TMDB) para não confundir o usuário
       const validSeasons = seasons.filter((season) => season.season_number > 0);
 
       validSeasons.forEach((season) => {
@@ -350,11 +376,9 @@ export default class DetailPage {
         optionElement.value = season.season_number;
         optionElement.textContent = `Temporada ${season.season_number}`;
 
-        // 2. Garante que a Temporada 1 (ou a atual que o usuário está) fique selecionada por padrão
         if (season.season_number == this.season) {
           optionElement.selected = true;
         }
-
         selectElement.appendChild(optionElement);
       });
 
@@ -370,16 +394,23 @@ export default class DetailPage {
     }
   }
 
-  async loadReviews() {
+  async loadReviews(forceRefresh = false) {
+    // Repassa o forceRefresh para a API
     const reviewResponse = await new ApiService().getMediaReviews(
       this.type,
       this.id,
+      forceRefresh,
     );
+
     if (reviewResponse && reviewResponse.success) {
-      // Procura o container principal onde vamos injetar a seção
       const gridContainer = document.querySelector(".details-grid");
 
-      // Chama o nosso novo componente isolado passando os dados e onde ele deve ser inserido
+      // 👇 NOVO: Remove a seção antiga da tela para não duplicar
+      const oldReviewSection = document.querySelector(".reviews-section");
+      if (oldReviewSection) {
+        oldReviewSection.remove();
+      }
+
       renderReviewSection(reviewResponse.data, gridContainer);
     }
   }

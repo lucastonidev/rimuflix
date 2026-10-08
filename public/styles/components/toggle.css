@@ -1,0 +1,63 @@
+/* public/styles/components/toggle.css */
+
+.ui-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ui-toggle-label {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  margin: 0;
+}
+
+.ui-toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ui-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4b5563; /* Estado inativo (padrão) */
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.ui-toggle-slider.active {
+  background-color: var(--accent, #e50914); /* Estado ativo */
+}
+
+.ui-toggle-dot {
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  transform: translateX(0); /* Posição inicial */
+}
+
+.ui-toggle-dot.active {
+  transform: translateX(20px); /* Posição final */
+}
+
+.ui-toggle-text {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}

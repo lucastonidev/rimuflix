@@ -4,10 +4,7 @@ export class PlaylistModal {
   constructor(data, type) {
     this.data = data;
     this.type = type;
-    this.favorites = [];
-    this.customLists = [];
-
-    // Inicializa o modal assim que a classe é instanciada
+    this.playlists = [];
     this.init();
   }
 
@@ -53,12 +50,13 @@ export class PlaylistModal {
   }
 
   setupListeners() {
-    const btnOpen = document.getElementById("btn-add-watchlist");
+    const btnOpen = document.getElementById("btn-open-playlists");
+
     if (btnOpen) {
       btnOpen.addEventListener("click", async () => {
         const originalHtml = btnOpen.innerHTML;
-        btnOpen.innerHTML =
-          '<i class="fa-solid fa-spinner fa-spin"></i> Carregando...';
+        // Colocamos o spinner só no botão pequeno
+        btnOpen.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
         btnOpen.style.pointerEvents = "none";
 
         await this.loadLists();
@@ -70,36 +68,27 @@ export class PlaylistModal {
     }
 
     const btnClose = document.getElementById("close-playlist-modal");
-    if (btnClose) {
-      btnClose.addEventListener("click", () => {
-        this.overlay.classList.remove("active");
-      });
-    }
+    if (btnClose)
+      btnClose.addEventListener("click", () =>
+        this.overlay.classList.remove("active"),
+      );
 
     if (this.btnCreateList) {
-      this.btnCreateList.addEventListener("click", () => {
-        this.createNewList(this.newListInput.value);
-      });
+      this.btnCreateList.addEventListener("click", () =>
+        this.createNewList(this.newListInput.value),
+      );
     }
 
     if (this.overlay) {
       this.overlay.addEventListener("click", (e) => {
-        if (e.target === this.overlay) {
-          this.overlay.classList.remove("active");
-        }
+        if (e.target === this.overlay) this.overlay.classList.remove("active");
       });
     }
   }
 
   async loadLists() {
     try {
-      const [favs, customs] = await Promise.all([
-        listService.getFavorites(),
-        listService.getCustomLists(),
-      ]);
-
-      this.favorites = favs || [];
-      this.customLists = customs || [];
+      this.playlists = await listService.getUserLists();
       this.renderPlaylists();
     } catch (error) {
       this.showError("Não foi possível carregar as listas.");
@@ -116,33 +105,23 @@ export class PlaylistModal {
     return [favoritesList, ...this.customLists];
   }
 
-  async toggleItemInList(listId, listName, itemDiv) {
+  async toggleItemInList(listId, itemDiv) {
     try {
-      itemDiv.classList.toggle("loading");
-      let result;
-      if (listId === "default") {
-        const toogle = this.favorites.find((l) => l.id === this.data.id);
-        if (toogle) {
-          result = await listService.removeFavorite(this.data.id, this.type);
-        } else {
-          result = await listService.addFavorite(this.data.id, this.type);
-        }
-      } else {
-        result = await listService.toggleCustomList(
-          this.data.id,
-          this.type,
-          listName,
-        );
-      }
+      itemDiv.classList.add("loading");
+      const result = await listService.toggleListItem(
+        listId,
+        this.data.id,
+        this.type,
+      );
 
       if (result.success) {
         const icon = itemDiv.querySelector(".check-icon");
         if (result.action === "added") {
-          itemDiv.classList.add("active");
-          icon.classList.add("visible");
+          itemDiv.classList.add("active", "in-list");
+          icon.style.opacity = "1";
         } else {
-          itemDiv.classList.remove("active");
-          icon.classList.remove("visible");
+          itemDiv.classList.remove("active", "in-list");
+          icon.style.opacity = "0";
         }
       }
     } catch (error) {
@@ -154,50 +133,38 @@ export class PlaylistModal {
 
   async createNewList(listName) {
     if (!listName || listName.trim() === "") return;
-
     try {
-      // Correção aqui:
-      await listService.toggleCustomList(
-        this.data.id,
-        this.type,
-        listName.trim(),
-      );
+      // Cria a lista no banco e já adiciona o item dentro dela
+      const createRes = await listService.createList(listName.trim());
+      // Assumindo que a API retorne o ID da lista nova em createRes.data.id
+      const newListId = createRes.data?.id || createRes.id;
+
+      if (newListId) {
+        await listService.toggleListItem(newListId, this.data.id, this.type);
+      }
+
       await this.loadLists();
       this.newListInput.value = "";
-      this.showSuccess(`Adicionado a "${listName}"`);
     } catch (error) {
       this.showError(error.message);
     }
   }
 
   renderPlaylists() {
-    const allLists = this.getAllLists();
     this.listContainer.innerHTML = "";
 
-    if (!allLists) {
-      const div = document.createElement("div");
-      div.className = "playlist-item favorite-item";
-      div.innerHTML = `
-        <div
-          class="list-info"
-          style="display: flex; align-items: center; gap: 10px;"
-        >
-          <i class="fa-solid fa-list"></i>
-          <span>Favoritos</span>
-        </div>
-        <i
-          class="fa-solid fa-check check-icon"
-          style="opacity: 0; transition: 0.2s;"
-        ></i>
-      `;
-    }
+    this.playlists.forEach((list) => {
+      // Identifica se é a lista de Favoritos baseada no default do DB
+      const isFavorite = list.name === "Favoritos";
 
-    allLists.forEach((list) => {
-      const isFavorite = list.id === "default";
-      const isItemInList = list.items.some(
-        (item) =>
-          String(item.id) === String(this.data.id) && item.type === this.type,
-      );
+      // Usa media_id e media_type do novo schema
+      const isItemInList =
+        list.items &&
+        list.items.some(
+          (item) =>
+            String(item.media_id) === String(this.data.id) &&
+            item.media_type === this.type,
+        );
 
       const div = document.createElement("div");
       div.className = `playlist-item ${isItemInList ? "in-list" : ""} ${isFavorite ? "favorite-item" : "custom-item"}`;
@@ -207,32 +174,21 @@ export class PlaylistModal {
         : '<i class="fa-solid fa-list"></i>';
 
       div.innerHTML = `
-                <div class="list-info" style="display: flex; align-items: center; gap: 10px;">
-                    ${listIcon}
-                    <span>${list.name}</span>
-                </div>
-                <i class="fa-solid fa-check check-icon" style="opacity: ${isItemInList ? "1" : "0"}; transition: 0.2s;"></i>
-            `;
+        <div class="list-info" style="display: flex; align-items: center; gap: 10px;">
+            ${listIcon}
+            <span>${list.name}</span>
+        </div>
+        <i class="fa-solid fa-check check-icon" style="opacity: ${isItemInList ? "1" : "0"}; transition: 0.2s;"></i>
+      `;
 
-      div.addEventListener("click", () => {
-        const checkIcon = div.querySelector(".check-icon");
-        if (div.classList.contains("in-list")) {
-          div.classList.remove("in-list");
-          checkIcon.style.opacity = "0";
-        } else {
-          div.classList.add("in-list");
-          checkIcon.style.opacity = "1";
-        }
-
-        this.toggleItemInList(list.id, list.name, div);
-      });
+      div.addEventListener("click", () => this.toggleItemInList(list.id, div));
       this.listContainer.appendChild(div);
     });
   }
 
   showError(message) {
-    console.error(message);
-    alert(message);
+    console.error("[DEV] Erro no PlaylistModal:", message);
+    showToastGlobal(message, "error");
   }
 
   showSuccess(message) {

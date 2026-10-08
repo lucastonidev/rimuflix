@@ -1,11 +1,11 @@
-import { supabase } from "../../config/supabase.js";
+import { supabaseAdmin } from "../../config/supabase.js";
 
 export async function authenticateUser(identifier, password) {
   const isEmail = identifier.includes("@");
 
-  let query = supabase.from("users").select("*");
+  let query = supabaseAdmin.from("users").select("*");
 
-  if (isEmail) {
+  if (isEmail) {   
     query = query.eq("email", identifier.toLowerCase());
   } else {
     query = query.eq("name", identifier.toLowerCase());
