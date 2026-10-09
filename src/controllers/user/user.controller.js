@@ -2,7 +2,7 @@ import UsersService from "../../services/user/user.service.js";
 
 class UsersController {
   getUserId(req) {
-    return req.cookies?.userId || req.user?.id;
+    return req.user?.id;
   }
 
   // --- Listas Customizadas ---

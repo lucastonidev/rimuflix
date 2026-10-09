@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import { supabase } from "../../config/supabase.js";
 
 export const requireAdmin = async (req, res, next) => {
   const accessToken = req.cookies?.admin_access;
@@ -7,7 +6,7 @@ export const requireAdmin = async (req, res, next) => {
 
   // 1. Se não tiver NENHUM token, barra imediatamente e manda pro login
   if (!accessToken && !refreshToken) {
-    return res.redirect("/login"); // Altere para a rota de login principal do seu site
+    return res.redirect("/login");
   }
 
   try {
@@ -76,61 +75,6 @@ export const requireAuth = (req, res, next) => {
   // Se o usuário existir, permite acessar a página (ex: o player de vídeo)
   next();
 };
-
-export async function authenticateUser(identifier, password) {
-  if (!password) throw new Error("A senha é obrigatória.");
-
-  const isEmail = identifier.includes("@");
-  let loginEmail = identifier;
-
-  // Se o usuário digitou o "username", precisamos descobrir o e-mail dele no banco primeiro
-  if (!isEmail) {
-    const { data: userRecord, error: dbError } = await supabase
-      .from("users")
-      .select("email, is_active")
-      .eq("name", identifier)
-      .single();
-
-    if (dbError || !userRecord) {
-      throw new Error("Usuário não encontrado.");
-    }
-    if (userRecord.is_active === false) {
-      throw new Error("Esta conta está bloqueada. Contate o administrador.");
-    }
-    loginEmail = userRecord.email;
-  }
-
-  // Autenticação real utilizando o Supabase Auth (Valida a senha criptografada)
-  const { data: authData, error: authError } =
-    await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password: password,
-    });
-
-  if (authError) {
-    if (authError.message.includes("Invalid login credentials")) {
-      throw new Error("E-mail/Usuário ou senha incorretos.");
-    }
-    throw new Error("Falha na autenticação: " + authError.message);
-  }
-
-  // Busca os dados públicos do usuário para colocar no JWT
-  const { data: userData, error: userError } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", authData.user.id)
-    .single();
-
-  if (userError || !userData) {
-    throw new Error("Erro ao carregar o perfil do usuário.");
-  }
-
-  if (userData.is_active === false) {
-    throw new Error("Esta conta está bloqueada. Contate o administrador.");
-  }
-
-  return userData;
-}
 
 export const checkUser = (req, res, next) => {
   // Pega os tokens usando os nomes CORRETOS

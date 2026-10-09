@@ -1,3 +1,12 @@
+const escapeHtml = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  })[character]);
+
 class AdminManageMedia {
   constructor() {
     this.tableBody = document.getElementById("media-table-body");
@@ -120,20 +129,20 @@ class AdminManageMedia {
           <td>
             <div class="media-title-cell">
               <i class="fa-solid ${iconClass}"></i>
-              ${media.title || "Sem título"}
+              ${escapeHtml(media.title || "Sem título")}
             </div>
           </td>
           <td><span class="badge ${typeClass}">${typeLabel}</span></td>
           
           <td style="color: var(--text-secondary); font-weight: 500;">${seasonEp}</td>
           
-          <td style="font-family: monospace; color: var(--text-secondary);">${media.tmdb_id}</td>
+          <td style="font-family: monospace; color: var(--text-secondary);">${escapeHtml(media.tmdb_id)}</td>
           <td>${date}</td>
           <td style="text-align: right;">
-            <a href="/admin/media/edit/${media.id}" class="btn btn-outline" style="padding: 6px 12px;" title="Editar">
+            <a href="/admin/media/edit/${encodeURIComponent(media.id)}" class="btn btn-outline" style="padding: 6px 12px;" title="Editar">
               <i class="fa-solid fa-pen" style="margin: 0;"></i>
             </a>
-            <button class="btn btn-outline btn-delete" data-id="${media.id}" style="padding: 6px 12px;" title="Excluir">
+            <button class="btn btn-outline btn-delete" data-id="${escapeHtml(media.id)}" style="padding: 6px 12px;" title="Excluir">
               <i class="fa-solid fa-trash" style="color: #ef4444; margin: 0;"></i>
             </button>
           </td>

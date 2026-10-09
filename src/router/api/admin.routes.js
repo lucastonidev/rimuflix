@@ -24,8 +24,11 @@ import {
   getSettingsController as getSettings,
   updateSettingsController as updateSettings,
 } from "../../controllers/admin/settings.controller.js";
+import { requireAdmin } from "../../middlewares/auth/auth.middleware.js";
 
 const router = express.Router();
+
+router.use(requireAdmin);
 
 router.get("/dashboard", getDashboardStats);
 router.get("/media", getMedia);

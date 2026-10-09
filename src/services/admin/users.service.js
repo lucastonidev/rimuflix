@@ -4,7 +4,7 @@ import { supabase } from "../../config/supabase.js";
 export const getAllUsers = async () => {
   const { data, error } = await supabase
     .from("users")
-    .select("*")
+    .select("id, name, email, role, is_active, avatar_url, created_at")
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(`Erro ao buscar usuários: ${error.message}`);
@@ -86,7 +86,6 @@ export const createUser = async ({ name, email, role, password }) => {
           name: name.trim(),
           email: cleanEmail,
           role: role || "member",
-          password: password,
           is_active: true,
         },
       ])
@@ -163,14 +162,11 @@ export const updateUser = async (userId, { name, email, role, password }) => {
     if (name) publicUpdates.name = name.trim();
     if (email) publicUpdates.email = email.trim().toLowerCase();
     if (role) publicUpdates.role = role;
-    if (password && password.trim().length > 0)
-      publicUpdates.password = password.trim(); // Atualiza a senha visual se for o caso
-
     const { data, error: dbError } = await supabase
       .from("users")
       .update(publicUpdates)
       .eq("id", userId)
-      .select();
+      .select("id, name, email, role, is_active, avatar_url, created_at");
 
     if (dbError) {
       if (dbError.code === "23505") {

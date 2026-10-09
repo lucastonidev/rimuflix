@@ -22,7 +22,8 @@
     "productName": "Rimuflix",
     "files": [
       "**/*",
-      ".env"
+      "!**/.env",
+      "!**/.env.*"
     ],
     "linux": {
       "target": [

@@ -239,8 +239,20 @@ class UsersService {
     const updates = {};
     if (payload.name) updates.name = payload.name;
     if (payload.email) updates.email = payload.email;
-    if (payload.password) updates.password = payload.password; // Considere fazer hash da senha se necessário
     if (payload.avatar_url) updates.avatar_url = payload.avatar_url;
+
+    if (payload.newPassword) {
+      if (payload.newPassword.length < 6) {
+        throw new Error("A nova senha deve ter pelo menos 6 caracteres.");
+      }
+
+      const { error: authError } =
+        await supabaseAdmin.auth.admin.updateUserById(userId, {
+          password: payload.newPassword,
+        });
+
+      if (authError) throw new Error(authError.message);
+    }
 
     const { data, error } = await supabaseAdmin
       .from("users")

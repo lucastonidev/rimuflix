@@ -1,8 +1,10 @@
 import express from "express";
 import multer from "multer"; // Necessário para o upload do avatar no settings.js
 import UsersController from "../../controllers/user/user.controller.js";
+import { checkUser } from "../../middlewares/auth/auth.middleware.js";
 
 const userRouter = express.Router();
+userRouter.use(checkUser);
 
 // Configuração básica do multer (Apenas memória)
 const upload = multer({ storage: multer.memoryStorage() });
