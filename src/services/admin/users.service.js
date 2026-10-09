@@ -70,7 +70,6 @@ export const createUser = async ({ name, email, role, password }) => {
           name: name.trim(),
           email: cleanEmail,
           role: role || "member",
-          password: password, // Mantemos aqui apenas por conveniência do painel admin
           is_active: true,
         },
       ], { onConflict: 'id' }) // 👈 O segredo está aqui! Ele previne o erro de duplicação.
