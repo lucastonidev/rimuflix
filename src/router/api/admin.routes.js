@@ -15,17 +15,21 @@ import {
   toggleUserStatus,
   createUser,
   updateUser,
-} from "../../controllers/admin/users.controller.js";
+} from "../../controllers/admin/user.controller.js";
 import {
   addSagaController as addSaga,
+  getSagaController as getSagas,
   deleteSagaController as deleteSaga,
 } from "../../controllers/admin/sagas.controller.js";
 import {
   getSettingsController as getSettings,
   updateSettingsController as updateSettings,
 } from "../../controllers/admin/settings.controller.js";
+import { requireAdmin } from "../../middlewares/auth/auth.middleware.js";
 
 const router = express.Router();
+
+router.use(requireAdmin);
 
 router.get("/dashboard", getDashboardStats);
 router.get("/media", getMedia);
@@ -38,6 +42,7 @@ router.get("/users", getUsers);
 router.post("/users", createUser);
 router.patch("/users/:id/status", toggleUserStatus);
 router.patch("/users/:id", updateUser);
+router.get("/sagas", getSagas);
 router.post("/sagas", addSaga);
 router.delete("/sagas/:id", deleteSaga);
 router.get("/settings", getSettings);

@@ -1,4 +1,4 @@
-import { supabase } from "../../config/supabase.js"; // Ajuste o caminho conforme o seu projeto
+import { supabase } from "../../config/supabase.js";
 
 export const UserDataModule = {
   sanitizeUsername: (text) => {
@@ -7,45 +7,8 @@ export const UserDataModule = {
   },
 
   // ==========================================
-  // FAVORITOS (watchlist)
+  // FAVORITOS E LISTAS (Legacy)
   // ==========================================
-  async getCustomLists(user_id) {
-    const { data, error } = await supabase
-      .from("custom_lists")
-      .select("*")
-      .eq("user_id", user_id);
-
-    if (error) return { success: false, error: error.message };
-
-    const grouped = {};
-
-    data.forEach((item) => {
-      // 1. Normaliza o nome caso tenha escapado algum espaço acidental no banco
-      const exactName = item.list_name.trim();
-
-      if (!grouped[exactName]) {
-        // 2. GERAÇÃO ROBUSTA DE ID: Converte o nome para Base64 e remove caracteres que quebram o HTML
-        // Isso garante que "Séries-Top" e "Series Top" gerem IDs completamente diferentes e únicos.
-        const safeId = Buffer.from(exactName)
-          .toString("base64")
-          .replace(/[^a-zA-Z0-9]/g, "");
-
-        grouped[exactName] = {
-          id: `list-${safeId}`,
-          name: exactName,
-          items: [],
-        };
-      }
-
-      grouped[exactName].items.push({
-        id: item.tmdb_id,
-        type: item.media_type,
-      });
-    });
-
-    return { success: true, data: Object.values(grouped) };
-  },
-
   async AddWatchlist({ user_id, tmdb_id, media_type }) {
     const { data: existing, error: findError } = await supabase
       .from("user_favorites")
@@ -109,9 +72,6 @@ export const UserDataModule = {
     }
   },
 
-  // ==========================================
-  // LISTAS PERSONALIZADAS (custom_lists)
-  // ==========================================
   async getCustomLists(user_id) {
     const { data, error } = await supabase
       .from("custom_lists")
@@ -139,15 +99,12 @@ export const UserDataModule = {
   },
 
   async toggleCustomList({ user_id, tmdb_id, media_type, list_name }) {
-    // 1. PROTEÇÃO DE ENTRADA: Remove espaços nas pontas e impede listas sem nome
     const cleanListName = (list_name || "").trim();
 
     if (!cleanListName) {
       return { success: false, error: "O nome da lista não pode estar vazio." };
     }
 
-    // 2. PROTEÇÃO DE CRASH: Usamos .limit(1) em vez de .maybeSingle().
-    // Se o banco tiver dados duplicados por acidente, ele pega o primeiro sem dar erro fatal.
     const { data: existingArray, error: findError } = await supabase
       .from("custom_lists")
       .select("id")
@@ -163,20 +120,14 @@ export const UserDataModule = {
       existingArray && existingArray.length > 0 ? existingArray[0] : null;
 
     if (existing) {
-      // REMOVER FILME DA LISTA
       const { error: deleteError } = await supabase
         .from("custom_lists")
         .delete()
-        .eq("id", existing.id); // Deleta especificamente a linha encontrada
+        .eq("id", existing.id);
 
       if (deleteError) return { success: false, error: deleteError.message };
       return { success: true, action: "removed" };
     } else {
-      // ADICIONAR FILME NA LISTA
-
-      // -> Opcional: Se quiser adicionar um limite Anti-Spam (ex: máximo 20 listas por pessoa)
-      // você pode fazer um select.count() aqui antes do insert.
-
       const { error: insertError } = await supabase
         .from("custom_lists")
         .insert([{ user_id, tmdb_id, media_type, list_name: cleanListName }]);
@@ -207,7 +158,6 @@ export const UserDataModule = {
     episode_number,
     stopped_at,
   }) {
-    // Usando upsert para atualizar ou inserir caso não exista
     const payload = {
       user_id,
       tmdb_id,
@@ -236,42 +186,5 @@ export const UserDataModule = {
 
     if (error) return { success: false, error: error.message };
     return { success: true, action: "removed" };
-  },
-
-  // ==========================================
-  // CONFIGURAÇÕES DE PERFIL
-  // ==========================================
-  async updateProfile(user_id, { name, email, avatar_url, password }) {
-    try {
-      // 1. Atualiza a tabela pública (que é a que o site lê)
-      const { data, error } = await supabase
-        .from("users")
-        .update({ name, email, avatar_url })
-        .eq("id", user_id)
-        .select()
-        .single();
-
-      if (error) return { success: false, error: error.message };
-
-      // 2. Atualiza Auth (E-mail e Senha)
-      let authUpdates = {};
-      if (email) authUpdates.email = email;
-      if (password) authUpdates.password = password;
-
-      if (Object.keys(authUpdates).length > 0) {
-        const { error: authError } = await supabase.auth.admin.updateUserById(
-          user_id,
-          authUpdates,
-        );
-        if (authError) {
-          // Se der erro na senha (ex: muito curta) ou e-mail já usado, barramos aqui.
-          return { success: false, error: authError.message };
-        }
-      }
-
-      return { success: true, data };
-    } catch (error) {
-      return { success: false, error: "Erro interno ao atualizar perfil." };
-    }
   },
 };

@@ -6,7 +6,7 @@ import livetvRoutes from "./api/livetv.routes.js";
 import exploreRoutes from "./api/explore.routes.js";
 import reviewRoutes from "./api/review.routes.js";
 import authRoutes from "./api/auth.routes.js";
-import { userRoute } from "./api/user.routes.js";
+import userRouter from "./api/user.routes.js";
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.use("/reviews", reviewRoutes);
 
 router.use("/auth", authRoutes);
 
-router.use("/user", userRoute);
+router.use("/user", userRouter);
 
 // O exploreRoutes agrupa as rotas raiz do catálogo (ex: /search, /doramas, /home/sections)
 router.use("/", exploreRoutes);

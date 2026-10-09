@@ -1,16 +1,21 @@
-import { supabase } from "../../config/supabase.js";
+import { supabaseAdmin } from "../../config/supabase.js";
 
 export const getPublicSagas = async (req, res) => {
   try {
-    // Busca todas as sagas do Supabase em vez do arquivo local
-    const { data: sagas, error } = await supabase
+    const { data: sagas, error } = await supabaseAdmin
       .from("sagas")
       .select("*")
       .order("created_at", { ascending: true });
 
     if (error) throw new Error(error.message);
 
-    // Retorna no mesmo formato que o frontend já espera
+    if (sagas == null || sagas.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Nenhuma saga encontrada",
+      });
+    }
+
     return res.status(200).json({
       success: true,
       data: sagas,

@@ -16,7 +16,7 @@ const buildUrlEmbedPlayer = (url, id, type, title) => {
 };
 
 export const getAllEmbedLink = async (id) => {
-  const allPlayers = await clientPlayer.getMovieProviders();
+  const allPlayers = await clientPlayer.getAllProviders();
   const embedLinks = [];
 
   allPlayers.map((player) => {

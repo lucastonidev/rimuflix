@@ -1,130 +1,308 @@
-@import '../reset.css';
-@import '../components/header.css';
-@import '../components/card.css';
-@import '../components/continue-watching.css';
-/* Reutilizamos o botão X */
+@import "../reset.css";
+@import "../components/header.css";
+@import "../components/toast.css";
+@import "../admin/components/modal.css";
 
+/* =========================================
+   ESTRUTURA PRINCIPAL - MINHAS LISTAS
+   ========================================= */
 .mylist-container {
   margin-top: 100px;
   padding-bottom: 60px;
   min-height: calc(100vh - 100px);
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.mylist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .page-title {
   font-size: 2.2rem;
-  margin-bottom: 30px;
-  font-weight: 700;
+  margin: 0;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
 }
 
-.mylist-layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 40px;
-  align-items: start;
-}
-
-/* Sidebar com as abas */
-.mylist-sidebar {
-  background: var(--secondary-bg);
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.sidebar-header h3 {
-  font-size: 1.1rem;
-  margin-bottom: 16px;
+.page-subtitle {
   color: var(--text-secondary);
+  font-size: 1rem;
+  margin-top: 8px;
 }
 
-.playlist-tabs {
+/* =========================================
+   AÇÕES DO HEADER
+   ========================================= */
+.mylist-actions {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
-.playlist-tab {
-  padding: 12px 16px;
-  background: var(--tertiary-bg);
+.btn-modern-action {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  padding: 10px 20px;
   border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.2s;
-  font-weight: 500;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
 }
 
-.playlist-tab:hover {
-  background: #2a2a2a;
+.btn-modern-action i {
+  font-size: 1.1rem;
 }
 
-.playlist-tab.active {
+.btn-modern-action:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-modern-action.primary {
   background: var(--accent);
   color: white;
+  border: none;
 }
 
-.tab-count {
-  background: rgba(0, 0, 0, 0.4);
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: bold;
+.btn-modern-action.primary:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
 }
 
-/* Cabeçalho da Lista Selecionada */
-.content-header {
+/* =========================================
+   GRID DE PASTAS (LISTAS)
+   ========================================= */
+.folders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* Estilo do Card da Pasta */
+.folder-card {
+  background: rgba(20, 20, 24, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Efeito de destaque no Hover */
+.folder-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(30, 30, 35, 0.8);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Linha colorida no topo de cada pasta */
+.folder-card::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 15px;
+  background: var(--text-secondary);
+  border-radius: 16px 16px 0 0;
+  transition: background 0.3s;
+}
+
+.folder-card:hover::before {
+  background: var(--accent);
+}
+
+/* Pasta "Favoritos" sempre tem a barra vermelha e ícone de coração */
+.folder-card.favorite-folder::before {
+  background: var(--accent);
+}
+.folder-card.favorite-folder .folder-icon {
+  background: rgba(229, 9, 20, 0.15);
+  color: var(--accent);
+}
+
+/* Área Superior do Card */
+.folder-header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.folder-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  display: flex;
   align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
 }
 
-#current-list-title {
-  font-size: 1.6rem;
+.folder-card:hover .folder-icon {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1) rotate(5deg);
 }
 
-.btn-danger {
+/* Botão de Excluir Lista (Apenas aparece no hover) */
+.btn-delete-folder {
   background: transparent;
-  border: 1px solid #ff4646;
-  color: #ff4646;
-  padding: 8px 16px;
-  border-radius: 6px;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.2rem;
   cursor: pointer;
-  font-weight: bold;
+  padding: 5px;
+  opacity: 0;
   transition: all 0.2s;
 }
 
-.btn-danger:hover {
-  background: #ff4646;
-  color: white;
+.folder-card:hover .btn-delete-folder {
+  opacity: 1;
 }
 
-.hidden {
-  display: none !important;
+.btn-delete-folder:hover {
+  color: var(--danger, #ef4444);
+  transform: scale(1.1);
 }
 
-/* Grid de Filmes/Séries */
-.media-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
+/* Em dispositivos Touch (Mobile), o botão de lixeira sempre aparece */
+@media (hover: none) {
+  .btn-delete-folder {
+    opacity: 1;
+  }
 }
 
-.empty-list-msg {
+/* Informações de Texto */
+.folder-info h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.folder-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.folder-meta i {
+  font-size: 0.9rem;
+}
+
+/* Badge de Privacidade (Público/Privado) */
+.privacy-badge {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.privacy-badge.public {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+/* =========================================
+   ESTADO VAZIO GLOBAL
+   ========================================= */
+.global-empty-state {
   grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 60px 20px;
-  color: var(--text-secondary);
-  background: var(--secondary-bg);
-  border-radius: 12px;
+  min-height: 400px;
+  background: rgba(20, 20, 24, 0.4);
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
 }
 
-/* Responsivo para celular */
-@media (max-width: 900px) {
-  .mylist-layout {
-    grid-template-columns: 1fr;
+.global-empty-state i {
+  font-size: 3.5rem;
+  color: var(--text-secondary);
+  opacity: 0.4;
+  margin-bottom: 20px;
+}
+
+.global-empty-state h3 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.global-empty-state p {
+  color: var(--text-secondary);
+  max-width: 400px;
+}
+
+/* =========================================
+    MODAL DE CRIAÇÃO DE LISTA
+   ========================================= */
+
+button#close-create-list {
+  background-color: transparent;
+  border: solid 1px #fff;
+  cursor: pointer;
+}
+
+button#close-create-list:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: solid 1px rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
+   RESPONSIVIDADE
+   ========================================= */
+@media (max-width: 768px) {
+  .mylist-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mylist-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .btn-modern-action {
+    width: 100%;
+    justify-content: center;
   }
 }

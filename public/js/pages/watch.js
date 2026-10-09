@@ -46,6 +46,7 @@ class WatchPage {
 
   async fetchOptionPlayerTv() {
     try {
+
       const response = await this.api.getAllPlayerTv(
         this.id,
         this.tv.currentSeason,
@@ -73,12 +74,87 @@ class WatchPage {
     }
   }
 
+  async renderQueuePanel() {
+    const urlParams = new URLSearchParams(window.location.search);
+    // Se a pessoa não veio com o link da fila, não fazemos nada
+    if (!urlParams.get("queue")) return;
+
+    const queueStr = localStorage.getItem("rimuflix:queue");
+    if (!queueStr) return;
+
+    try {
+      const queue = JSON.parse(queueStr);
+      // Procura em que posição da lista nós estamos atualmente
+      const currentIndex = queue.items.findIndex(
+        (item) =>
+          String(item.media_id) === String(this.id) &&
+          item.media_type === this.type,
+      );
+
+      if (currentIndex !== -1) {
+        const hasNext = currentIndex < queue.items.length - 1;
+        const nextItem = hasNext ? queue.items[currentIndex + 1] : null;
+
+        let btnHtml = "";
+        if (hasNext) {
+          const nextUrl = `/${nextItem.media_type}/watch/${nextItem.media_id}?queue=true`;
+          btnHtml = `
+             <a href="${nextUrl}" class="btn-primary" style="text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+               Próximo da Lista <i class="fa-solid fa-forward-step"></i>
+             </a>
+           `;
+        } else {
+          btnHtml = `
+             <span style="color: var(--success); font-weight: bold; display: flex; align-items: center; gap: 8px;">
+               <i class="fa-solid fa-circle-check"></i> Fim da Playlist
+             </span>
+           `;
+        }
+
+        const panelHtml = `
+          <div class="queue-panel" style="margin: 24px 0; background: rgba(20,20,24,0.8); backdrop-filter: blur(10px); padding: 16px 24px; border-radius: 12px; border: 1px solid rgba(229, 9, 20, 0.4); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); flex-wrap: wrap; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 16px;">
+                 <div style="width: 48px; height: 48px; border-radius: 10px; background: rgba(229, 9, 20, 0.15); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                   <i class="fa-solid fa-list-check"></i>
+                 </div>
+                 <div>
+                     <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Maratona Ativa</span>
+                     <h4 style="margin: 4px 0 0 0; color: #fff; font-size: 1.1rem;">${queue.listName}</h4>
+                     <span style="font-size: 0.85rem; color: #ccc;">Vídeo ${currentIndex + 1} de ${queue.items.length}</span>
+                 </div>
+              </div>
+              <div style="display: flex; justify-content: center;">
+                 ${btnHtml}
+              </div>
+          </div>
+        `;
+
+        const playerWrapper =
+          document.querySelector(".watch-player") ||
+          document.getElementById("playerSwitcher");
+        if (playerWrapper) {
+          playerWrapper.insertAdjacentHTML("afterend", panelHtml);
+        }
+      }
+    } catch (e) {
+      console.error("Erro ao processar fila da playlist", e);
+    }
+  }
+
   async init(id, type) {
+    if (!id || id === 'undefined') {
+        console.error("Erro: ID inválido para a página de Watch.");
+        window.location.href = "/"; // Manda de volta para a Home
+        return;
+    }
+
     this.id = id;
     this.type = type;
 
     await this.fetchDetailsFromId();
     if (!this.data) return;
+
+    document.title = `Assistindo ${this.data.title || this.data.name} - Rimuflix`;
 
     if (this.type === "movie") {
       watchProgress.saveWatchProgress({
@@ -105,9 +181,6 @@ class WatchPage {
         this.tv,
       );
       switcher.render();
-      if (this.players.length > 0)
-        switcher.updateFrameSrc(this.players[0].embed);
-
       return;
     }
 
@@ -144,7 +217,6 @@ class WatchPage {
       this.tv,
     );
     switcher.render();
-    if (this.players.length > 0) switcher.updateFrameSrc(this.players[0].embed);
 
     const episodesModule = new WatchEpisodes(
       this.data,
@@ -154,6 +226,8 @@ class WatchPage {
       this.tv,
     );
     episodesModule.init();
+
+    this.renderQueuePanel();
   }
 }
 

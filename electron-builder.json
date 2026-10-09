@@ -6,7 +6,7 @@
     "output": "dist",
     "buildResources": "build"
   },
-  "files": ["**/*", ".env"],
+  "files": ["**/*", "!**/.env", "!**/.env.*"],
   "asar": true,
   "win": {
     "target": [

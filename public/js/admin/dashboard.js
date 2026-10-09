@@ -1,4 +1,13 @@
 // public/js/admin/dashboard.js
+const escapeHtml = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  })[character]);
+
 class AdminDashboard {
   constructor() {
     this.elements = {
@@ -62,7 +71,7 @@ class AdminDashboard {
         <div class="timeline-item">
           <div class="timeline-icon ${colorClass}"><i class="fa-solid ${icon}"></i></div>
           <div class="timeline-content">
-            <h4>${media.title}</h4>
+            <h4>${escapeHtml(media.title)}</h4>
             <div class="timeline-time">
               <i class="fa-regular fa-clock"></i> ${formattedDate}
             </div>

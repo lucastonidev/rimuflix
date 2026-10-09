@@ -1,4 +1,4 @@
-import { supabase } from "../../config/supabase.js";
+import { supabaseAdmin } from "../../config/supabase.js";
 
 /**
  * Função auxiliar privada para trocar as variáveis nas URLs dos provedores
@@ -23,10 +23,10 @@ const getProviderIcon = (type, icon) => {
 };
 
 /**
- * Busca e formata os provedores para Filmes
+ * Busca todos os provedores 
  */
-export const getMovieProviders = async (id) => {
-  const { data: appSettings, error } = await supabase
+export const getAllProviders = async (id) => {
+  const { data: appSettings, error } = await supabaseAdmin
     .from("app_settings")
     .select("*");
  const providers = appSettings[0]["active_providers"];
@@ -37,24 +37,6 @@ export const getMovieProviders = async (id) => {
     title: prov.name,
     icon: getProviderIcon(prov.type, prov.icon),
     embed: prov.url ? formatProviderUrl(prov.url, id) : null,
-    type: prov.type,
-  }));
-};
-
-/**
- * Busca e formata os provedores para Séries (TV)
- */
-export const getTvProviders = async (id, season, episode) => {
-  const { data: providers, error } = await supabase
-    .from("providers")
-    .select("*");
-
-  if (error) throw error;
-
-  return providers.map((prov) => ({
-    title: prov.name,
-    icon: getProviderIcon(prov.type, prov.icon),
-    embed: prov.url ? formatProviderUrl(prov.url, id, season, episode) : null,
     type: prov.type,
   }));
 };

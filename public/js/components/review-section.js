@@ -7,17 +7,26 @@ function createStarsHtml(rating) {
   return starsHtml;
 }
 
+const escapeHtml = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  })[character]);
+
 /**
  * Cria o card individual de cada avaliação
  */
 function createReviewCard(review) {
-  const userName = review.users?.name || "Membro Rimuflix";
+  const userName = escapeHtml(review.users?.name || "Membro Rimuflix");
   const date = new Date(review.created_at).toLocaleDateString("pt-BR");
   const starsHtml = createStarsHtml(review.rating);
 
   // Só renderiza a tag <p> se existir comentário
   const commentHtml = review.comment
-    ? `<p class="review-comment">"${review.comment}"</p>`
+    ? `<p class="review-comment">"${escapeHtml(review.comment)}"</p>`
     : "";
 
   return `

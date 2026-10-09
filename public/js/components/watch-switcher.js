@@ -28,7 +28,7 @@ export class WatchSwitcher {
     const playerSwitcher = document.getElementById("playerSwitcher");
     if (!playerSwitcher) return;
 
-    // 👇 LÓGICA NOVA: Injeta o botão de Torrent nativo caso ele não venha da API de provedores
+    // Injeta o botão de Torrent nativo caso ele não venha da API de provedores
     const hasTorrent = this.players.some((p) => p.type === "Torrent");
     if (!hasTorrent) {
       this.players.push({
@@ -58,13 +58,15 @@ export class WatchSwitcher {
       const btn = document.createElement("button");
       btn.className = `player-option ${index === 0 ? "active" : ""}`;
 
+      const playerTitle = player.title || player.name || `Player ${index + 1}`;
+      const playerUrl = player.url || player.embed;
+
       if (player.type === "Torrent") {
-        // Renderiza o botão nativo do Torrent usando o ícone do FontAwesome
         btn.innerHTML = `
-          <div class="player-option__icon" data-type="torrent" title="${player.title}">
+          <div class="player-option__icon" data-type="torrent" title="${playerTitle}">
             ${player.icon}
           </div>
-          ${player.title}
+          ${playerTitle}
         `;
         btn.dataset.url = "";
         btn.dataset.type = "torrent";
@@ -72,14 +74,19 @@ export class WatchSwitcher {
         return;
       }
 
-      // Renderiza os botões normais de Embed
-      btn.innerHTML = `<img class="player-option__icon" src="${player.icon}" alt="${player.title}" /> ${player.title}`;
-      btn.dataset.url = player.embed;
+      btn.innerHTML = `<img class="player-option__icon" src="${player.icon}" alt="${playerTitle}" onerror="this.outerHTML='<i class=\\'fa-solid fa-play\\'></i>'" /> ${playerTitle}`;
+      btn.dataset.url = playerUrl;
       btn.dataset.type = "iframe";
       listContainer.appendChild(btn);
     });
 
     this.setupListeners();
+
+    // 👇 AUTO-PLAY: Inicia o primeiro player da lista automaticamente
+    const firstBtn = listContainer.querySelector(".player-option");
+    if (firstBtn) {
+      firstBtn.click();
+    }
   }
 
   setupListeners() {
@@ -183,21 +190,29 @@ export class WatchSwitcher {
     `;
 
     torrentList.forEach((t) => {
-      // Fallbacks para garantir que a interface não quebre se a API mudar
       const quality = t.quality || t.resolution || "Auto";
-      const size = t.size || "-- GB";
+      const size = t.size || "--";
       const seeders = t.seeders || t.seeds || 0;
+      const title = t.title || t.name || "Torrent Release";
+      const source = t.source || "P2P";
 
-      // Inteligência de cores: Verde (Rápido), Amarelo (Médio), Vermelho (Lento/Morto)
       const healthColor =
         seeders > 40 ? "#10b981" : seeders > 10 ? "#f59e0b" : "#ef4444";
 
       menuHtml += `
         <button class="torrent-file-btn" data-magnet="${t.magnet}">
-          <div class="torrent-file-btn__quality">${quality}</div>
-          <div class="torrent-file-btn__info">
-            <span title="Tamanho do Arquivo"><i class="fa-solid fa-hard-drive"></i> ${size}</span>
-            <span title="Semeadores Ativos" style="color: ${healthColor};"><i class="fa-solid fa-arrow-up"></i> ${seeders}</span>
+          <div class="torrent-file-btn__title" title="${title}">
+            ${title}
+          </div>
+          <div class="torrent-file-btn__bottom">
+            <div class="torrent-file-btn__quality">
+              ${quality}
+            </div>
+            <div class="torrent-file-btn__info">
+              <span class="torrent-source-badge">${source}</span>
+              <span title="Tamanho do Arquivo"><i class="fa-solid fa-hard-drive"></i> ${size}</span>
+              <span title="Semeadores Ativos" style="color: ${healthColor};"><i class="fa-solid fa-arrow-up"></i> ${seeders}</span>
+            </div>
           </div>
         </button>
       `;

@@ -176,6 +176,11 @@ export class WatchEpisodes {
       seasonNumber: Number(season),
       episodeNumber: Number(episode),
     });
-    window.location.href = `/${this.type}/watch/${this.id}?season=${season}&episode=${episode}`;
+
+    // 👇 NOVO: Verifica se está no modo maratona para repassar o parâmetro para o próximo episódio
+    const urlParams = new URLSearchParams(window.location.search);
+    const queueParam = urlParams.has("queue") ? "&queue=true" : "";
+
+    window.location.href = `/${this.type}/watch/${this.id}?season=${season}&episode=${episode}${queueParam}`;
   }
 }

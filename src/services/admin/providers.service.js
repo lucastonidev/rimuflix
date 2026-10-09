@@ -1,7 +1,7 @@
-import { supabase } from "../../config/supabase.js";
+import { supabaseAdmin } from "../../config/supabase.js";
 
 export const getProviders = async () => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("app_settings")
     .select("active_providers")
     .eq("id", "global")
@@ -15,7 +15,7 @@ export const getProviders = async () => {
 
 export const saveProviders = async (providersArray) => {
   // Atualiza ou insere a linha 'global' com a nova lista
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("app_settings")
     .upsert([{ id: "global", active_providers: providersArray }], {
       onConflict: "id",

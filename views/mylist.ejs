@@ -1,51 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+  <head>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="/styles/pages/mylist.css" />
+    <title>Rimuflix - Minhas Listas</title>
+  </head>
 
-<head>
-  <%- include('partials/head') %>
-    <link rel="stylesheet" href="/styles/pages/mylist.css">
-    <title>Rimuflix - Sua lista de favoritos</title>
-</head>
-
-<body>
-  <%- include("./partials/header.ejs") %>
+  <body>
+    <%- include("./partials/header.ejs") %>
     <main class="mylist-container container">
+  <div class="mylist-header">
+    <div>
       <h1 class="page-title">Minhas Listas</h1>
+      <p class="page-subtitle">Organize seus filmes, séries e animes em coleções.</p>
+    </div>
+    <div class="mylist-actions" id="mylist-actions"></div>
+  </div>
 
-      <div class="mylist-layout">
-        <!-- Barra lateral com os nomes das listas -->
-        <aside class="mylist-sidebar">
-          <div class="sidebar-header">
-            <h3>Suas Playlists</h3>
-          </div>
-          <ul id="playlist-tabs" class="playlist-tabs">
-            <!-- O JS vai injetar as abas aqui -->
-          </ul>
-        </aside>
-
-        <!-- Área dos cards -->
-        <section class="mylist-content">
-          <div class="content-header">
-            <h2 id="current-list-title">Carregando...</h2>
-            <button id="btn-delete-list" class="btn-danger hidden">
-              <i class="fa-solid fa-trash"></i> Apagar Lista
-            </button>
-          </div>
-
-          <div id="playlist-grid" class="media-grid">
-            <!-- O JS vai injetar os filmes/séries aqui -->
-          </div>
-        </section>
-      </div>
-    </main>
+  <div class="folders-grid" id="folders-grid"></div>
+</main>
 
     <script type="module">
-      import MyList from '/js/pages/mylist.js';
-      document.addEventListener('DOMContentLoaded', () => {
+      import MyList from "/js/pages/mylist.js";
+      document.addEventListener("DOMContentLoaded", () => {
         const page = new MyList();
         page.init();
       });
     </script>
-</body>
-
+  </body>
 </html>
