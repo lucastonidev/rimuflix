@@ -5,13 +5,11 @@ export async function authenticateUser(identifier, password) {
 
   const isEmail = identifier.includes("@");
   let loginEmail = identifier.toLowerCase().trim();
-
-  // 1. Descobrir o e-mail se o usuário digitou apenas o "username"
   if (!isEmail) {
     const { data: userRecord, error: dbError } = await supabaseAdmin
       .from("users")
       .select("email, is_active")
-      .eq("name", identifier)
+      .ilike("name", identifier.trim())
       .single();
 
     if (dbError || !userRecord) {
@@ -24,7 +22,6 @@ export async function authenticateUser(identifier, password) {
     loginEmail = userRecord.email;
   }
 
-  // 2. Autenticação REAL E SEGURA utilizando o Supabase Auth (Criptografada)
   const { data: authData, error: authError } =
     await supabase.auth.signInWithPassword({
       email: loginEmail,
