@@ -65,19 +65,14 @@ export const requireAdmin = async (req, res, next) => {
 };
 
 export const requireAuth = (req, res, next) => {
-  // Como o 'checkUser' já validou os tokens reais (user_access ou admin_access)
-  // e populou o req.user na requisição, basta verificar se ele está lá.
   if (!req.user) {
-    // Heurística: Prevenção de erros - Redireciona de forma clara
     return res.redirect("/login?error=auth_required");
   }
 
-  // Se o usuário existir, permite acessar a página (ex: o player de vídeo)
   next();
 };
 
 export const checkUser = (req, res, next) => {
-  // Pega os tokens usando os nomes CORRETOS
   const accessToken = req.cookies.admin_access || req.cookies.user_access;
   const refreshToken = req.cookies.admin_refresh || req.cookies.user_refresh;
   const isAdmin = !!req.cookies.admin_refresh;

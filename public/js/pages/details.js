@@ -42,6 +42,7 @@ export default class DetailPage {
     }
 
     const detalhesCarregados = await this.fetchDetails();
+    document.title = `Rimuflix - ${this.data.detail.title || this.data.detail.name}`;
     if (!detalhesCarregados) {
       const heroContainer = document.querySelector(".hero-container");
       heroContainer.innerHTML = "";

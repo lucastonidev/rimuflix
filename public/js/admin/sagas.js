@@ -44,7 +44,7 @@ class AdminSagas {
       '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>';
 
     try {
-      const response = await fetch("/api/v1/sagas");
+      const response = await fetch("/api/v1/admin/sagas");
       const result = await response.json();
 
       if (result.success) {

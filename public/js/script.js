@@ -8,7 +8,9 @@ class App {
     this.HeroElement = document.getElementById("page-container");
     this.introOverlay = document.getElementById("intro-overlay");
     this.introVideo = document.getElementById("intro-video");
-    this.skipBtn = document.getElementById("skip-intro-btn");
+    this.skipBtn =
+      document.getElementById("skip-intro-btn") ||
+      document.querySelector(".skip-btn");
   }
 
   async init() {
@@ -35,19 +37,38 @@ class App {
   waitIntroVideo() {
     return new Promise((resolve) => {
       let isResolved = false;
+
       const finishIntro = () => {
         if (!isResolved) {
           isResolved = true;
+
+          // 👇 A MÁGICA AQUI: Oculta o overlay e pausa o vídeo imediatamente
+          if (this.introVideo) this.introVideo.pause();
+          if (this.introOverlay) this.introOverlay.classList.add("hidden");
+          if (this.HeroElement) {
+            this.HeroElement.classList.remove("scaling-intro");
+            this.HeroElement.classList.add("ready");
+          }
+          document.body.classList.remove("hidde-scroll");
+
           resolve();
         }
       };
+
       if (this.introVideo) {
         this.introVideo.onended = finishIntro;
         this.introVideo.onerror = finishIntro;
       }
+
       if (this.skipBtn) {
-        this.skipBtn.addEventListener("click", finishIntro);
+        // Se a pessoa clicar, força o encerramento na hora!
+        this.skipBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          finishIntro();
+        });
       }
+
+      // Timeout de segurança caso o vídeo trave
       setTimeout(finishIntro, 4500);
     });
   }

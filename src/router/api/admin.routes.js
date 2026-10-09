@@ -15,9 +15,10 @@ import {
   toggleUserStatus,
   createUser,
   updateUser,
-} from "../../controllers/admin/users.controller.js";
+} from "../../controllers/admin/user.controller.js";
 import {
   addSagaController as addSaga,
+  getSagaController as getSagas,
   deleteSagaController as deleteSaga,
 } from "../../controllers/admin/sagas.controller.js";
 import {
@@ -41,6 +42,7 @@ router.get("/users", getUsers);
 router.post("/users", createUser);
 router.patch("/users/:id/status", toggleUserStatus);
 router.patch("/users/:id", updateUser);
+router.get("/sagas", getSagas);
 router.post("/sagas", addSaga);
 router.delete("/sagas/:id", deleteSaga);
 router.get("/settings", getSettings);

@@ -21,8 +21,12 @@ class SearchPage {
     };
 
     this.elements = {
-      searchInput: document.getElementById("searchInput"),
-      searchButton: document.getElementById("searchButton"),
+      searchInput:
+        document.getElementById("searchInput") ||
+        document.querySelector(".modern-search input"),
+      searchButton:
+        document.getElementById("searchButton") ||
+        document.querySelector(".modern-search .btn-search"),
       resultsContainer: document.getElementById("search-results"),
       typeNavLinks: document.querySelectorAll("#type-nav a"),
       genreList: document.getElementById("genre-list"),
@@ -120,13 +124,19 @@ class SearchPage {
       });
     });
 
-    this.elements.searchButton.addEventListener("click", this.handleSearch);
+    if (this.elements.searchButton) {
+      this.elements.searchButton.addEventListener("click", () =>
+        this.handleSearch(),
+      );
+    }
 
-    this.elements.searchInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        this.handleSearch();
-      }
-    });
+    if (this.elements.searchInput) {
+      this.elements.searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          this.handleSearch();
+        }
+      });
+    }
 
     if (this.elements.btnPrevPage) {
       this.elements.btnPrevPage.addEventListener("click", () => {
@@ -333,9 +343,10 @@ class SearchPage {
   }
 
   handleSearch() {
+    if (!this.elements.searchInput) return;
+    
     const typedQuery = this.elements.searchInput.value.trim().toLowerCase();
 
-    // Procura se o que foi digitado bate com algum nome de gênero
     const matchedGenre = this.genresData.find(
       (g) => g.name.toLowerCase() === typedQuery,
     );
@@ -491,5 +502,10 @@ class SearchPage {
     this.elements.btnNextPage.disabled = this.state.page >= this.totalPages;
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchPage = new SearchPage();
+  searchPage.init();
+});
 
 export default SearchPage;

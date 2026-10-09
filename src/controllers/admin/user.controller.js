@@ -1,4 +1,4 @@
-import * as usersService from "../../services/admin/users.service.js";
+import * as userService from "../../services/admin/user.service.js";
 
 const sanitizeUsername = (text) => {
   if (!text) return "";
@@ -7,7 +7,7 @@ const sanitizeUsername = (text) => {
 
 export const getUsers = async (req, res) => {
   try {
-    const data = await usersService.getAllUsers();
+    const data = await userService.getAllUsers();
     return res.status(200).json({ success: true, data });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
@@ -19,7 +19,7 @@ export const toggleUserStatus = async (req, res) => {
     const { id } = req.params;
     const { currentStatus } = req.body;
 
-    const updatedUser = await usersService.toggleUserStatus(id, currentStatus);
+    const updatedUser = await userService.toggleUserStatus(id, currentStatus);
 
     return res.status(200).json({
       success: true,
@@ -54,7 +54,7 @@ export const createUser = async (req, res) => {
       });
     }
 
-    const newUser = await usersService.createUser({
+    const newUser = await userService.createUser({
       name: cleanName,
       email: email.trim().toLowerCase(),
       password,
@@ -74,7 +74,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   const userId = req.params.id;
   
-  const result = await usersService.updateUser(userId, req.body);
+  const result = await userService.updateUser(userId, req.body);
 
   if (!result.success) {
     return res.status(400).json(result); 

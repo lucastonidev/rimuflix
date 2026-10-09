@@ -154,6 +154,8 @@ class WatchPage {
     await this.fetchDetailsFromId();
     if (!this.data) return;
 
+    document.title = `Assistindo ${this.data.title || this.data.name} - Rimuflix`;
+
     if (this.type === "movie") {
       watchProgress.saveWatchProgress({
         tmdbId: this.id,

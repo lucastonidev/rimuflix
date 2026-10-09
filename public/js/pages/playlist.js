@@ -29,7 +29,9 @@ class PlaylistPage {
     }
 
     await this.fetchPlaylistData();
+    document.title = `${this.listData.name} - Rimuflix`;
     this.setupListeners();
+
   }
 
   async fetchPlaylistData() {

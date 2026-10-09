@@ -4,7 +4,7 @@
 <head>
   <%- include('partials/head') %>
     <link rel="stylesheet" href="/styles/pages/search.css">
-    <title>Rimuflix - busca qualquer serie/filme/novela</title>
+    <title>Rimuflix - Busca</title>
 </head>
 
 <body>
@@ -132,11 +132,7 @@
       </div>
     </div>
 
-    <script type="module">
-      import SearchPage from '/js/pages/search.js';
-      const page = new SearchPage();
-      page.init();
-    </script>
+    <script type="module" src="/js/pages/search.js"></script>
 </body>
 
 </html>
