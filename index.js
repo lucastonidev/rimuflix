@@ -13,7 +13,12 @@ import { log } from "console";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-if (process.env.SUPABASE_URL === undefined || process.env.SUPABASE_KEY === undefined) {
+if (
+  process.env.SUPABASE_URL === undefined ||
+  process.env.SUPABASE_ANON_KEY === undefined ||
+  (process.env.SUPABASE_SERVICE_ROLE_KEY === undefined &&
+    process.env.SUPABASE_SERVICE_KEY === undefined)
+) {
   if (fs.existsSync(path.join(__dirname, ".env.local"))) {
     dotenv.config({ path: ".env.local", override: true });
     console.log("🛠️  Rodando com variáveis de ambiente locais (.env.local)");
