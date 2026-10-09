@@ -7,7 +7,10 @@ const userRouter = express.Router();
 userRouter.use(checkUser);
 
 // Configuração básica do multer (Apenas memória)
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {fileSize: 2 * 1024 * 1024}
+});
 
 // ==========================================
 // ROTAS DE LISTAS (Substitui as antigas rotas de watchlist)

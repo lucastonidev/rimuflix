@@ -329,6 +329,37 @@ class UsersService {
     }
     return true;
   }
+
+  // ==========================================
+  // UPLOAD DE IMAGEM PARA O SUPABASE STORAGE
+  // ==========================================
+  async uploadAvatar(userId, file) {
+    // 1. Pega a extensão original do arquivo (ex: .png, .jpg)
+    const fileExtension = file.originalname.split(".").pop();
+
+    // 2. Cria um nome único usando o ID do usuário e o timestamp atual
+    const fileName = `${userId}-${Date.now()}.${fileExtension}`;
+    const filePath = `public/${fileName}`;
+
+    // 3. Faz o upload do buffer em memória direto para o Supabase
+    const { error } = await supabaseAdmin.storage
+      .from("avatars") // O nome do bucket que você criou
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true, // Substitui se houver conflito
+      });
+
+    if (error) {
+      throw new Error("Erro ao fazer upload da imagem: " + error.message);
+    }
+
+    // 4. Obtém a URL pública gerada para salvar no banco de dados
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+  }
 }
 
 export default new UsersService();

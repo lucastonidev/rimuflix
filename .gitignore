@@ -3,5 +3,5 @@ node_modules
 dist
 planejamento
 .env.local
-force-admin.js
+supabase
 .vercel

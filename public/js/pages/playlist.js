@@ -2,6 +2,7 @@ import ApiService from "../api.js";
 import { createMediaCard } from "../components/media-card.js";
 import { showToastGlobal } from "../utils/utils.js";
 import * as listService from "../components/list-service.js";
+import { log } from "electron-builder";
 
 class PlaylistPage {
   constructor() {
@@ -31,7 +32,6 @@ class PlaylistPage {
     await this.fetchPlaylistData();
     document.title = `${this.listData.name} - Rimuflix`;
     this.setupListeners();
-
   }
 
   async fetchPlaylistData() {
@@ -360,10 +360,8 @@ class PlaylistPage {
       });
 
       filtered.forEach((item) => {
-        this.elements.grid.innerHTML += createMediaCard(
-          item.media,
-          item.displayType,
-        );
+        const card = this.createCard(item);
+        this.elements.grid.appendChild(card);
       });
 
       this.elements.countLabel.textContent = `${filtered.length} resultados`;

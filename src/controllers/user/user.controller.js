@@ -191,18 +191,18 @@ class UsersController {
           .status(401)
           .json({ success: false, error: "Não autenticado." });
 
-      // O payload vem do body e pode conter um file enviado pelo multer (se houver upload de imagem pro Supabase Storage)
       const payload = { ...req.body };
 
-      // Caso utilize upload de avatar, você manipularia o req.file aqui e faria o upload para gerar o avatar_url
+      // 👇 Se o multer encontrou um arquivo na requisição, fazemos o upload
       if (req.file) {
-        // Ex: const avatarUrl = await uploadAvatarToStorage(req.file);
-        // payload.avatar_url = avatarUrl;
+        const avatarUrl = await UsersService.uploadAvatar(userId, req.file);
+        payload.avatar_url = avatarUrl;
       }
 
       const updatedUser = await UsersService.updateProfile(userId, payload);
       return res.json({ success: true, data: updatedUser });
     } catch (error) {
+      // Retorna 400 em caso de arquivo muito grande ou erro no Supabase
       return res.status(400).json({ success: false, error: error.message });
     }
   }
