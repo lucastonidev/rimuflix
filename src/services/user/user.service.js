@@ -1,5 +1,4 @@
 import { supabaseAdmin, supabase } from "../../config/supabase.js";
-import jwt from "jsonwebtoken";
 
 class UsersService {
   // ==========================================
@@ -31,7 +30,7 @@ class UsersService {
     return lists;
   }
 
-  async getListById(listId, token) {
+  async getListById(listId, userId) {
     // 1. Busca os dados e os itens
     const { data: listData, error } = await supabaseAdmin
       .from("custom_lists")
@@ -49,28 +48,11 @@ class UsersService {
       .single();
 
     if (error || !listData) {
-      throw { status: 404, message: "Playlist não encontrada." };
+      //localhost:3000/playlist/04cbdae9-8875-4951-933c-50c49b1be42e
+      http: throw { status: 404, message: "Playlist não encontrada." };
     }
 
-    // 👇 O PULO DO GATO: Se for PÚBLICA, o código salta este IF e nem sequer olha para o token.
     if (!listData.is_public) {
-      if (!token) {
-        throw {
-          status: 401,
-          message: "Esta playlist é privada. Inicie sessão para visualizar.",
-        };
-      }
-
-      // Se for privada, valida a identidade
-      let userId;
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // Garante que apanha o ID de qualquer formato que tenha usado no jwt.sign()
-        userId = decoded.id || decoded.userId;
-      } catch (err) {
-        throw { status: 401, message: "Sessão inválida ou expirada." };
-      }
-
       if (userId !== listData.user_id) {
         throw {
           status: 403,
@@ -79,7 +61,6 @@ class UsersService {
       }
     }
 
-    // 3. Se for pública OU se for o dono da lista privada, devolve os dados
     return listData;
   }
 
@@ -178,8 +159,14 @@ class UsersService {
       .eq("user_id", userId)
       .order("updated_at", { ascending: false });
 
-    if (error) throw new Error("Erro ao buscar progresso.");
-    return data;
+      if (error.code === "PGRST205") {  
+        return {
+          success: true,
+          data: [],
+        };
+      }
+      
+      return { success: true, data: data || [] };
   }
 
   async saveWatchProgress(userId, payload) {

@@ -2,7 +2,6 @@ import ApiService from "../api.js";
 import { createMediaCard } from "../components/media-card.js";
 import { showToastGlobal } from "../utils/utils.js";
 import * as listService from "../components/list-service.js";
-import { log } from "electron-builder";
 
 class PlaylistPage {
   constructor() {

@@ -34,18 +34,10 @@ class HeaderMenu {
       const response = await fetch("/api/v1/auth/me");
       const result = await response.json();
 
-      if (result.success && result.data) {
-        // O servidor confirmou que o cookie é válido e retornou o usuário!
+      if (result.success && result.data.authenticated) {
         this.user = result.data;
-
-        // Atualiza o localStorage para manter tudo sincronizado
-        localStorage.setItem("rimuflix:user", JSON.stringify(result.data));
-        localStorage.setItem("rimuflix:userId", result.data.id);
       } else {
-        // O servidor disse que não há sessão (cookie expirado ou ausente)
         this.user = null;
-
-        // Limpa o localStorage forçadamente, pois a sessão acabou
         localStorage.removeItem("rimuflix:user");
         localStorage.removeItem("rimuflix:userId");
       }

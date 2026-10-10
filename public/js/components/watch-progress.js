@@ -7,7 +7,7 @@ const checkAuthStatus = async () => {
   try {
     const res = await fetch("/api/v1/auth/me");
     const json = await res.json();
-    return json.success; // Se o servidor disse que o token é válido, retorna true
+    return json.success && json.data.authenticated === true;
   } catch (e) {
     return false;
   }
