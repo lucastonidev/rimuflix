@@ -106,21 +106,8 @@ class UsersController {
   async getListDetails(req, res) {
     try {
       const listId = req.params.id;
-      let token = null;
-
-      // 1. Extração 100% segura do token
-      if (req.cookies && req.cookies.token) {
-        token = req.cookies.token;
-      } else if (
-        req.headers &&
-        req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer ")
-      ) {
-        token = req.headers.authorization.split(" ")[1];
-      }
-
-      // 2. Passa para o Service (O Service só vai verificar este token se a lista for privada)
-      const listData = await UsersService.getListById(listId, token);
+      
+      const listData = await UsersService.getListById(listId, req.user?.id);
 
       return res.status(200).json({ success: true, data: listData });
     } catch (error) {
@@ -145,9 +132,10 @@ class UsersController {
           .json({ success: false, error: "Não autenticado." });
 
       const progress = await UsersService.getWatchProgress(userId);
+      
       return res.json({ success: true, data: progress });
     } catch (error) {
-      return res.status(500).json({ success: false, error: error.message });
+      return res.status(500).json(error);
     }
   }
 

@@ -41,7 +41,10 @@ class HeroGenerator {
         },
       });
       const result = await response.json();
-      this.isLoggedIn = result.success && result.data ? true : false;
+      console.log(result);
+      
+      this.isLoggedIn =
+        result.success && result.data.authenticated ? true : false;
     } catch (error) {
       console.error("Erro ao validar sessão na API:", error);
       this.isLoggedIn = false;
