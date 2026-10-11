@@ -12,7 +12,7 @@
     "start": "node index.js",
     "start:dev": "cross-env NODE_ENV=development nodemon index.js",
     "start:supabase": "npx supabase start",
-    "electron": "electron .",
+    "electron": "electron main.js",
     "electron:build:win": "electron-builder --win --x64 --publish always",
     "electron:build:linux": "electron-builder --linux deb",
     "electron:build:appimage": "electron-builder --linux AppImage"
