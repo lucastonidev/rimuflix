@@ -35,11 +35,11 @@ export const login = async (req, res) => {
 
     // 3. CRIAÇÃO DOS COOKIES
     if (userData.user.role === "admin") {
-      res.cookie("admin_access", userData.accessToken, userData.options);
-      res.cookie("admin_refresh", userData.refreshToken, userData.options);
+      res.cookie("admin_access", userData.accessToken, userData.accessOptions);
+      res.cookie("admin_refresh", userData.refreshToken, userData.refreshOptions);
     } else {
-      res.cookie("user_access", userData.accessToken, userData.options);
-      res.cookie("user_refresh", userData.refreshToken, userData.options);
+      res.cookie("user_access", userData.accessToken, userData.accessOptions);
+      res.cookie("user_refresh", userData.refreshToken, userData.refreshOptions);
     }
 
     // 4. RETORNO DE SUCESSO

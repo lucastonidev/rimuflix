@@ -160,7 +160,8 @@ export default class AuthService {
         user: userData,
         accessToken,
         refreshToken,
-        options: this.getCookieOptions(this.COOKIE_ACCESS_AGE),
+        accessOptions: this.getCookieOptions(this.COOKIE_ACCESS_AGE),
+        refreshOptions: this.getCookieOptions(this.COOKIE_REFRESH_AGE),
       },
     };
   }
