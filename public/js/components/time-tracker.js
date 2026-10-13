@@ -8,6 +8,10 @@ export class TimeTracker {
   constructor(mediaData) {
     this.media = mediaData;
     this.secondsActive = 0;
+    this.durationSeconds =
+      Number.isFinite(mediaData.durationSeconds) && mediaData.durationSeconds > 0
+        ? mediaData.durationSeconds
+        : null;
     this.interval = null;
 
     this.init();
@@ -36,6 +40,7 @@ export class TimeTracker {
         this.secondsActive = h * 3600 + m * 60 + s;
       }
     }
+    this.secondsActive = this.limitToDuration(this.secondsActive);
 
     this.injectCard();
     this.injectModal();
@@ -50,13 +55,17 @@ export class TimeTracker {
   }
 
   startTimer() {
-    if (this.interval) return;
+    if (this.interval || this.hasReachedDuration()) return;
     this.interval = setInterval(() => {
-      this.secondsActive++;
+      this.secondsActive = this.limitToDuration(this.secondsActive + 1);
       this.updateDisplay();
 
       if (this.secondsActive % 10 === 0) {
         this.triggerLocalAutoSave();
+      }
+
+      if (this.hasReachedDuration()) {
+        this.pauseTimer();
       }
     }, 1000);
   }
@@ -76,6 +85,20 @@ export class TimeTracker {
       .padStart(2, "0");
     const s = (totalSeconds % 60).toString().padStart(2, "0");
     return { h, m, s, string: `${h}:${m}:${s}` };
+  }
+
+  limitToDuration(seconds) {
+    const safeSeconds = Math.max(0, Number(seconds) || 0);
+    return this.durationSeconds === null
+      ? safeSeconds
+      : Math.min(safeSeconds, this.durationSeconds);
+  }
+
+  hasReachedDuration() {
+    return (
+      this.durationSeconds !== null &&
+      this.secondsActive >= this.durationSeconds
+    );
   }
 
   updateDisplay() {
@@ -251,7 +274,7 @@ export class TimeTracker {
         const m = parseInt(document.getElementById("track-m").value || 0, 10);
         const s = parseInt(document.getElementById("track-s").value || 0, 10);
 
-        this.secondsActive = h * 3600 + m * 60 + s;
+        this.secondsActive = this.limitToDuration(h * 3600 + m * 60 + s);
         this.updateDisplay();
         this.triggerLocalAutoSave();
 

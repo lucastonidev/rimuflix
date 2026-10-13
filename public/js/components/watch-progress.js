@@ -2,10 +2,10 @@ import { STORAGE_KEYS } from "./storageKeys.js";
 
 // Função melhorada que não confia apenas no localStorage
 const checkAuthStatus = async () => {
-  if (!localStorage.getItem(STORAGE_KEYS.USER_ID)) return false;
-
   try {
-    const res = await fetch("/api/v1/auth/me");
+    const res = await fetch("/api/v1/auth/me", {
+      credentials: "same-origin",
+    });
     const json = await res.json();
     return json.success && json.data.authenticated === true;
   } catch (e) {
@@ -21,7 +21,9 @@ export const getWatchProgressState = async () => {
 
   if (isLoggedIn) {
     try {
-      const response = await fetch("/api/v1/user/progress");
+      const response = await fetch("/api/v1/user/progress", {
+        credentials: "same-origin",
+      });
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -49,7 +51,9 @@ export const getWatchProgressState = async () => {
 
   cloudData.forEach((cloudItem) => {
     const index = mergedData.findIndex(
-      (localItem) => String(localItem.tmdbId) === String(cloudItem.tmdbId),
+      (localItem) =>
+        String(localItem.tmdbId) === String(cloudItem.tmdbId) &&
+        localItem.mediaType === cloudItem.mediaType,
     );
 
     if (index !== -1) {
@@ -66,6 +70,7 @@ export const getWatchProgressState = async () => {
 };
 
 export const saveWatchProgress = async (newItem) => {
+  autoSaveLocalProgress(newItem);
   const isLoggedIn = await checkAuthStatus();
 
   if (isLoggedIn) {
@@ -77,27 +82,30 @@ export const saveWatchProgress = async (newItem) => {
         episode_number: newItem.episodeNumber || 1,
       };
 
-      if (newItem.stoppedAt) {
+      if (newItem.stoppedAt !== undefined) {
         payload.stopped_at = newItem.stoppedAt;
       }
 
       const response = await fetch("/api/v1/user/progress/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify(payload),
       });
 
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        console.warn("Falha no servidor. Fallback ativado.", result.error);
+        console.error("Falha ao salvar progresso no banco.", {
+          status: response.status,
+          error: result.error,
+        });
       }
     } catch (error) {
       console.warn("Sem conexão. Fallback ativado.", error);
     }
   }
 
-  autoSaveLocalProgress(newItem);
 };
 
 export const removeWatchProgress = async (tmdbId, mediaType = "tv") => {
@@ -107,6 +115,7 @@ export const removeWatchProgress = async (tmdbId, mediaType = "tv") => {
     try {
       await fetch(`/api/v1/user/progress/remove/${mediaType}/${tmdbId}`, {
         method: "DELETE",
+        credentials: "same-origin",
       });
     } catch (error) {
       console.error("Erro ao remover progresso na nuvem", error);
@@ -128,7 +137,9 @@ export const autoSaveLocalProgress = (newItem) => {
   const currentArray =
     JSON.parse(localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)) || [];
   const index = currentArray.findIndex(
-    (item) => String(item.tmdbId) === String(newItem.tmdbId),
+    (item) =>
+      String(item.tmdbId) === String(newItem.tmdbId) &&
+      item.mediaType === newItem.mediaType,
   );
 
   if (index === -1) {

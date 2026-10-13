@@ -1,5 +1,9 @@
 import ApiService from "../api.js";
-import { renderMovieInfo, renderTvInfo } from "../components/media-info.js";
+import {
+  renderMovieInfo,
+  renderTvInfo,
+  setupCopyTitleButton,
+} from "../components/media-info.js";
 import * as watchProgress from "../components/watch-progress.js";
 import { WatchSwitcher } from "../components/watch-switcher.js";
 import { WatchEpisodes } from "../components/watch-episodes.js";
@@ -72,6 +76,8 @@ class WatchPage {
         this.tv.currentEpisode,
       );
     }
+
+    setupCopyTitleButton(container);
   }
 
   async renderQueuePanel() {
@@ -161,6 +167,7 @@ class WatchPage {
         tmdbId: this.id,
         mediaType: this.type,
         timestamp: Date.now(),
+        stoppedAt: "00:00:00",
       });
 
       // Inicializa o rastreador de tempo para filmes
@@ -169,6 +176,8 @@ class WatchPage {
         type: this.type,
         season: 1,
         episode: 1,
+        durationSeconds:
+          Number(this.data.runtime) > 0 ? Number(this.data.runtime) * 60 : null,
       });
 
       await this.fetchOptionPlayerMovie();
@@ -194,7 +203,18 @@ class WatchPage {
       mediaType: this.type,
       seasonNumber: this.tv.currentSeason,
       episodeNumber: this.tv.currentEpisode,
+      stoppedAt: "00:00:00",
     });
+
+    await this.fetchSeasonDetails(this.tv.currentSeason);
+    const currentEpisode = this.seasonData?.episodes?.find(
+      (episode) =>
+        Number(episode.episode_number) === Number(this.tv.currentEpisode),
+    );
+    const episodeRuntime =
+      Number(currentEpisode?.runtime) ||
+      Number(this.data.episode_run_time?.[0]) ||
+      0;
 
     // Inicializa o rastreador de tempo para séries
     new TimeTracker({
@@ -202,9 +222,9 @@ class WatchPage {
       type: this.type,
       season: this.tv.currentSeason,
       episode: this.tv.currentEpisode,
+      durationSeconds: episodeRuntime > 0 ? episodeRuntime * 60 : null,
     });
 
-    await this.fetchSeasonDetails(this.tv.currentSeason);
     this.renderMediaInfo();
 
     await this.fetchOptionPlayerTv();

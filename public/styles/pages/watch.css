@@ -16,6 +16,17 @@
   margin-bottom: 24px;
 }
 
+.movie-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.movie-title-row .movie-title {
+  margin-bottom: 0;
+}
+
 .btn-back {
   background-color: transparent;
   color: #e0e0e0;

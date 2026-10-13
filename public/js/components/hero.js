@@ -1,4 +1,5 @@
 import ApiService from "../api.js";
+import { copyTextToClipboard, showToastGlobal } from "../utils/utils.js";
 
 class HeroGenerator {
   constructor() {
@@ -134,10 +135,17 @@ class HeroGenerator {
       `;
     }
 
+    const title = movie.title || movie.name || "Título não disponível";
+
     article.innerHTML = `
       <div class="hero-overlay"></div>
       <div class="hero-content container">
-        <h1 title="${movie.title || movie.name}">${movie.title || movie.name || "Título não disponível"}</h1>
+        <div class="hero-title-row">
+          <h1 title="${title}">${title}</h1>
+          <button class="copy-title-button" type="button" title="Copiar título" aria-label="Copiar título">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
         <div class="hero-meta">
           <span class="card-badge">${this.dateFormart(movie)}</span>
           <span class="circle-separetor"></span>
@@ -152,6 +160,24 @@ class HeroGenerator {
         </div>
       </div>
     `;
+
+    article
+      .querySelector(".copy-title-button")
+      ?.addEventListener("click", async (event) => {
+        const button = event.currentTarget;
+        try {
+          await copyTextToClipboard(title);
+          button.innerHTML = '<i class="fa-solid fa-check"></i>';
+          showToastGlobal("Título copiado!", "success");
+        } catch (error) {
+          console.error("Erro ao copiar título:", error);
+          showToastGlobal("Não foi possível copiar o título.", "error");
+        } finally {
+          setTimeout(() => {
+            button.innerHTML = '<i class="fa-regular fa-copy"></i>';
+          }, 1500);
+        }
+      });
 
     const extractedGenreIds =
       movie.genre_ids || (movie.genres ? movie.genres.map((g) => g.id) : []);

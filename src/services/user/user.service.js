@@ -154,37 +154,48 @@ class UsersService {
   // ==========================================
   async getWatchProgress(userId) {
     const { data, error } = await supabaseAdmin
-      .from("watch_progress") // Ajuste se o nome da sua tabela for diferente
+      .from("watch_history")
       .select("*")
       .eq("user_id", userId)
       .order("updated_at", { ascending: false });
 
-      if (error.code === "PGRST205") {  
+    if (error) {
+      if (error.code === "PGRST205") {
         return {
           success: true,
           data: [],
         };
       }
-      
-      return { success: true, data: data || [] };
+      throw new Error(`Erro ao buscar progresso: ${error.message}`);
+    }
+
+    return { success: true, data: data || [] };
   }
 
   async saveWatchProgress(userId, payload) {
     const { tmdb_id, media_type, season_number, episode_number, stopped_at } =
       payload;
 
-    // Verifica se já existe progresso para esta mídia
-    const { data: existing } = await supabaseAdmin
-      .from("watch_progress")
+    if (!tmdb_id || !media_type) {
+      throw new Error("tmdb_id e media_type são obrigatórios.");
+    }
+
+    const { data: existing, error: findError } = await supabaseAdmin
+      .from("watch_history")
       .select("id")
       .eq("user_id", userId)
       .eq("tmdb_id", String(tmdb_id))
-      .single();
+      .eq("media_type", media_type)
+      .maybeSingle();
+
+    if (findError) {
+      throw new Error(`Erro ao localizar progresso: ${findError.message}`);
+    }
 
     let result;
     if (existing) {
       result = await supabaseAdmin
-        .from("watch_progress")
+        .from("watch_history")
         .update({
           season_number,
           episode_number,
@@ -193,7 +204,7 @@ class UsersService {
         })
         .eq("id", existing.id);
     } else {
-      result = await supabaseAdmin.from("watch_progress").insert({
+      result = await supabaseAdmin.from("watch_history").insert({
         user_id: userId,
         tmdb_id: String(tmdb_id),
         media_type,
@@ -203,13 +214,15 @@ class UsersService {
       });
     }
 
-    if (result.error) throw new Error("Erro ao salvar progresso.");
+    if (result.error) {
+      throw new Error(`Erro ao salvar progresso: ${result.error.message}`);
+    }
     return true;
   }
 
   async removeWatchProgress(userId, mediaType, tmdbId) {
     const { error } = await supabaseAdmin
-      .from("watch_progress")
+      .from("watch_history")
       .delete()
       .eq("user_id", userId)
       .eq("tmdb_id", String(tmdbId))

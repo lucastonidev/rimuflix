@@ -133,7 +133,7 @@ class UsersController {
 
       const progress = await UsersService.getWatchProgress(userId);
       
-      return res.json({ success: true, data: progress });
+      return res.json(progress);
     } catch (error) {
       return res.status(500).json(error);
     }

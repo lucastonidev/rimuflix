@@ -12,7 +12,12 @@ export function renderMovieInfo(media) {
     <a class="btn-back" href="/movie/${media.id}" title="Voltar para pagina do filme">
     <i class="fa-solid fa-angle-left"></i>
     </a>
-    <h1 id="movieTitle" class="movie-title">${media.title}</h1>
+    <div class="movie-title-row">
+      <h1 id="movieTitle" class="movie-title">${media.title}</h1>
+      <button class="copy-title-button" type="button" title="Copiar título" aria-label="Copiar título">
+        <i class="fa-regular fa-copy"></i>
+      </button>
+    </div>
     </div>
       <div class="movie-meta">
         <span id="ratting" class="match">
@@ -30,7 +35,12 @@ export function renderMovieInfo(media) {
 
 export function renderTvInfo(media, currentSeason, currentEpisode) {
   return `
-    <h1 id="movieTitle" class="movie-title">${media.name}</h1>
+    <div class="movie-title-row">
+      <h1 id="movieTitle" class="movie-title">${media.name}</h1>
+      <button class="copy-title-button" type="button" title="Copiar título" aria-label="Copiar título">
+        <i class="fa-regular fa-copy"></i>
+      </button>
+    </div>
     <div class="movie-meta">
       <span id="ratting" class="match">
         ${media.vote_average?.toFixed(1)}
@@ -45,3 +55,25 @@ export function renderTvInfo(media, currentSeason, currentEpisode) {
     </div>
   `;
 }
+
+export function setupCopyTitleButton(container) {
+  const button = container?.querySelector(".copy-title-button");
+  if (!button) return;
+
+  button.addEventListener("click", async () => {
+    try {
+      const title = container.querySelector(".movie-title")?.textContent.trim();
+      await copyTextToClipboard(title);
+      button.innerHTML = '<i class="fa-solid fa-check"></i>';
+      showToastGlobal("Título copiado!", "success");
+    } catch (error) {
+      console.error("Erro ao copiar título:", error);
+      showToastGlobal("Não foi possível copiar o título.", "error");
+    } finally {
+      setTimeout(() => {
+        button.innerHTML = '<i class="fa-regular fa-copy"></i>';
+      }, 1500);
+    }
+  });
+}
+import { copyTextToClipboard, showToastGlobal } from "../utils/utils.js";

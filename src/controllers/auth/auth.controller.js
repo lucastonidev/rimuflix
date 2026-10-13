@@ -46,10 +46,10 @@ export const login = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: {
-        id: userData.id,
-        name: userData.name,
-        role: userData.role,
-        avatar_url: userData.avatar_url || "",
+        id: userData.user.id,
+        name: userData.user.name,
+        role: userData.user.role,
+        avatar_url: userData.user.avatar_url || "",
       },
     });
   } catch (error) {
