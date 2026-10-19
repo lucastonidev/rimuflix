@@ -19,6 +19,7 @@ export const saveProvidersController = async (req, res) => {
         .json({ success: false, error: "Formato de provedores inválido." });
     }
 
+    providersService.validateProviders(providers);
     await providersService.saveProviders(providers);
 
     return res.status(200).json({

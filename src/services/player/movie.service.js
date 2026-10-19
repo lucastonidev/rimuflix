@@ -1,5 +1,6 @@
 import * as clientPlayer from "./player.client.js";
 import { getCustomMediaPlayers } from "../database/mediaDrive.service.js";
+import { getM3uPlayersByTitle } from "../tv/m3u.service.js";
 
 const buildUrlEmbedPlayer = (url, id, type, title) => {
   let embedUrl = url;
@@ -15,7 +16,7 @@ const buildUrlEmbedPlayer = (url, id, type, title) => {
   return embedUrl;
 };
 
-export const getAllEmbedLink = async (id) => {
+export const getAllEmbedLink = async (id, title, idPoster) => {
   const allPlayers = await clientPlayer.getAllProviders();
   const embedLinks = [];
 
@@ -31,6 +32,7 @@ export const getAllEmbedLink = async (id) => {
       embed: embedUrl,
       icon: player.icon,
       type: player.type,
+      sandbox: player.sandbox,
     });
   });
 
@@ -38,6 +40,9 @@ export const getAllEmbedLink = async (id) => {
   if (customPlayers && customPlayers.length > 0) {
     embedLinks.push(...customPlayers);
   }
+
+  const m3uPlayers = await getM3uPlayersByTitle(title, "movie", idPoster);
+  embedLinks.push(...m3uPlayers);
 
   return embedLinks;
 };

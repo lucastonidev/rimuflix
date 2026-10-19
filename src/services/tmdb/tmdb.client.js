@@ -1,5 +1,7 @@
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const DEFAULT_LANGUAGE = "pt-BR";
+const TMDB_TIMEOUT_MS = 15000;
+const TMDB_MAX_RETRIES = 2;
 
 class TmdbHttpError extends Error {
   constructor(message, status, url, details = null) {
@@ -65,16 +67,43 @@ export async function tmdbRequest(path, options = {}) {
 
   const url = buildUrl(path, query);
 
-  const response = await fetch(url, {
-    method,
-    headers: {
-      Accept: "application/json",
-      ...headers,
-    },
-    body,
-  });
+  let lastError;
 
-  return parseResponse(response, url);
+  for (let attempt = 0; attempt <= TMDB_MAX_RETRIES; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          Accept: "application/json",
+          ...headers,
+        },
+        body,
+        signal: AbortSignal.timeout(TMDB_TIMEOUT_MS),
+      });
+
+      return await parseResponse(response, url);
+    } catch (error) {
+      lastError = error;
+
+      if (error instanceof TmdbHttpError || attempt === TMDB_MAX_RETRIES) {
+        break;
+      }
+
+      const delay = 300 * 2 ** attempt;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  if (lastError instanceof TmdbHttpError) {
+    throw lastError;
+  }
+
+  const networkError = new Error(
+    `Não foi possível conectar ao TMDB após ${TMDB_MAX_RETRIES + 1} tentativas.`,
+    { cause: lastError },
+  );
+  networkError.status = 503;
+  throw networkError;
 }
 
 export async function tmdbGet(path, query = {}) {

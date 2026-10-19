@@ -55,6 +55,7 @@ export const getAllEmbedLink = async (id, season, episode) => {
         embed: embedUrl,
         icon: player.icon,
         type: player.type,
+        sandbox: player.sandbox,
       });
     });
 

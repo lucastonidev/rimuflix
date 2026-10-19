@@ -33,6 +33,10 @@ class AdminMedia {
     this.previewType = document.getElementById("preview-type");
     this.btnSubmit = document.getElementById("btn-submit-media");
     this.pageTitle = document.getElementById("page-title");
+    this.m3uNameInput = document.getElementById("m3u_name");
+    this.m3uUrlInput = document.getElementById("m3u_url");
+    this.m3uButton = document.getElementById("btn-add-m3u");
+    this.m3uStatus = document.getElementById("m3u-status");
 
     this.editId = null;
 
@@ -68,6 +72,7 @@ class AdminMedia {
   async init() {
     if (!this.form) return;
 
+    this.m3uButton?.addEventListener("click", () => this.addM3uPlaylist());
     this.btnSearchTmdb.addEventListener("click", () => this.fetchTmdbData());
     this.tmdbIdInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
@@ -98,6 +103,46 @@ class AdminMedia {
     if (urlParts.includes("edit")) {
       this.editId = urlParts[urlParts.length - 1];
       await this.loadMediaForEdit();
+    }
+  }
+
+  async addM3uPlaylist() {
+    const url = this.m3uUrlInput?.value.trim();
+    const name = this.m3uNameInput?.value.trim();
+    if (!url) {
+      this.showToast("Informe a URL da lista M3U.", "warning");
+      this.m3uUrlInput?.focus();
+      return;
+    }
+
+    const originalHtml = this.m3uButton.innerHTML;
+    this.m3uButton.disabled = true;
+    this.m3uButton.innerHTML =
+      '<i class="fa-solid fa-spinner fa-spin"></i> Validando...';
+    if (this.m3uStatus) this.m3uStatus.textContent = "";
+
+    try {
+      const response = await fetch("/api/v1/admin/m3u", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, url }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Não foi possível adicionar a lista.");
+      }
+
+      const total = result.data.imported_count || 0;
+      this.showToast("Lista M3U adicionada com sucesso!", "success");
+      if (this.m3uStatus) this.m3uStatus.textContent = `${total} canal(is) validado(s).`;
+      this.m3uNameInput.value = "";
+      this.m3uUrlInput.value = "";
+    } catch (error) {
+      console.error("Erro ao adicionar playlist M3U:", error);
+      this.showToast(error.message, "error");
+    } finally {
+      this.m3uButton.disabled = false;
+      this.m3uButton.innerHTML = originalHtml;
     }
   }
 

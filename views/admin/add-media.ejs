@@ -22,6 +22,34 @@
         </div>
 
         <div class="card">
+          <div class="form-section">
+            <div class="section-header">
+              <span class="step-badge"><i class="fa-solid fa-list"></i></span>
+              <h3>Adicionar lista IPTV (M3U)</h3>
+            </div>
+            <p class="text-muted">
+              A lista será validada antes de ficar disponível na TV ao vivo.
+              Listas inválidas por três verificações consecutivas serão removidas.
+            </p>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label" for="m3u_name">Nome da lista</label>
+                <input id="m3u_name" class="form-control" placeholder="Ex: IPTV principal" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="m3u_url">URL da lista M3U</label>
+                <input id="m3u_url" class="form-control" type="url"
+                  placeholder="https://exemplo.com/lista.m3u" />
+              </div>
+            </div>
+            <div class="form-actions" style="margin-top: 16px; text-align: right">
+              <button type="button" id="btn-add-m3u" class="btn-primary">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Validar e adicionar lista
+              </button>
+            </div>
+            <div id="m3u-status" class="text-muted" style="margin-top: 12px"></div>
+          </div>
+
           <form id="form-add-media" class="admin-form">
             <!-- SEÇÃO 1: Busca e Identificação -->
             <div class="form-section">

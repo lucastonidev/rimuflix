@@ -26,6 +26,11 @@ import {
   updateSettingsController as updateSettings,
 } from "../../controllers/admin/settings.controller.js";
 import { requireAdmin } from "../../middlewares/auth/auth.middleware.js";
+import {
+  addM3uPlaylist,
+  listM3uPlaylists,
+  removeM3uPlaylist,
+} from "../../controllers/admin/m3u.controller.js";
 
 const router = express.Router();
 
@@ -47,5 +52,8 @@ router.post("/sagas", addSaga);
 router.delete("/sagas/:id", deleteSaga);
 router.get("/settings", getSettings);
 router.post("/settings", updateSettings);
+router.get("/m3u", listM3uPlaylists);
+router.post("/m3u", addM3uPlaylist);
+router.delete("/m3u/:id", removeM3uPlaylist);
 
 export default router;

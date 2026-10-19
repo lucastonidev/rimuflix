@@ -5,6 +5,4 @@ supabase
 .vercel
 dist
 planejamento
-.env.local
-supabase
 .vercel

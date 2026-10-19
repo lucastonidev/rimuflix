@@ -1,5 +1,31 @@
 import { supabaseAdmin } from "../../config/supabase.js";
 
+const SANDBOX_MODES = new Set(["ads", "none", "custom"]);
+const SANDBOX_TOKEN_PATTERN = /^[a-z][a-z0-9-]*$/;
+
+export const validateProviders = (providers) => {
+  providers.forEach((provider, index) => {
+    if (!provider || typeof provider !== "object") {
+      throw new Error(`Provedor inválido na posição ${index}.`);
+    }
+
+    const mode = provider.sandboxMode || "none";
+    const tokens = provider.sandboxTokens || [];
+
+    if (!SANDBOX_MODES.has(mode)) {
+      throw new Error(`Modo de sandbox inválido no provedor ${index + 1}.`);
+    }
+
+    if (!Array.isArray(tokens) || tokens.some((token) => typeof token !== "string" || !SANDBOX_TOKEN_PATTERN.test(token))) {
+      throw new Error(`Tokens de sandbox inválidos no provedor ${index + 1}.`);
+    }
+
+    if (tokens.length > 20) {
+      throw new Error(`O provedor ${index + 1} possui tokens demais.`);
+    }
+  });
+};
+
 export const getProviders = async () => {
   const { data, error } = await supabaseAdmin
     .from("app_settings")

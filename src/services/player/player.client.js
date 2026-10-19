@@ -22,6 +22,18 @@ const getProviderIcon = (type, icon) => {
   return icon;
 };
 
+const getSandboxAttribute = (provider) => {
+  if (provider.sandboxMode === "ads") {
+    return "allow-scripts allow-same-origin";
+  }
+
+  if (provider.sandboxMode === "custom" && Array.isArray(provider.sandboxTokens)) {
+    return provider.sandboxTokens.join(" ");
+  }
+
+  return "";
+};
+
 /**
  * Busca todos os provedores 
  */
@@ -29,14 +41,20 @@ export const getAllProviders = async (id) => {
   const { data: appSettings, error } = await supabaseAdmin
     .from("app_settings")
     .select("*");
- const providers = appSettings[0]["active_providers"];
-
   if (error) throw error;
+  const providers = appSettings?.[0]?.active_providers || [];
 
-  return providers.map((prov) => ({
-    title: prov.name,
-    icon: getProviderIcon(prov.type, prov.icon),
-    embed: prov.url ? formatProviderUrl(prov.url, id) : null,
-    type: prov.type,
-  }));
+  return providers.map((prov) => {
+    const hasNoAdsLabel =
+      prov.sandboxMode === "ads" &&
+      !String(prov.name || "").endsWith("| no Ads");
+
+    return {
+      title: hasNoAdsLabel ? `${prov.name} | no Ads` : prov.name,
+      icon: getProviderIcon(prov.type, prov.icon),
+      embed: prov.url ? formatProviderUrl(prov.url, id) : null,
+      type: prov.type,
+      sandbox: getSandboxAttribute(prov),
+    };
+  });
 };

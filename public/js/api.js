@@ -66,8 +66,10 @@ class ApiService {
     return await this.fetchWithCache(url, 1);
   }
 
-  async getAllPlayerMovie(id) {
-    return await this.fetchWithCache(`/api/v1/player/movie/${id}`, 0);
+  async getAllPlayerMovie(id, title = "", idPoster = "") {
+    const query = title ? `?title=${encodeURIComponent(title)}` : "";
+    const query2 = idPoster ? `&idPoster=${encodeURIComponent(idPoster)}` : "";
+    return await this.fetchWithCache(`/api/v1/player/movie/${id}${query}${query2}`, 0);
   }
 
   async getAllPlayerTv(id, season, episode) {

@@ -34,8 +34,11 @@
           <input type="text" id="input-filter-list" placeholder="Buscar nesta lista...">
         </div>
         
-        <div class="layout-toggles">
+        <div class="playlist-controls-actions">
           <span id="items-count-label">Carregando...</span>
+          <button class="btn-secondary playlist-add-button" id="btn-add-playlist-items" type="button" hidden>
+            <i class="fa-solid fa-plus"></i> Adicionar títulos
+          </button>
         </div>
       </div>
 
@@ -46,6 +49,25 @@
 
     </div>
   </main>
+
+  <div class="playlist-add-overlay" id="playlist-add-overlay" hidden>
+    <div class="playlist-add-modal" role="dialog" aria-modal="true" aria-labelledby="playlist-add-title">
+      <div class="playlist-add-header">
+        <h2 id="playlist-add-title">Adicionar títulos</h2>
+        <button class="playlist-close" id="close-playlist-add" type="button" aria-label="Fechar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form class="playlist-add-search" id="playlist-add-form">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="playlist-add-input" type="search" placeholder="Buscar filmes ou séries..." autocomplete="off">
+        <button class="btn-primary" type="submit">Buscar</button>
+      </form>
+      <div class="playlist-add-results" id="playlist-add-results">
+        <p class="playlist-add-message">Busque um filme ou uma série para adicionar.</p>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="/js/pages/playlist.js"></script>
 </body>

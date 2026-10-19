@@ -4,6 +4,8 @@ export const GetMoviePlayerLinks = async (req, res) => {
   try {
     const data = await GetMoviePlayerLinksService.getAllEmbedLink(
       req.params.id,
+      req.query.title,
+      req.query.idPoster
     );
 
     return res.status(200).json({

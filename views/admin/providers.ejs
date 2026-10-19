@@ -79,6 +79,38 @@
                 </div>
               </div>
 
+              <div class="form-group">
+                <label for="provider_sandbox_mode" class="form-label"
+                  >Sandbox do iframe</label
+                >
+                <div class="select-wrapper">
+                  <select id="provider_sandbox_mode" class="form-control">
+                    <option value="ads">Bloquear propaganda</option>
+                    <option value="none">Não bloquear</option>
+                    <option value="custom">Personalizado</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <small class="form-help"
+                  >Limita pop-ups e permissões do player.</small
+                >
+              </div>
+
+              <div class="form-group" id="provider_sandbox_custom_group" hidden>
+                <label for="provider_sandbox_tokens" class="form-label"
+                  >Atributos personalizados</label
+                >
+                <input
+                  type="text"
+                  id="provider_sandbox_tokens"
+                  class="form-control"
+                  placeholder="allow-scripts, allow-same-origin"
+                />
+                <small class="form-help"
+                  >Separe os tokens por vírgula, sem espaços dentro do token.</small
+                >
+              </div>
+
               <button type="submit" class="btn btn-primary w-full mt-4">
                 <i class="fa-solid fa-save"></i> Adicionar Provedor
               </button>

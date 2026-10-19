@@ -6,10 +6,9 @@ import * as listService from "../components/list-service.js";
 class PlaylistPage {
   constructor() {
     this.api = new ApiService();
-    // Extrai o ID da lista da URL (ex: localhost:3000/playlist/123-abc)
     this.listId = window.location.pathname.split("/").pop();
     this.listData = null;
-    this.mediaCache = []; // Guarda os itens carregados para a busca interna
+    this.mediaCache = [];
 
     this.elements = {
       hero: document.getElementById("playlist-hero"),
@@ -17,6 +16,12 @@ class PlaylistPage {
       grid: document.getElementById("playlist-grid"),
       searchInput: document.getElementById("input-filter-list"),
       countLabel: document.getElementById("items-count-label"),
+      addButton: document.getElementById("btn-add-playlist-items"),
+      addOverlay: document.getElementById("playlist-add-overlay"),
+      closeAdd: document.getElementById("close-playlist-add"),
+      addForm: document.getElementById("playlist-add-form"),
+      addInput: document.getElementById("playlist-add-input"),
+      addResults: document.getElementById("playlist-add-results"),
     };
   }
 
@@ -30,12 +35,12 @@ class PlaylistPage {
 
     await this.fetchPlaylistData();
     document.title = `${this.listData.name} - Rimuflix`;
+    this.setupAddTitleModal();
     this.setupListeners();
   }
 
   async fetchPlaylistData() {
     try {
-      // 1. Busca os detalhes da lista via API (você precisará criar essa rota no backend)
       const response = await fetch(`/api/v1/user/lists/${this.listId}`);
       const result = await response.json();
 
@@ -52,11 +57,13 @@ class PlaylistPage {
   }
 
   async renderHero() {
-    const isOwner = await listService.isUserLoggedIn(); // Verifica se está logado para exibir opções
+    const isOwner =
+      Boolean(localStorage.getItem("rimuflix:userId")) &&
+      localStorage.getItem("rimuflix:userId") === String(this.listData.user_id);
     const itemCount = this.listData.items ? this.listData.items.length : 0;
 
-    let coverImage = "/img/default-playlist.png";
-    let heroBg = "linear-gradient(to bottom, #141414, #000)";
+    let coverImage;
+    let heroBg;
 
     // Pega o poster do primeiro item para usar como capa (se existir)
     if (itemCount > 0) {
@@ -66,16 +73,18 @@ class PlaylistPage {
           firstItem.media_type,
           firstItem.media_id,
         );
+
         if (res.success && res.data) {
           coverImage = `https://image.tmdb.org/t/p/w300${res.data.poster_path}`;
           heroBg = `url("https://image.tmdb.org/t/p/w1280${res.data.backdrop_path}")`;
         }
       } catch (e) {
-        /* Falha silenciosa para a capa */
+        console.error("Erro ao buscar o poster do primeiro item:", e);
       }
+    } else {
+      coverImage = "/img/poster-playlist-case-not-itens.jpeg";
+      heroBg = "/img/banner-playlist-case-not-itens.jpeg";
     }
-
-    this.elements.hero.style.backgroundImage = heroBg;
 
     let actionsHtml = `
       <button class="btn-primary playlist-btn-action" id="btn-play-all" title="Iniciar Maratona">
@@ -88,6 +97,7 @@ class PlaylistPage {
 
     // Injeta o Toggle usando as classes limpas do CSS se o utilizador for o dono
     if (isOwner) {
+      this.elements.addButton.hidden = false;
       actionsHtml += `
         <div class="ui-toggle-container">
           <label class="ui-toggle-label">
@@ -230,6 +240,132 @@ class PlaylistPage {
     }
   }
 
+  setupAddTitleModal() {
+    this.elements.addButton?.addEventListener("click", () => {
+      this.elements.addOverlay.hidden = false;
+      this.elements.addInput.focus();
+    });
+
+    this.elements.closeAdd?.addEventListener("click", () => {
+      this.elements.addOverlay.hidden = true;
+    });
+
+    this.elements.addOverlay?.addEventListener("click", (event) => {
+      if (event.target === this.elements.addOverlay) {
+        this.elements.addOverlay.hidden = true;
+      }
+    });
+
+    this.elements.addForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const query = this.elements.addInput.value.trim();
+      if (!query) return;
+      await this.searchTitles(query);
+    });
+  }
+
+  async searchTitles(query) {
+    this.elements.addResults.innerHTML =
+      '<p class="playlist-add-message"><i class="fa-solid fa-spinner fa-spin"></i> Buscando...</p>';
+
+    try {
+      const response = await fetch(
+        `/api/v1/search?q=${encodeURIComponent(query)}&type=all&page=1`,
+      );
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Não foi possível buscar títulos.");
+      }
+
+      const results = (result.data?.results || []).filter(
+        (media) => media.media_type === "movie" || media.media_type === "tv",
+      );
+      this.renderAddResults(results);
+    } catch (error) {
+      console.error("Erro ao buscar títulos para a playlist:", error);
+      this.elements.addResults.innerHTML = `<p class="playlist-add-message error">${error.message}</p>`;
+    }
+  }
+
+  renderAddResults(results) {
+    if (results.length === 0) {
+      this.elements.addResults.innerHTML =
+        '<p class="playlist-add-message">Nenhum filme ou série encontrado.</p>';
+      return;
+    }
+
+    this.elements.addResults.innerHTML = "";
+    results.forEach((media) => {
+      const mediaType = media.media_type;
+      const title = media.title || media.name || "Sem título";
+      const isInList = this.listData.items.some(
+        (item) =>
+          String(item.media_id) === String(media.id) &&
+          item.media_type === mediaType,
+      );
+      const resultItem = document.createElement("div");
+      resultItem.className = "playlist-add-result";
+
+      const poster = media.poster_path
+        ? `https://image.tmdb.org/t/p/w92${media.poster_path}`
+        : "";
+      resultItem.innerHTML = `
+          ${poster ? `<img src="${poster}" alt="" loading="lazy">` : '<div class="playlist-add-poster-fallback"><i class="fa-solid fa-film"></i></div>'}
+          <div class="playlist-add-result-info">
+            <strong></strong>
+            <span>${mediaType === "movie" ? "Filme" : "Série"}</span>
+          </div>
+          <button class="btn-secondary playlist-add-result-button" type="button" ${isInList ? "disabled" : ""}>
+            ${isInList ? "Adicionado" : "Adicionar"}
+          </button>
+        `;
+      resultItem.querySelector("strong").textContent = title;
+      resultItem
+        .querySelector("button")
+        .addEventListener("click", () =>
+          this.addTitleToPlaylist(media, resultItem),
+        );
+      this.elements.addResults.appendChild(resultItem);
+    });
+  }
+
+  async addTitleToPlaylist(media, resultItem) {
+    const button = resultItem.querySelector("button");
+    button.disabled = true;
+    button.textContent = "Adicionando...";
+
+    try {
+      const response = await listService.toggleListItem(
+        this.listId,
+        media.id,
+        media.media_type,
+      );
+      if (response.action !== "added") {
+        throw new Error("O título não foi adicionado à playlist.");
+      }
+
+      this.listData.items.push({
+        media_id: String(media.id),
+        media_type: media.media_type,
+      });
+      button.textContent = "Adicionado";
+      await this.renderGrid();
+      this.updatePlaylistCount();
+      showToastGlobal("Título adicionado à playlist.", "success");
+    } catch (error) {
+      button.disabled = false;
+      button.textContent = "Adicionar";
+      showToastGlobal(error.message, "error");
+    }
+  }
+
+  updatePlaylistCount() {
+    const count = this.listData.items?.length || 0;
+    const badge = document.querySelector(".playlist-count-badge");
+    if (badge) badge.textContent = `${count} títulos`;
+  }
+
   async renderGrid() {
     if (!this.listData.items || this.listData.items.length === 0) {
       this.elements.grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Esta lista está vazia.</p>`;
@@ -359,8 +495,8 @@ class PlaylistPage {
       });
 
       filtered.forEach((item) => {
-        const card = this.createCard(item);
-        this.elements.grid.appendChild(card);
+        const cardHtml = createMediaCard(item.media, item.displayType);
+        this.elements.grid.insertAdjacentHTML("beforeend", cardHtml);
       });
 
       this.elements.countLabel.textContent = `${filtered.length} resultados`;

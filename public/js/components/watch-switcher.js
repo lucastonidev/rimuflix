@@ -9,7 +9,7 @@ export class WatchSwitcher {
     this.torrentPlayer = new TorrentPlayer();
   }
 
-  updateFrameSrc(url) {
+  updateFrameSrc(url, sandbox = "") {
     let iframe = document.getElementById("watchFrame");
     if (!iframe) {
       const container =
@@ -21,7 +21,11 @@ export class WatchSwitcher {
         iframe = document.getElementById("watchFrame");
       }
     }
-    if (iframe) iframe.src = url;
+    if (iframe) {
+      if (sandbox) iframe.setAttribute("sandbox", sandbox);
+      else iframe.removeAttribute("sandbox");
+      iframe.src = url;
+    }
   }
 
   render() {
@@ -76,6 +80,7 @@ export class WatchSwitcher {
 
       btn.innerHTML = `<img class="player-option__icon" src="${player.icon}" alt="${playerTitle}" onerror="this.outerHTML='<i class=\\'fa-solid fa-play\\'></i>'" /> ${playerTitle}`;
       btn.dataset.url = playerUrl;
+      if (player.sandbox) btn.dataset.sandbox = player.sandbox;
       btn.dataset.type = "iframe";
       listContainer.appendChild(btn);
     });
@@ -115,7 +120,7 @@ export class WatchSwitcher {
         }
 
         const url = button.dataset.url;
-        if (url) this.updateFrameSrc(url);
+        if (url) this.updateFrameSrc(url, button.dataset.sandbox || "");
       });
     });
   }

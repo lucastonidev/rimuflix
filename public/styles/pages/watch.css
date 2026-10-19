@@ -3,6 +3,7 @@
 @import '../components/watch-switcher.css';
 @import '../components/watch-episodes.css';
 @import '../components/time-tracker.css';
+@import '../components/button.css';
 
 .watch-page {
   margin-top: 120px;

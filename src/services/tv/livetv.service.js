@@ -1,4 +1,5 @@
 import NodeCache from "node-cache";
+import { getM3uChannels } from "./m3u.service.js";
 
 const channelsCache = new NodeCache({ stdTTL: 3600 });
 
@@ -79,10 +80,11 @@ export const getLiveTvChannelsService = async () => {
   if (channelsCache.has("tv_channels")) return channelsCache.get("tv_channels");
 
   // O Promise.all roda as 3 APIs ao mesmo tempo para ser muito mais rápido!
-  const [superflixData, reiData, extraData] = await Promise.all([
+  const [superflixData, reiData, extraData, m3uChannels] = await Promise.all([
     fetchSuperflix(),
     fetchReiDosEmbeds(),
     fetchProvedorExtra(),
+    getM3uChannels(),
   ]);
 
   const channelsMap = new Map();
@@ -201,6 +203,11 @@ export const getLiveTvChannelsService = async () => {
         url: playerUrl,
       });
     }
+  });
+
+  m3uChannels.forEach((channel) => {
+    const normName = normalizeName(channel.name);
+    if (normName) channelsMap.set(`m3u-${channel.id}`, channel);
   });
 
   const unifiedChannels = Array.from(channelsMap.values());

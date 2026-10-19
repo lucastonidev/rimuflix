@@ -26,7 +26,10 @@ export const searchMedia = async (req, res) => {
     console.error("Erro na busca:", error);
     return res.status(error.status || 500).json({
       success: false,
-      error: "Erro ao realizar busca",
+      error:
+        error.status === 503
+          ? "O serviço de catálogo está temporariamente indisponível."
+          : "Erro ao realizar busca",
       message: error.message,
     });
   }

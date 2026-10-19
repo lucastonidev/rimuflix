@@ -3,6 +3,7 @@
 @import '../components/card.css';
 @import '../components/toast.css';
 @import '../components/toggle.css';
+@import '../components/button.css';
 
 /* =========================================
    ESTRUTURA GERAL DA PLAYLIST
@@ -179,6 +180,19 @@
   margin-bottom: 24px;
 }
 
+.playlist-controls-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.playlist-add-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
 .search-internal {
   position: relative;
   width: 300px;
@@ -214,6 +228,132 @@
   color: var(--text-secondary);
   font-weight: 500;
 }
+
+.playlist-add-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.playlist-add-overlay[hidden] {
+  display: none;
+}
+
+.playlist-add-modal {
+  width: min(620px, 100%);
+  max-height: min(700px, 90vh);
+  overflow: hidden;
+  background: var(--secondary-bg, #181818);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.playlist-add-header,
+.playlist-add-search,
+.playlist-add-result {
+  display: flex;
+  align-items: center;
+}
+
+.playlist-add-header {
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.playlist-add-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+.playlist-add-search {
+  gap: 10px;
+  padding: 16px 20px;
+}
+
+.playlist-add-search i {
+  color: #888;
+}
+
+.playlist-add-search input {
+  min-width: 0;
+  flex: 1;
+  padding: 10px 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+
+.playlist-add-results {
+  max-height: 510px;
+  overflow-y: auto;
+  padding: 0 20px 20px;
+}
+
+.playlist-add-message {
+  margin: 20px 0;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.playlist-add-message.error {
+  color: var(--danger, #ef4444);
+}
+
+.playlist-add-result {
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.playlist-add-result img,
+.playlist-add-poster-fallback {
+  width: 42px;
+  height: 60px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.playlist-add-poster-fallback {
+  display: grid;
+  place-items: center;
+  color: #888;
+  background: #292929;
+}
+
+.playlist-add-result-info {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.playlist-add-result-info strong {
+  overflow: hidden;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-add-result-info span {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.playlist-add-result-button {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+}
+
 
 /* =========================================
    GRID (LISTA DOS ITENS DA PLAYLIST)
@@ -269,6 +409,10 @@
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
+  }
+
+  .playlist-controls-actions {
+    justify-content: space-between;
   }
   
   .search-internal {

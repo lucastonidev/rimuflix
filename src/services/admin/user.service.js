@@ -4,7 +4,7 @@ import { supabaseAdmin } from "../../config/supabase.js"; // 👈 Alterado para 
 export const getAllUsers = async () => {
   const { data, error } = await supabaseAdmin
     .from("users")
-    .select("*")
+    .select("id, name, email, role, is_active, avatar_url, created_at")
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(`Erro ao buscar usuários: ${error.message}`);
@@ -129,32 +129,48 @@ export const updateUser = async (userId, { name, email, role, password }) => {
       }
     }
 
-    // B) Atualiza a tabela pública 'users'
+    // B) Atualiza somente os dados de perfil na tabela pública 'users'.
+    // A senha permanece exclusivamente no Supabase Auth.
     const publicUpdates = {};
     if (name) publicUpdates.name = name.trim();
     if (email) publicUpdates.email = email.trim().toLowerCase();
     if (role) publicUpdates.role = role;
-    if (password && password.trim().length > 0) {
-      publicUpdates.password = password.trim(); // Atualiza a senha visual do painel
-    }
 
-    const { data, error: dbError } = await supabaseAdmin
-      .from("users")
-      .update(publicUpdates)
-      .eq("id", userId)
-      .select();
+    let data;
+    if (Object.keys(publicUpdates).length > 0) {
+      const result = await supabaseAdmin
+        .from("users")
+        .update(publicUpdates)
+        .eq("id", userId)
+        .select("id, name, email, role, is_active, avatar_url, created_at");
 
-    if (dbError) {
-      if (dbError.code === "23505") {
+      if (result.error) {
+        if (result.error.code === "23505") {
+          return {
+            success: false,
+            error: "Este e-mail já existe na tabela de perfis.",
+          };
+        }
         return {
           success: false,
-          error: "Este e-mail já existe na tabela de perfis.",
+          error: `Erro no banco de dados: ${result.error.message}`,
         };
       }
-      return {
-        success: false,
-        error: `Erro no banco de dados: ${dbError.message}`,
-      };
+      data = result.data;
+    } else {
+      const result = await supabaseAdmin
+        .from("users")
+        .select("id, name, email, role, is_active, avatar_url, created_at")
+        .eq("id", userId)
+        .single();
+
+      if (result.error) {
+        return {
+          success: false,
+          error: `Erro ao carregar o perfil atualizado: ${result.error.message}`,
+        };
+      }
+      data = [result.data];
     }
 
     return { success: true, data: data[0] };

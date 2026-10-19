@@ -16,7 +16,10 @@ export const getDetails = async (req, res) => {
 
     return res.status(error.status || 500).json({
       success: false,
-      error: "Erro ao buscar dados da mídia",
+      error:
+        error.status === 503
+          ? "O serviço de catálogo está temporariamente indisponível."
+          : "Erro ao buscar dados da mídia",
       message: error.message,
     });
   }

@@ -1,1 +1,47 @@
-INSERT INTO public.app_settings (id, tmdb_api_key, ads_blocker, default_theme, active_providers, updated_at) VALUES ('global', 'e3c955d8855dd5db99786b04a9ceb619', true, 'dark', '[{"id": "prov_1785705349146", "url": "https://superflixapi.pro/", "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMTgwIDE4MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgcng9IjQwIiBmaWxsPSIjZmYwMDAwIi8+PHRleHQgeD0iNTAlIiB5PSI1NCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSI2OCIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZmZmZiI+U0E8L3RleHQ+PC9zdmc+", "name": "Superflix", "type": "Embed"}, {"id": "prov_1785873164295", "url": "https://redeflixapi.store/", "icon": "https://redeflixapi.store/favicon.png", "name": "Redeflix", "type": "Embed"}, {"id": "prov_1785873274820", "url": "https://mgeb.top/embed/", "icon": "https://mgeb.top/assets/favico.png", "name": "MegaEmbed", "type": "Embed"}, {"id": "prov_1785873308803", "url": "https://myembed.biz/", "icon": "https://embedmovies.org/assets/favicon.jpg", "name": "Embed Movies", "type": "Embed"}, {"id": "prov_1785873384690", "url": "https://warezcdn.lat/", "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMTgwIDE4MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgcng9IjQwIiBmaWxsPSIjNDI1ZmYwIi8+PHRleHQgeD0iNTAlIiB5PSI1NCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSI2OCIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZmZmZiI+V0M8L3RleHQ+PC9zdmc+\\",", "name": "Warez CDN", "type": "Embed"}, {"id": "prov_1785873434665", "url": "https://api.pomfy.stream/", "icon": "https://pomfy.stream/favicon.ico?favicon.8d4a5aa5.ico", "name": "Pomfy Stream", "type": "Embed"}, {"id": "prov_1786150235078", "url": "https://embed-api.clickhost.xyz/embed/", "icon": "https://i.imgur.com/E71OQsa.png", "name": "StreamAPI", "type": "Embed"}]', '2026-08-02 22:08:00.234+00');
+BEGIN;
+
+CREATE TABLE public.m3u_playlists (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  url text NOT NULL UNIQUE,
+  channels jsonb NOT NULL DEFAULT '[]'::jsonb,
+  import_status text NOT NULL DEFAULT 'pending',
+  imported_count integer NOT NULL DEFAULT 0,
+  is_active boolean NOT NULL DEFAULT true,
+  failure_count integer NOT NULL DEFAULT 0,
+  last_checked_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.m3u_media (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  playlist_id uuid NOT NULL REFERENCES public.m3u_playlists (id) ON DELETE CASCADE,
+  external_key text NOT NULL,
+  title text NOT NULL,
+  media_type text NOT NULL CHECK (media_type IN ('movie', 'series', 'live')),
+  stream_url text NOT NULL,
+  poster_url text,
+  category text,
+  season_number integer,
+  episode_number integer,
+  is_active boolean NOT NULL DEFAULT true,
+  last_seen_at timestamptz NOT NULL DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (playlist_id, external_key)
+);
+
+CREATE INDEX m3u_media_type_idx ON public.m3u_media (media_type);
+CREATE INDEX m3u_media_category_idx ON public.m3u_media (category);
+CREATE INDEX m3u_media_playlist_idx ON public.m3u_media (playlist_id);
+CREATE INDEX m3u_media_title_idx ON public.m3u_media (lower(title));
+
+ALTER TABLE public.m3u_playlists ENABLE ROW LEVEL SECURITY;
+
+GRANT SELECT ON TABLE public.m3u_playlists TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.m3u_playlists TO service_role;
+GRANT SELECT ON TABLE public.m3u_media TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.m3u_media TO service_role;
+
+COMMIT;

@@ -45,6 +45,13 @@ class AdminProviders {
     if (this.form) {
       this.form.addEventListener("submit", (e) => this.handleAddProvider(e));
     }
+    const sandboxMode = document.getElementById("provider_sandbox_mode");
+    if (sandboxMode) {
+      sandboxMode.addEventListener("change", () => {
+        document.getElementById("provider_sandbox_custom_group").hidden =
+          sandboxMode.value !== "custom";
+      });
+    }
   }
 
   async fetchProviders() {
@@ -101,6 +108,7 @@ class AdminProviders {
           <p title="${prov.url}">${prov.url}</p>
           <div class="provider-footer">
              <span class="badge ${badgeColor}">${prov.type}</span>
+             <span class="badge info">${this.getSandboxLabel(prov)}</span>
           </div>
         </div>
       `;
@@ -110,6 +118,12 @@ class AdminProviders {
     document.querySelectorAll(".btn-delete").forEach((btn) => {
       btn.addEventListener("click", (e) => this.handleDeleteProvider(e));
     });
+  }
+
+  getSandboxLabel(provider) {
+    if (provider.sandboxMode === "ads") return "Bloqueia propaganda";
+    if (provider.sandboxMode === "custom") return "Sandbox personalizado";
+    return "Sem bloqueio";
   }
 
   async handleAddProvider(e) {
@@ -130,12 +144,30 @@ class AdminProviders {
       this.btnSubmit.disabled = true;
     }
 
+    const sandboxMode = document.getElementById("provider_sandbox_mode").value;
+    const sandboxTokens = document
+      .getElementById("provider_sandbox_tokens")
+      .value.split(",")
+      .map((token) => token.trim())
+      .filter(Boolean);
+
+    if (sandboxMode === "custom" && sandboxTokens.length === 0) {
+      this.showToast("Informe ao menos um atributo personalizado.", "warning");
+      if (this.btnSubmit) {
+        this.btnSubmit.innerHTML = originalText;
+        this.btnSubmit.disabled = false;
+      }
+      return;
+    }
+
     const newProvider = {
       id: "prov_" + Date.now(),
       name: nameInput,
       url: urlInput,
       icon: document.getElementById("provider_url_icon").value.trim(),
       type: document.getElementById("provider_type").value,
+      sandboxMode,
+      sandboxTokens,
     };
 
     // Adição Otimista (mostra na tela antes de salvar no servidor)

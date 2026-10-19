@@ -24,6 +24,8 @@ class WatchPage {
     try {
       const response = await this.api.GetById(this.type, this.id);
       this.data = response.data;
+      console.log(this.data);
+      
     } catch (error) {
       console.error("Erro ao buscar detalhes:", error);
     }
@@ -40,8 +42,15 @@ class WatchPage {
 
   async fetchOptionPlayerMovie() {
     try {
-      const response = await this.api.getAllPlayerMovie(this.id);
-      // Garante que, se a API não mandar o 'data', ele vira um array vazio
+
+
+      const response = await this.api.getAllPlayerMovie(
+        this.id,
+        this.data?.title || this.data?.name || "",
+        this.data?.poster_path
+          ? this.data.poster_path.split("/").pop().split(".")[0]
+          : "",
+      );
       this.players = response?.data || [];
     } catch (error) {
       this.players = [];
@@ -82,7 +91,6 @@ class WatchPage {
 
   async renderQueuePanel() {
     const urlParams = new URLSearchParams(window.location.search);
-    // Se a pessoa não veio com o link da fila, não fazemos nada
     if (!urlParams.get("queue")) return;
 
     const queueStr = localStorage.getItem("rimuflix:queue");

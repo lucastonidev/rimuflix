@@ -4,7 +4,7 @@ import { copyTextToClipboard, showToastGlobal } from "../utils/utils.js";
 class HeroGenerator {
   constructor() {
     this.GenreList = undefined;
-    this.isLoggedIn = false; // Será atualizado via API
+    this.isLoggedIn = false;
   }
 
   async getMovieGenresMap() {
